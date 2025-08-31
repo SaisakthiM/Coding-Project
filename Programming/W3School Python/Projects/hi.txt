@@ -1,0 +1,2 @@
+This is a text file 
+try to count how many vowels or consonants are there inside this file

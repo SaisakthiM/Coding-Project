@@ -1,0 +1,908 @@
+/* This is a CSS tutorial from W3School
+
+First We are going to learn about CSS Background
+Note: This is just a extension course. I Hope you know basics. If You Want to know HTML and CSS basics refer W3School HTML Directory
+
+We are going to learn about Properties below
+
+background-color
+background-image
+background-repeat
+background-attachment
+background-position
+background (shorthand property)
+*/
+
+#h1 {
+    background-color: red; /* This would change the background color to red.
+    Note: In default, a Tag takes all the spaces available, so this tag takes 1536 * 80 pixels. we can change it with width and height functions */
+    width: 200px;
+    height: 50px;
+}
+/* There is also property called Opacity. which defines the transparency of the element. 
+The range is from 0 (Opaque) to 1 (Complete Transparent)*/
+#h3 {
+    width: 150px;
+    height : 20px;
+    background-color: rgb(92, 172, 31);
+    opacity: 0.5;
+}
+/* You can also add transparency using alpha values in rgba. if you want to*/
+
+/* In CSS, You can also add background images for elements / Tags using background-image property
+for eg : */
+#h4 {
+    background-image: url("image.png");
+}
+
+/* CSS background-repeat
+
+By default, the background-image property repeats an image both horizontally and vertically.
+Some images should be repeated only horizontally or vertically, or they will look strange, like this:
+
+Eg : 
+body {
+    background-image: url("gradient_bg.png");
+}
+If the image above is repeated only horizontally (background-repeat: repeat-x;), the background will look better:
+
+Example
+body {
+  background-image: url("gradient_bg.png");
+  background-repeat: repeat-x;
+}
+  
+Note: To repeat an image vertically, set background-repeat: repeat-y;
+
+CSS background-position
+The background-position property is used to specify the position of the background image.
+
+Example
+Position the background image in the top-right corner: 
+
+body {
+  background-image: url("img_tree.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+*/
+
+/* CSS Background Attachment
+
+CSS background-attachment
+The background-attachment property specifies whether the background image should scroll or be fixed (will not scroll with the rest of the page):
+
+Example
+Specify that the background image should be fixed:
+
+body {
+  background-image: url("img_tree.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: fixed;
+}
+Specify that the background image should scroll with the rest of the page:
+
+body {
+  background-image: url("img_tree.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-attachment: scroll;
+}
+*/
+
+/* 
+CSS background - Shorthand property
+To shorten the code, it is also possible to specify all the background properties in one single property.
+This is called a shorthand property.
+Instead of writing:
+
+body {
+  background-color: #ffffff;
+  background-image: url("img_tree.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+You can use the shorthand property background:
+
+Example
+Use the shorthand property to set the background properties in one declaration:
+
+body {
+  background: #ffffff url("img_tree.png") no-repeat right top;
+}
+When using the shorthand property the order of the property values is:
+
+background-color
+background-image
+background-repeat
+background-attachment
+background-position
+It does not matter if one of the property values is missing, as long as the other ones are in this order. 
+
+Note:  we do not use the background-attachment property in the examples above, as it does not have a value. */
+
+/*CSS Borders
+The CSS border properties allow you to specify the style, width, and color of an element's border.
+CSS Border Style
+The border-style property specifies what kind of border to display.
+
+The following values are allowed:
+
+dotted - Defines a dotted border
+dashed - Defines a dashed border
+solid - Defines a solid border
+double - Defines a double border
+groove - Defines a 3D grooved border. The effect depends on the border-color value
+ridge - Defines a 3D ridged border. The effect depends on the border-color value
+inset - Defines a 3D inset border. The effect depends on the border-color value
+outset - Defines a 3D outset border. The effect depends on the border-color value
+none - Defines no border
+hidden - Defines a hidden border
+The border-style property can have from one to four values (for the top border, right border, bottom border, and the left border)
+
+*/
+
+p.dotted {border-style: dotted;}
+p.dashed {border-style: dashed;}
+p.solid {border-style: solid;}
+p.double {border-style: double;}
+p.groove {border-style: groove;}
+p.ridge {border-style: ridge;}
+p.inset {border-style: inset;}
+p.outset {border-style: outset;}
+p.none {border-style: none;}
+p.hidden {border-style: hidden;}
+p.mix {border-style: dotted dashed solid double;}
+
+/*CSS Border Width
+CSS Border Width
+The border-width property specifies the width of the four borders.
+
+The width can be set as a specific size (in px, pt, cm, em, etc) or by using one of the three pre-defined values: thin, medium, or thick:
+
+Example
+Demonstration of the different border widths:
+*/
+p.one {
+  border-style: solid;
+  border-width: 5px;
+}
+
+p.two {
+  border-style: solid;
+  border-width: medium;
+}
+
+p.three {
+  border-style: dotted;
+  border-width: 2px;
+}
+
+p.four {
+  border-style: dotted;
+  border-width: thick;
+}
+
+p.five {
+  border-style: double;
+  border-width: 15px;
+}
+
+p.six {
+  border-style: double;
+  border-width: thick;
+}
+
+/* There is also width property which defined the width we can increase both horizontally, vertically, left and right
+Note: You can change these properties to a limit. The text takes some default space. you have to edit those 
+*/
+p.one {
+  border-style: solid;
+  border-width: 5px 20px; /* 5px top and bottom, 20px on the sides */
+}
+
+p.two {
+  border-style: solid;
+  border-width: 20px 5px; /* 20px top and bottom, 5px on the sides */
+}
+
+p.three {
+  border-style: solid;
+  border-width: 25px 10px 4px 35px; /* 25px top, 10px right, 4px bottom and 35px left */
+}
+
+/* CSS Border Color
+The border-color property is used to set the color of the four borders.
+
+The color can be set by:
+
+name - specify a color name, like "red"
+HEX - specify a HEX value, like "#ff0000"
+RGB - specify a RGB value, like "rgb(255,0,0)"
+HSL - specify a HSL value, like "hsl(0, 100%, 50%)"
+transparent
+Note: If border-color is not set, it inherits the color of the element.
+
+Example
+Demonstration of the different border colors:
+
+p.one {
+  border-style: solid;
+  border-color: red;
+}
+
+p.two {
+  border-style: solid;
+  border-color: green;
+}
+
+p.three {
+  border-style: dotted;
+  border-color: blue;
+}
+Result:
+
+Red border
+Green border
+Blue border
+Specific Side Colors
+The border-color property can have from one to four values (for the top border, right border, bottom border, and the left border). 
+
+Example
+p.one {
+  border-style: solid;
+  border-color: red green blue yellow; /* red top, green right, blue bottom and yellow left }
+*/
+
+/*
+CSS Margins
+The CSS margin properties are used to create space around elements, outside of any defined borders.
+
+With CSS, you have full control over the margins. There are properties for setting the margin for each side of an element (top, right, bottom, and left).
+
+Margin - Individual Sides
+CSS has properties for specifying the margin for each side of an element:
+
+margin-top
+margin-right
+margin-bottom
+margin-left
+All the margin properties can have the following values:
+
+auto - the browser calculates the margin
+length - specifies a margin in px, pt, cm, etc.
+% - specifies a margin in % of the width of the containing element
+inherit - specifies that the margin should be inherited from the parent element
+Note: Negative values are allowed. 
+
+Margin - Shorthand Property
+To shorten the code, it is possible to specify all the margin properties in one property.
+
+The margin property is a shorthand property for the following individual margin properties:
+
+margin-top
+margin-right
+margin-bottom
+margin-left
+So, here is how it works:
+
+If the margin property has four values:
+
+margin: 25px 50px 75px 100px;
+top margin is 25px
+right margin is 50px
+bottom margin is 75px
+left margin is 100px
+Example
+Use the margin shorthand property with four values:
+
+p {
+  margin: 25px 50px 75px 100px;
+}
+
+*/
+p.ten {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+}
+
+/*The inherit Value
+This example lets the left margin of the <p class="ex1"> element be inherited from the parent element (<div>):
+
+Example
+Use of the inherit value:
+
+div {
+  border: 1px solid red;
+  margin-left: 100px;
+}
+
+p.ex1 {
+  margin-left: inherit;
+}
+  
+*/
+
+
+.h10 {
+    margin : 0px 0px 50px 0px;
+
+}
+.h11 {
+    margin : 0px 0px 20px 0px;
+}
+
+/* 
+CSS Padding
+The CSS padding properties are used to generate space around an element's content, inside of any defined borders.
+
+With CSS, you have full control over the padding. There are properties for setting the padding for each side of an element (top, right, bottom, and left).
+
+Padding - Individual Sides
+CSS has properties for specifying the padding for each side of an element:
+
+padding-top
+padding-right
+padding-bottom
+padding-left
+All the padding properties can have the following values:
+
+length - specifies a padding in px, pt, cm, etc.
+% - specifies a padding in % of the width of the containing element
+inherit - specifies that the padding should be inherited from the parent element
+Note: Negative values are not allowed.
+
+Example
+Set different padding for all four sides of a <div> element:  
+
+div {
+  padding-top: 50px;
+  padding-right: 30px;
+  padding-bottom: 50px;
+  padding-left: 80px;
+}
+
+Padding - Shorthand Property
+To shorten the code, it is possible to specify all the padding properties in one property.
+
+The padding property is a shorthand property for the following individual padding properties:
+
+padding-top
+padding-right
+padding-bottom
+padding-left
+So, here is how it works:
+
+If the padding property has four values:
+
+padding: 25px 50px 75px 100px;
+top padding is 25px
+right padding is 50px
+bottom padding is 75px
+left padding is 100px*/
+
+#sai {
+    padding : 10px 10px 10px 10px;  
+}
+
+/* Padding and Element Width
+The CSS width property specifies the width of the element's content area. The content area is the portion inside the padding, border, and margin of an element (the box model).
+
+So, if an element has a specified width, the padding added to that element will be added to the total width of the element. This is often an undesirable result.
+
+Example
+Here, the <div> element is given a width of 300px. However, the actual width of the <div> element will be 350px (300px + 25px of left padding + 25px of right padding):
+
+div {
+  width: 300px;
+  padding: 25px;
+}
+To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property. This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.
+
+Example
+Use the box-sizing property to keep the width at 300px, no matter the amount of padding:
+
+div {
+  width: 300px;
+  padding: 25px;
+  box-sizing: border-box;
+}*/
+
+
+
+/*CSS Setting height and width
+The height and width properties are used to set the height and width of an element.
+
+The height and width properties do not include padding, borders, or margins. It sets the height/width of the area inside the padding, border, and margin of the element.
+
+CSS height and width Values
+The height and width properties may have the following values:
+
+auto - This is default. The browser calculates the height and width
+length - Defines the height/width in px, cm, etc.
+% - Defines the height/width in percent of the containing block
+initial - Sets the height/width to its default value
+inherit - The height/width will be inherited from its parent value
+
+Note: Remember that the height and width properties do not include padding, borders, or margins! They set the height/width of the area inside the padding, border, and margin of the element!
+for eg :  */
+
+#width {
+    width: 300px;
+    height: 120px;
+    background-color: bisque;
+
+}
+
+/* Setting max-width
+The max-width property is used to set the maximum width of an element.
+
+The max-width can be specified in length values, like px, cm, etc., or in percent (%) of the containing block, or set to none (this is default. Means that there is no maximum width).
+
+The problem with the <div> above occurs when the browser window is smaller than the width of the element (500px). The browser then adds a horizontal scrollbar to the page.
+
+In this situation, using max-width will improve the browser's handling of small windows.
+
+Tip: Drag the browser window to smaller than 500px wide, to see the difference between the two divs!
+
+This element has a height of 100 pixels and a max-width of 500 pixels.
+Note: If you for some reason use both the width property and the max-width property on the same element, and the value of the width property is larger than the max-width property; the max-width property will be used (and the width property will be ignored).*/
+
+/* CSS Box Model
+All HTML elements can be considered as boxes.
+
+The CSS Box Model
+In CSS, the term "box model" is used when talking about design and layout.
+
+The CSS box model is essentially a box that wraps around every HTML element. It consists of: content, padding, borders and margins. The image below illustrates the box model:
+
+Explanation of the different parts:
+
+Content - The content of the box, where text and images appear
+Padding - Clears an area around the content. The padding is transparent
+Border - A border that goes around the padding and content
+Margin - Clears an area outside the border. The margin is transparent
+The box model allows us to add a border around elements, and to define space between elements. 
+
+Example
+Demonstration of the box model:
+
+div {
+  width: 300px;
+  border: 15px solid green;
+  padding: 50px;
+  margin: 20px;
+}
+ADVERTISEMENT
+
+Width and Height of an Element
+In order to set the width and height of an element correctly in all browsers, you need to know how the box model works.
+
+Important: When you set the width and height properties of an element with CSS, you just set the width and height of the content area. To calculate the total width and height of an element, you must also include the padding and borders.
+
+Example
+This <div> element will have a total width of 350px and a total height of 80px: 
+
+div {
+  width: 320px;
+  height: 50px;
+  padding: 10px;
+  border: 5px solid gray;
+  margin: 0;
+}
+Here is the calculation:
+
+  320px (width of content area)
++ 20px (left padding + right padding)
++ 10px (left border + right border)
+= 350px (total width)
+
+  50px (height of content area)
++ 20px (top padding + bottom padding)
++ 10px (top border + bottom border)
+= 80px (total height)
+The total width of an element should be calculated like this:
+
+Total element width = width + left padding + right padding + left border + right border
+The total height of an element should be calculated like this:
+Total element height = height + top padding + bottom padding + top border + bottom border
+
+Note: The margin property also affects the total space that the box will take up on the page, but the margin is not included in the actual size of the box. The box's total width and height stops at the border.*/
+
+/*CSS Box Model
+All HTML elements can be considered as boxes.
+
+The CSS Box Model
+In CSS, the term "box model" is used when talking about design and layout.
+
+The CSS box model is essentially a box that wraps around every HTML element. It consists of: content, padding, borders and margins. The image below illustrates the box model:
+
+Explanation of the different parts:
+
+Content - The content of the box, where text and images appear
+Padding - Clears an area around the content. The padding is transparent
+Border - A border that goes around the padding and content
+Margin - Clears an area outside the border. The margin is transparent
+The box model allows us to add a border around elements, and to define space between elements. 
+
+Example
+Demonstration of the box model:
+
+div {
+  width: 300px;
+  border: 15px solid green;
+  padding: 50px;
+  margin: 20px;
+}
+
+
+Width and Height of an Element
+In order to set the width and height of an element correctly in all browsers, you need to know how the box model works.
+
+Important: When you set the width and height properties of an element with CSS, you just set the width and height of the content area. To calculate the total width and height of an element, you must also include the padding and borders.
+
+Example
+This <div> element will have a total width of 350px and a total height of 80px: 
+
+div {
+  width: 320px;
+  height: 50px;
+  padding: 10px;
+  border: 5px solid gray;
+  margin: 0;
+}
+Here is the calculation:
+
+  320px (width of content area)
++ 20px (left padding + right padding)
++ 10px (left border + right border)
+= 350px (total width)
+
+  50px (height of content area)
++ 20px (top padding + bottom padding)
++ 10px (top border + bottom border)
+= 80px (total height)
+The total width of an element should be calculated like this:
+
+Total element width = width + left padding + right padding + left border + right border
+
+The total height of an element should be calculated like this:
+
+Total element height = height + top padding + bottom padding + top border + bottom border
+
+Note: The margin property also affects the total space that the box will take up on the page, but the margin is not included in the actual size of the box. The box's total width and height stops at the border.
+
+*/
+
+/*CSS Outline
+An outline is a line 
+
+An outline is a line that is drawn around elements, OUTSIDE the borders, to make the element "stand out".
+
+CSS has the following outline properties:
+
+outline-style
+outline-color
+outline-width
+outline-offset
+outline
+Note: Outline differs from borders! Unlike border, the outline is drawn outside the element's border, and may overlap other content. Also, the outline is NOT a part of the element's dimensions; the element's total width and height is not affected by the width of the outline.
+
+CSS Outline Style
+The outline-style property specifies the style of the outline, and can have one of the following values:
+
+dotted - Defines a dotted outline
+dashed - Defines a dashed outline
+solid - Defines a solid outline
+double - Defines a double outline
+groove - Defines a 3D grooved outline
+ridge - Defines a 3D ridged outline
+inset - Defines a 3D inset outline
+outset - Defines a 3D outset outline
+none - Defines no outline
+hidden - Defines a hidden outline
+The following example shows the different outline-style values: */
+
+#dotted_outline {
+    outline-color: green;
+    outline-style: dotted;
+}
+#solid_line {
+    outline-color: blueviolet;
+    outline-style: solid;
+}
+
+/* CSS Outline Width
+The outline-width property specifies the width of the outline, and can have one of the following values:
+
+thin (typically 1px)
+medium (typically 3px)
+thick (typically 5px)
+A specific size (in px, pt, cm, em, etc)
+
+*/
+
+#thickness {
+    border: 1px solid black;
+    outline-style: solid;
+    outline-color: red;
+    outline-width: medium;
+}
+
+/* CSS Outline - Shorthand property
+The outline property is a shorthand property for setting the following individual outline properties:
+
+outline-width
+outline-style (required)
+outline-color
+The outline property is specified as one, two, or three values from the list above.
+The order of the values does not matter.*/
+
+#outline_shorthand {
+    outline: 3px solid rgb(92, 172, 31);
+}
+
+/*CSS Outline Offset
+The outline-offset property adds space between an outline and the edge/border of an element.
+ The space between an element and its outline is transparent. */
+
+#outline_offset {
+    outline: 3px solid hsla(232, 86%, 45%, 0.2);
+    outline-offset: 10px;
+}
+
+/*
+CSS Links 
+
+Styling Links
+Links can be styled with any CSS property (e.g. color, font-family, background, etc.).
+
+In addition, links can be styled differently depending on what state they are in.
+
+The four links states are:
+a:link - a normal, unvisited link
+a:visited - a link the user has visited
+a:hover - a link when the user mouses over it
+a:active - a link the moment it is clicked
+
+When setting the style for several link states, there are some order rules:
+
+a:hover MUST come after a:link and a:visited
+a:active MUST come after a:hover
+
+For Eg : 
+*/
+
+#link:link {
+    color : red;
+}
+#link:visited {
+    color: green;
+}
+#link:hover {
+    color: aliceblue;
+}
+#link:active {
+    color: yellow;
+}
+
+/* Now we combine all we learned into this css link */
+
+#subscribe:link, #subscribe:visited  {
+    background-color: red;
+    color: white;
+    border: 3px solid black;
+    border-radius: 30px;
+    padding: 14px 25px;
+    text-decoration: none;
+}
+
+#subscribe:hover, #subscribe:active {
+    background-color: rgb(168, 57, 23);
+    cursor: pointer;
+}
+
+/* CSS Lists 
+
+In HTML, there are two main types of lists:
+
+unordered lists (<ul>) - the list items are marked with bullets
+ordered lists (<ol>) - the list items are marked with numbers or letters
+
+The CSS list properties allow you to:
+
+Set different list item markers for ordered lists
+Set different list item markers for unordered lists
+Set an image as the list item marker
+Add background colors to lists and list items
+
+*/
+
+/* First we are going to change markers. we are going to use list-style-type property */
+
+#ol1 {
+    list-style-type: upper-roman;
+}
+#ul1 {
+    list-style-type: lower-alpha;
+}
+
+/* Just know that we cn also use images as markers in OL and UL.
+for that list-style-image property is used. We are not going to show that because it is mostly useless
+and would be very ugly if you chose a wrong image */
+
+/* But the nest property is used frequently.
+this is list-style-property which determines the position of markers
+
+"list-style-position: outside;" means that the bullet points will be outside the list item. 
+The start of each line of a list item will be aligned vertically. This is default:
+
+Coffee - A brewed drink prepared from roasted coffee beans...
+Tea
+Coca-cola
+"list-style-position: inside;" means that the bullet points will be inside the list item.
+As it is part of the list item, it will be part of the text and push the text at the start:
+
+Coffee - A brewed drink prepared from roasted coffee beans...
+Tea
+Coca-cola*/
+
+#ol2 {
+    list-style-position: outside;
+}
+#ul2 {
+    list-style-position: inside;
+}
+
+/* 
+Remove Default Settings
+The list-style-type:none property can also be used to remove the markers/bullets. 
+Note: the list also has default margin and padding. 
+To remove this, add margin:0 and padding:0 to <ul> or <ol>:*/
+
+ul.demo {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* List - Shorthand property
+The list-style property is a shorthand property. It is used to set all the list properties in one declaration:
+
+Example
+ul {
+  list-style: square inside url("sqpurple.gif");
+}
+When using the shorthand property, the order of the property values are:
+
+list-style-type (if a list-style-image is specified, the value of this property will be displayed if the image for some reason cannot be displayed)
+list-style-position (specifies whether the list-item markers should appear inside or outside the content flow)
+list-style-image (specifies an image as the list item marker)
+If one of the property values above is missing, the default value for the missing property will be inserted, if any.
+
+*/
+
+ol.demo {
+    list-style: circle inside;
+}
+
+/* Styling List With Colors
+We can also style lists with colors, to make them look a little more interesting.
+
+Anything added to the <ol> or <ul> tag, affects the entire list, 
+while properties added to the <li> tag will affect the individual list items.
+
+*/
+
+ol.demo1 {
+    background-color: burlywood;
+    padding : 30px;
+}
+
+ul.demo1 {
+    background-color: rgb(138, 27, 172);
+}
+
+/* CSS Float : 
+
+This property allows elements to float around.
+Note: Use display:flow-root; in body tag if the content 
+
+*/
+
+#img1 {
+    float : left;
+    padding-left: 20px;
+    margin-right: 10px;
+
+}
+#img2 {
+    float: right;
+    margin-left: 10px;
+}
+
+/*<!--overflow property that sets the desired
+behavior when content does not fit in the parent element box (overflows)
+overflow: visible
+overflow: hidden
+overflow: clip
+overflow: scroll
+overflow: auto --!> */
+
+div.overflow_1 {
+    border: 2px solid rgb(220, 291,44);
+    height: 30px;
+    overflow: scroll;
+}
+
+/* Display Level : 
+There is 2 types of display levels
+
+1) Block Line Tags : They Start on a new line and take up full width available 
+                 (h1, p, div, form, ol, header, footer)
+2) Inline Tags : They do not start on a new line, width is limited to what is needed
+                 (span, a, img)
+
+*/
+
+div.display_div {
+    background-color: rgb(150, 12, 192);
+    width: 100px;
+    height: 100px;
+}
+span.display_span {
+    background-color: rgb(65, 93, 255);
+}
+
+/* There is 3 options in display property
+display: block; It changes the elements into a block level 
+display: inline; the element only takes the required space and cannot be assigned any width or height
+display:  inline-block; this is a hybrid between two. 
+it allows to change the width and height but will not take the entire line
+*/
+
+/* 
+Height and Width
+We can edit height and width of a element using height and width tag
+*/
+
+div.box {
+    height : 120px;
+    width : 700px;
+    padding-left: 20px;
+    float: left;
+}
+/* Notice if we use borders on the box element, it starts in a new line. 
+For solving that issue, we have box-sizing property. it creates the border so that it comes continuous
+*/
+
+div.box {
+    border: 2px solid;
+    height : 144px;
+    width : 750px;
+    box-sizing: border-box;
+    padding-left: 20px;
+    float: left;
+}
+
+/* Positions :
+    There are 5 types of posiitionig
+    
+relative positioned relative to where it normally fixed positioned relative to the viewport
+fixed  = position related to viewpoint
+absolute = positioned relative to nearest ancestor sticky= positioned based on scroll position
+static = default position for an element
+sticky = position above the scroll position
+*/
+#boxes {
+	
+}
+
+
+
+
+
+
