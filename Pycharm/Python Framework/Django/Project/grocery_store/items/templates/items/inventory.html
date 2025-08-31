@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <header class="bg-green-600 text-white p-4">
+        <div class="container mx-auto">
+            <h1 class="text-2xl font-bold">Grocery Management System</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Inventory</h2>
+            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onclick="showAddItemModal()">Add Item</button>
+        </div>
+        <table class="min-w-full bg-white border rounded shadow">
+            <thead class="bg-green-200">
+                <tr>
+                    <th class="border px-4 py-2">Item Name</th>
+                    <th class="border px-4 py-2">Category</th>
+                    <th class="border px-4 py-2">Quantity</th>
+                    <th class="border px-4 py-2">Price</th>
+                    <th class="border px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable">
+                <!-- Dynamic content here -->
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Modal for adding an item -->
+    <div id="addItemModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white rounded shadow p-6 w-1/3">
+            <h3 class="text-lg font-semibold mb-4">Add New Item</h3>
+            <form id="addItemForm">
+                <div class="mb-4">
+                    <label class="block mb-2">Item Name</label>
+                    <input type="text" id="itemName" class="w-full border rounded px-3 py-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Category</label>
+                    <select id="itemCategory" class="w-full border rounded px-3 py-2">
+                        <option value="Fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="Beverages">Beverages</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Quantity</label>
+                    <input type="number" id="itemQuantity" class="w-full border rounded px-3 py-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Price</label>
+                    <input type="number" id="itemPrice" class="w-full border rounded px-3 py-2">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 mr-2" onclick="closeAddItemModal()">Cancel</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const addItemModal = document.getElementById('addItemModal');
+
+        function showAddItemModal() {
+            addItemModal.classList.remove('hidden');
+            addItemModal.classList.add('flex');
+        }
+
+        function closeAddItemModal() {
+            addItemModal.classList.add('hidden');
+            addItemModal.classList.remove('flex');
+        }
+
+        document.getElementById('addItemForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('itemName').value;
+            const category = document.getElementById('itemCategory').value;
+            const quantity = document.getElementById('itemQuantity').value;
+            const price = document.getElementById('itemPrice').value;
+
+            const table = document.getElementById('inventoryTable');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border px-4 py-2">${name}</td>
+                <td class="border px-4 py-2">${category}</td>
+                <td class="border px-4 py-2">${quantity}</td>
+                <td class="border px-4 py-2">${price}</td>
+                <td class="border px-4 py-2">
+                    <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700" onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+            table.appendChild(row);
+            closeAddItemModal();
+        });
+
+        function deleteRow(button) {
+            button.parentElement.parentElement.remove();
+        }
+    </script>
+</body>
+</html>

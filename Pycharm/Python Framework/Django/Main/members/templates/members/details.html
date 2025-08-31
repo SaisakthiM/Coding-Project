@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<ul>
+    {% for mymember in mymembers%}
+        <h1>{{ mymember.first_name }} {{ mymember.last_name }}</h1>
+        <li>Phone: {{ mymember.phone }}</li>
+        <li>Member since: {{ mymember.joined_date }}</li>
+    {% endfor %}
+</ul>
+
+<p>Back to <a href="/members/home">Members</a></p>
+
+</body>
+</html>
