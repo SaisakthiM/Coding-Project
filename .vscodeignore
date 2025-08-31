@@ -1,0 +1,38 @@
+{
+    // --------------------
+    // Only show and index active folders
+    // --------------------
+    "files.exclude": {
+        "**/*": true,               // hide everything
+        "**/src": false,            // show your main working folder
+        "**/app": false              // add more folders you actively work on
+    },
+
+    "search.exclude": {
+        "**/*": true,               // ignore everything in search
+        "**/src": false,
+        "**/app": false
+    },
+
+    "files.watcherExclude": {
+        "**/*": true,               // do not watch anything
+        "**/src/**": false,
+        "**/app/**": false
+    },
+
+    // --------------------
+    // Performance optimizations
+    // --------------------
+    "editor.largeFileOptimizations": true,
+    "editor.minimap.enabled": false,
+    "workbench.editor.enablePreview": false,
+    "workbench.tree.indent": 16,
+    "files.useExperimentalFileWatcher": false,
+    "extensions.ignoreRecommendations": true,
+
+    // --------------------
+    // Optional: Limit history and untitled files
+    // --------------------
+    "files.hotExit": "onExitAndWindowClose",
+    "workbench.editor.history.limit": 5
+}
