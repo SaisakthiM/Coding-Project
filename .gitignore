@@ -101,3 +101,22 @@ target/
 *.env
 .Dockerfile
 docker-compose.override.yml
+
+# IDE / Editor
+.vscode/
+.PyCharm/
+.Web\ Storm/
+*.sln
+*.slnx
+*.code-workspace
+
+# Python virtual env
+.venv-12/
+
+# Node / JS
+node_modules/
+package-lock.json
+
+# Temporary / configs
+*.json
+*.ps1
