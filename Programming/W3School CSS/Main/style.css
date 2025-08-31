@@ -886,6 +886,10 @@ div.box {
     box-sizing: border-box;
     padding-left: 20px;
     float: left;
+    
+}
+#big_box {
+  display: flex;
 }
 
 /* Positions :
@@ -897,10 +901,14 @@ absolute = positioned relative to nearest ancestor sticky= positioned based on s
 static = default position for an element
 sticky = position above the scroll position
 */
-#boxes {
-	
+
+#combinators {
+    border: 2px solid;
 }
 
+#combinators p {
+	border: 2px solid;
+}
 
 
 
