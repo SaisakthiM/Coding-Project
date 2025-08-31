@@ -1,0 +1,10 @@
+# .continue/continue_config.yaml
+
+ignore:
+  - "**/node_modules/**"
+  - "**/venv/**"
+  - "**/.git/**"
+  - "**/*.log"
+  - "**/*.tmp"
+  - "**/.vscode/**"
+  - "**/.continue/**"
