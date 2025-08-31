@@ -1,0 +1,12 @@
+{
+  "tag-pair": true,            // Enforce paired tags
+  "attr-lowercase": false,     // Don't require lowercase attributes (templates often use mixed-case)
+  "attr-value-double-quotes": false, // Templates may use single quotes
+  "doctype-first": false,      // Ignore DOCTYPE errors
+  "id-unique": true,           // Keep unique IDs
+  "src-not-empty": false,      // Ignore empty src attributes (common in templates)
+  "title-require": false,      // Don't require <title>
+  "space-tab-mixed-disabled": "ignore",
+  "inline-style-disabled": false,
+  "attr-no-duplication": true
+}
