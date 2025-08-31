@@ -66,5 +66,13 @@ We can also set colors for the shadow*/
     background-color: rgb(255, 255, 255);
     box-shadow: 5px 5px 10px ;
 }
-/*Margins : Spaces around the element 
+/*
+
+combinators : explain the relationship between listed sectors
+blank  = desendant
+> = child
+~ = general sibling 
++ = adjacent sibling
+
+eg : div > p 
 */
