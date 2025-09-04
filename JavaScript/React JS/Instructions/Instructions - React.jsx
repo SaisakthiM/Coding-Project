@@ -102,5 +102,143 @@ function Card() {
 Do you know why we used className instead of class 
 it is because class is a reserved keyword and you cannot use it in a jsx file
 
+now we can start with applying styles
+
+HOW TO STYLE REACT COMPONENTS WITH CSS
+(not including external frameworks or preprocessors)
+1. EXTERNAL
+2. MODULES
+3. INLINE
+
+External : the normal way of css we use here
+Modules : we can also pack the css as modules and import it
+
+In button.moodule.css :
+.Button {
+    background-color: rgb(0, 26, 255);
+	border: none;
+	border-radius: 15px;
+	width: 80px;
+	height: 40px;
+	color :hsl(162, 65%, 55%);
+}
+In Button.jsx : 
+import styles from './Button.module.css'
+
+function Button() {
+    return (<button className={styles.Button}>Click me</button>);
+}
+export default Button
+
+Inline : we can also use css in the comonent itself but it is not recommended mostly
+function Button() {
+    const styles = {
+        backgroundColor: "rgb(0, 26, 255)",
+	border: "none",
+	borderRadius: "15px",
+	width: "80px",
+	height: "40px",
+	color : "hsl(162, 65%, 55%)",
+    }
+    return (<button style={styles}>Click me</button>);
+}
+export default Button
+
+this is inline
+
+
+props : read-only properties that are shared between components. 
+        A parent component can send data to a child component. <Component key=value />
+
+this can be used to get input form
+the props is similar to a object in JS. it stores the parameter as key and value as value
+
+function Student(props) {
+    return (<div>
+        <p> Name: {props.name}</p>
+        <p>Age : {props.age}</p>
+    </div>);
+}   
+export default Student;
+
+import Student from "./Student"
+function App() {
+    return (<Student name="Saisakthi" age='17'></Student>);
+}
+
+export default App
+
+as you can see, thr App gave a input name = Saisakthi
+here name is stored as key and saisakthi as value, 
+the Student Component can access the input value by mentioning the key
+Note: The values are just similar to Object, it is not a Object itself, it is actually props which stores these
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 */
