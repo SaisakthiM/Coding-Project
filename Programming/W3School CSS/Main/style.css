@@ -911,6 +911,91 @@ sticky = position above the scroll position
 }
 
 
+/* Pseudo Classes and Elements : 
 
+Pseudo classes and elements, take it like a built-in function. it has set of features which make it easier to assign 
+take a button, if we hover over a button, nothing happens, but we can atually assign something using 
+:hover class which helps here, and the elements (like button) we do it is called pseudo-elements
+They modify a special state of an element
+*/
 
+.pseudo-button {
+	background-color: aqua;
+	width : 80px;
+	border-radius: 20px;
+}	
+.pseudo-button:hover {
+	background-color: rgb(25, 204, 204);
+	transition: background-color 0.3s ease transform 0.3s ease;
+}
+#google-a:link {
+	color: red;
+	text-underline-offset: -100px;
+}
+#google-a::after {
+	color:blue;
+}
+#google-a::before {
+	color: red;
+}
+#google-a:hover {
+	color: lightblue;
+}
+#google-a:active {
+	color: blueviolet;
+}
 
+/* 
+
+| Symbol | Meaning                                          |
+| ------ | ------------------------------------------------ |
+| `*`    | Repeat the element N times                       |
+| `$`    | Placeholder for numbering in class names or text |
+| `{}`   | Wrap text inside the element                     |
+| `>`    | Child combinator (nest elements)                 |
+| `+`    | Sibling combinator (next element)                |
+| `^`    | Climb up one level in nesting                    |
+| `()`   | Group elements for repeating/nesting             |
+| `@`    | Start number for `$` placeholder                 |
+
+This could be very useful for html. these are knows as emma shortcuts
+
+| Abbreviation                                                     | Description                                                      | Expanded HTML Example                                                                              |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `div.item$*5`                                                    | Create 5 divs with numeric classes                               | `<div class="item1"></div> <div class="item2"></div> … <div class="item5"></div>`                  |
+| `div.item$*5{Item $}`                                            | Add text with numbering                                          | `<div class="item1">Item 1</div> … <div class="item5">Item 5</div>`                                |
+| `div.item$*5@10{Item $}`                                         | Start numbering from 10                                          | `<div class="item10">Item 10</div> … <div class="item14">Item 14</div>`                            |
+| `ul>li.item$*3{List $}`                                          | Nested elements (ul with repeated li)                            | `<ul><li class="item1">List 1</li><li class="item2">List 2</li><li class="item3">List 3</li></ul>` |
+| `(div>span.item$)*3{Text $}`                                     | Grouping with repeated nested elements                           | `<div><span class="item1">Text 1</span></div> … <div><span class="item3">Text 3</span></div>`      |
+| `div.item$*3>p.text$*2{Paragraph $}`                             | Complex nesting: multiple divs each with multiple paragraphs     | `<div class="item1"><p class="text1">Paragraph 1</p><p class="text2">Paragraph 2</p></div> …`      |
+| `div.item$*3>p{Paragraph $}+span{Note $}`                        | Sibling elements: paragraph + span inside each div               | `<div class="item1"><p>Paragraph 1</p><span>Note 1</span></div> …`                                 |
+| `section.section$*2>article.article$*2>h2{Title $}+p{Content $}` | Nested sections with multiple articles, headings, and paragraphs | `<section class="section1"><article class="article1"><h2>Title 1</h2><p>Content 1</p></article> …` |
+| `div.item$*5>{This is list$}`                                    | Shortcut variation using `>` and `{}`                            | Same as `div.item$*5{This is list$}`                                                               |
+
+🔹 Tips
+
+$: replaces with the number of the repetition.
+@number: sets the starting number for $.
+{}: wraps the inner text.
+>: child element nesting.
++: sibling element.
+(): group elements to repeat as a unit.
+*/
+
+.pseudo-class ul li:hover {
+	background-color: yellow;
+}
+
+.pseudo-class ul li:active {
+	background-color: pink;
+}
+.pseudo-class ul li {
+	background-color: grey;
+}
+
+.greeting .main {
+	display: none;
+}
+.greeting p:nth-of-type(2):hover {
+	display: block;
+}
