@@ -1,0 +1,44 @@
+1) yes java use explicit types
+it is a statically typed language
+
+2) if (condition) {
+    statement
+}
+else if {
+    statment
+}
+else {
+    statement
+}
+
+3) a block started with { and ended with }
+
+4) for declaring a method 
+static - if your method needed not be modified by instance or else leave it none
+type - we have to mention a return type, use void if none is used
+name - any name but not the keyword
+(input with explicit type)
+{
+    statments 
+    return (must if you mentioned any return type, if void, no return)
+}
+
+sample method to add 2 numbers
+
+int add(int a, int b) {
+    return a+b;
+}
+ok i really don't know what is a object method but i guess are you talking about 
+
+int add1 = new add(5,4);
+is this the object method
+
+5) it is possible if we used extra parameters for the same function
+by adding parameter, the signature of the fucntion changes
+
+6) use Math.Random() function
+
+7) use scanner 
+like Scanner scanner = new Scanner(System.in)
+
+i mostly used this so i didn't know the second way
