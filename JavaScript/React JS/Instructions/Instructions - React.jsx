@@ -174,6 +174,22 @@ the Student Component can access the input value by mentioning the key
 Note: The values are just similar to Object, it is not a Object itself, it is actually props which stores these
 
 
+propTypes = a mechanism that ensures that the passed value is of the correct datatype.
+age: PropTypes.number
+that's how the type is stored, remember, 
+it will only gives a warning on console.log it does not block the flow of program
+
+Student.propTypes = {
+    name: PropTypes.string,
+    age: PropTypes.number,
+    isStudent:  PropTypes.bool,
+
+}
+
+
+defaultProps = default values for props in case passed from the parent component name: "Guest" they are not
+
+
 
 
 
