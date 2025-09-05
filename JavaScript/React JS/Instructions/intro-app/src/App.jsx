@@ -11,6 +11,11 @@ function App() {
         <Footer></Footer>
         <Card></Card>
         <Button></Button>
+        <Student name="Saisakthi" age={17} isStudent={true} />
+        <Student name="Patrick" age={14} isStudent={true} />
+        <Student name="Kate" age={26} isStudent={false} />
+        <Student name="Mao" age={89} isStudent={false} />
+        <Student /> {/* Uses default props */}
     </div>);
 }
 
