@@ -116,3 +116,6 @@ Configurations and Scripts/Android CMD Tools/platforms/android-34/data/res/
 
 # Django static/vendor JS files
 Pycharm/Python Framework/Django/Main/main_static/admin/js/vendor/
+
+# Script files
+filename.ps1
