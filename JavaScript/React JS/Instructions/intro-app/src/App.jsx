@@ -16,6 +16,8 @@ function App() {
         <Student name="Kate" age={26} isStudent={false} />
         <Student name="Mao" age={89} isStudent={false} />
         <Student /> {/* Uses default props */}
+        <UserGreeeting isLoggedIn={true} username="Sai"></UserGreeeting>
+		<UserGreeeting></UserGreeeting>
     </div>);
 }
 

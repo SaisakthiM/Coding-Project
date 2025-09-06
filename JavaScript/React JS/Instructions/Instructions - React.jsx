@@ -226,7 +226,106 @@ export default Student;
 conditional rendering = allows you to control what gets rendered
                         in your application based on certain conditions
                         (show, hide, or change components)
-k
+
+We can also use destructuring isntead of props 
+and add propTypes which is way easier
+
+import PropTypes from 'prop-types';
+
+function UserGreeeting({ isLoggedIn = true, username = "Guest" }) {
+  const welcomePrompt = <h2 className="welcome-class">Welcome {username}</h2>;
+  const loginPrompt = <h2 className="login-prompt">Please log in</h2>;
+
+  return isLoggedIn ? welcomePrompt : loginPrompt;
+}
+
+// Correct propTypes
+UserGreeeting.propTypes = {
+    user: PropTypes.shape({
+    isLoggedIn: PropTypes.bool,
+    username: PropTypes.string,
+  }),
+};
+
+export default UserGreeeting
+
+rendering lists : 
+remember these glorius sentence in React
+
+"You can render one, Return one and reuse anywhere"
+it's like RRR but not environment of nature but for environment of the React
+"it is the only library to react to a error, not to over-react. suits it's name"
+
+these lines describes react on what it is
+
+ok come back to the first line, i said that you can render one right,
+but a list has many elements which opposes the idea of it, 
+so what it does is that it iterates the array and add all the elements and rendering it as a single string
+
+so you can do it with magic of mapping each elements with a li tag and using it, 
+now when it iterates, it gets rendered into list which is much better
+
+now get to rendering Objects, react will not iterate through objects like it did with arrays,
+instead it throws a error that plain objects cannot be rendered
+
+HTML Entities : 
+| Entity      | Symbol  | Description                    |
+| ----------- | ------- | ------------------------------ |
+| `&amp;`     | &       | Ampersand                      |
+| `&lt;`      | <       | Less than                      |
+| `&gt;`      | >       | Greater than                   |
+| `&quot;`    | "       | Double quote                   |
+| `&apos;`    | '       | Single quote / apostrophe      |
+| `&nbsp;`    | (space) | Non-breaking space             |
+| `&ensp;`    |         | En space (half-em width space) |
+| `&emsp;`    |         | Em space (full width space)    |
+| `&thinsp;`  |         | Thin space                     |
+| `&dollar;`  | \$      | Dollar sign                    |
+| `&euro;`    | €       | Euro sign                      |
+| `&pound;`   | £       | Pound sterling                 |
+| `&yen;`     | ¥       | Yen                            |
+| `&cent;`    | ¢       | Cent                           |
+| `&plus;`    | +       | Plus                           |
+| `&minus;`   | −       | Minus                          |
+| `&times;`   | ×       | Multiplication                 |
+| `&divide;`  | ÷       | Division                       |
+| `&equals;`  | =       | Equals                         |
+| `&ne;`      | ≠       | Not equal                      |
+| `&le;`      | ≤       | Less than or equal             |
+| `&ge;`      | ≥       | Greater than or equal          |
+| `&larr;`    | ←       | Left arrow                     |
+| `&uarr;`    | ↑       | Up arrow                       |
+| `&rarr;`    | →       | Right arrow                    |
+| `&darr;`    | ↓       | Down arrow                     |
+| `&harr;`    | ↔       | Left-right arrow               |
+| `&middot;`  | ·       | Middle dot                     |
+| `&bull;`    | •       | Bullet point                   |
+| `&hellip;`  | …       | Ellipsis                       |
+| `&dagger;`  | †       | Dagger                         |
+| `&Dagger;`  | ‡       | Double dagger                  |
+| `&permil;`  | ‰       | Per mille                      |
+| `&sect;`    | §       | Section sign                   |
+| `&para;`    | ¶       | Paragraph sign                 |
+| `&hearts;`  | ♥       | Heart                          |
+| `&spades;`  | ♠       | Spade                          |
+| `&clubs;`   | ♣       | Club                           |
+| `&diams;`   | ♦       | Diamond                        |
+| `&star;`    | ★       | Star                           |
+| `&check;`   | ✔       | Check mark                     |
+| `&times;`   | ✖       | Cross mark                     |
+| `&copy;`    | ©       | Copyright                      |
+| `&reg;`     | ®       | Registered trademark           |
+| `&trade;`   | ™       | Trademark                      |
+| `&#169;`    | ©       | Copyright (numeric)            |
+| `&#174;`    | ®       | Registered (numeric)           |
+| `&#9733;`   | ★       | Star (numeric)                 |
+| `&#9829;`   | ♥       | Heart (numeric)                |
+| `&#8252;`   | ‼       | Double exclamation (numeric)   |
+| `&#10003;`  | ✔       | Check mark (numeric)           |
+| `&#x2764;`  | ❤️      | Heart (Unicode hex)            |
+| `&#x2714;`  | ✔       | Check mark (Unicode hex)       |
+| `&#x1F600;` | 😀      | Grinning face emoji            |
+
 
 
 
