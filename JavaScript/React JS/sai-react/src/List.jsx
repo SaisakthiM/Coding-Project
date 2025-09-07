@@ -12,8 +12,8 @@ function List({items, category}) {
 	
 
     return (<>
-	<h3>{category}</h3>
-	<ul>{list_fruits}</ul>
+	<h3 className="list-category">{category}</h3>
+	<ul className="list-items">{list_fruits}</ul>
 	</>);
     
 }
