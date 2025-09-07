@@ -2,7 +2,7 @@ import Button from './Buttons/Button.jsx'
 function App() {
 	return (
 		<>
-		<Button></Button>
+		<Button name="sai"></Button>
 		</>
 	);
 }
