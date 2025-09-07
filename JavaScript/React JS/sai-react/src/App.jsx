@@ -11,8 +11,9 @@ function App() {
 
 	return (
 		<>
-		<List items={fruits} category="fruits"></List>
+		<List items={fruits} category='Fruits'></List>
 		<List items={vegetables} category="vegetables"></List>
+		<List></List>
 		</>
 	);
 }
