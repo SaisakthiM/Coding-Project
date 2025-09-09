@@ -29,6 +29,7 @@ function App() {
         <List items={fruits} category='Fruits'></List>
 		<List items={vegetables} category="vegetables"></List>
 		<List></List>
+    <Button name="sai"></Button>
     </div>);
 }
 

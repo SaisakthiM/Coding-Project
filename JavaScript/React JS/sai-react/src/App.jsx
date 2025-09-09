@@ -1,8 +1,10 @@
-import Button from './Buttons/Button.jsx'
+import Buttons from './Buttons.jsx'
+import ProfilePicture from './profilePicture.jsx';
 function App() {
 	return (
 		<>
-		<Button name="sai"></Button>
+		<Buttons></Buttons>
+		<ProfilePicture></ProfilePicture>
 		</>
 	);
 }

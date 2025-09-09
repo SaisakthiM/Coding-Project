@@ -26,18 +26,19 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    command: ["/wait-for-db.sh"]
+    command: ["/wait-for-db.sh"]  # or your usual backend start command
 
   frontend:
     build: ./frontend
     container_name: socialmediaapp-frontend
     ports:
-      - "5173:5173"
+      - "5173:5173"    # Vite dev server port
     volumes:
       - ./frontend:/app
       - /app/node_modules
     stdin_open: true
     tty: true
+    command: ["npm", "run", "dev", "--", "--host"]  # ensure Vite binds to 0.0.0.0
 
 volumes:
   db_data:
