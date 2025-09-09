@@ -25,11 +25,12 @@ function App() {
         <Student name="Mao" age={89} isStudent={false} />
         <Student /> {/* Uses default props */}
         <UserGreeeting isLoggedIn={true} username="Sai"></UserGreeeting>
-		<UserGreeeting></UserGreeeting>
+        <UserGreeeting></UserGreeeting>
         <List items={fruits} category='Fruits'></List>
-		<List items={vegetables} category="vegetables"></List>
-		<List></List>
-    <Button name="sai"></Button>
+        <List items={vegetables} category="vegetables"></List>
+        <List></List>
+        <Button name="sai"></Button>
+        <ProfilePicture></ProfilePicture>
     </div>);
 }
 
