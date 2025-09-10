@@ -1,6 +1,5 @@
 function App() {
-	return(<h1>Hello, Social Media App!</h1>
-);
+	return (<h1>HI</h1>)
 }
 
 export default App;
