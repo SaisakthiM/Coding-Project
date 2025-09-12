@@ -18,6 +18,6 @@ think of it as a import module we use in python and the only key difference is
 when we say a importing module, we are just importing another python file which can be execueted bu itself
 but a header file is just a interface and cannot be executed
 
-
+First before we jump into learning c, we have to learn a
 
 */
