@@ -1,12 +1,9 @@
-import Buttons from './Buttons.jsx'
-import ProfilePicture from '../../Instructions/intro-app/src/ProfilePicture.jsx';
+import MyComponent from './MyComponent.jsx';
+
 function App() {
-	return (
-		<>
-		<Buttons></Buttons>
+	return (<MyComponent>
 		
-		</>
-	);
+	</MyComponent>)
 }
 
 export default App;
