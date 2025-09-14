@@ -269,7 +269,21 @@ now get to rendering Objects, react will not iterate through objects like it did
 instead it throws a error that plain objects cannot be rendered
 
 
+State Management : 
+The Single most important thing in react is simply the state management
+ok what is even a state
+take a page with a heading title with name on it just name
+now there is a input box to enter your name and a button saying "change the title"
+you enter your name and clivk the button
+now magic the name changes 
+how is that
+it's state, the preveous state where "name" is displayed is the previous state
+the new name you entered is the final state
+in react, you can define a state using "const [name, setName] = useState("name")"
+the name stores the initial state "name" and 
 
+Note: very importnat, if you misconfigured the state of the app, most of the times
+the entire application will not work, but other apps do
 
 
 
