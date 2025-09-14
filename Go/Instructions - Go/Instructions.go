@@ -107,3 +107,40 @@ Runtime errors. Occur when a program is running. These are generally worse becau
 While we're in the browser it can be a bit hard to tell the difference because we run and compile the code in the same step.
 
 */
+
+/* Type Sizes
+
+Integers, uints, floats, and complex numbers all have type sizes.
+
+Signed Integers (No Decimal)
+int  int8  int16  int32  int64
+
+Unsigned Integers (Whole Numbers/No Decimal)
+"uint" stands for "unsigned integer".
+
+uint uint8 uint16 uint32 uint64 uintptr
+
+Signed Decimal Numbers
+float32 float64
+
+Complex Numbers (a Complex Number Has a Real and Imaginary Part)
+complex64 complex128
+
+What's the Deal With the Sizes?
+The size (8, 16, 32, 64, 128, etc) represents how many bits in memory will be used to store the variable. The "default" int and uint types refer to their respective 32 or 64-bit sizes depending on the environment of the user.
+
+The "standard" sizes that should be used unless you have a specific performance need (e.g. using less memory) are:
+
+int
+uint
+float64
+complex128
+Converting Between Types
+Some types can be easily converted like this:
+
+temperatureFloat := 88.26
+temperatureInt := int64(temperatureFloat)
+
+Casting a float to an integer in this way truncates the floating point portion.
+
+*/
