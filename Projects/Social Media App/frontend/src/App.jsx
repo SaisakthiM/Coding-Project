@@ -1,5 +1,8 @@
+import Test from "./Test";
 function App() {
-	return (<h1>HI</h1>)
+	return (<>
+		<Test></Test>
+	</>);
 }
 
 export default App;
