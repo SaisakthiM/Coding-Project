@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.posts',
     'corsheaders',
+    "graphene_django",
 ]
 
 MIDDLEWARE = [
@@ -140,4 +141,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.CustomUser"
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+GRAPHENE = {
+    "SCHEMA": "socialapp.schema.schema",  # point to schema.py
+}
+
 
