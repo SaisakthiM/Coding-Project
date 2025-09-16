@@ -1,41 +1,32 @@
-# Use official Python slim image
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
 
-# Prevent Python from writing .pyc files and enable unbuffered logs
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DEFAULT_TIMEOUT=100 \
-    PIP_RETRIES=10 \
-    PIP_NO_CACHE_DIR=1
-
-# Set work directory
 WORKDIR /app
 
-# Install system dependencies for psycopg2 and image processing
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    netcat-traditional \
+    netcat-openbsd gcc libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements first (without graphene-django)
 COPY requirements.txt .
+
+# Upgrade pip, setuptools, wheel and install other dependencies
 RUN pip install --upgrade pip setuptools wheel \
     && pip install -r requirements.txt \
     && pip check
 
-# Copy project files
+# Now install graphene-django separately
+RUN pip install graphene-django
+
+# Copy the project files
 COPY . .
 
-# Copy wait-for-db script
+# Copy wait-for-db.sh and make it executable
 COPY wait-for-db.sh /wait-for-db.sh
 RUN chmod +x /wait-for-db.sh
 
-# Switch to your Django app directory
+# Set working directory to Django app
 WORKDIR /app/social_media
 
-# Start with wait-for-db
+# Run wait-for-db.sh when container starts
 CMD ["/wait-for-db.sh"]
-
-# Expose Django port
-EXPOSE 8000
