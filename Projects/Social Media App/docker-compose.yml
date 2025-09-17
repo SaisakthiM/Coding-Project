@@ -9,26 +9,36 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+    restart: unless-stopped
 
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
+    restart: unless-stopped
 
   kafka:
     image: wurstmeister/kafka
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     ports:
       - "9092:9092"
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
 
   backend:
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     build: ./backend
     depends_on:
       - db
@@ -43,15 +53,17 @@ services:
     ports:
       - "8000:8000"
     command: ["./start-backend.sh"]
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - ./frontend/node_modules:/app/node_modules
     ports:
       - "5173:5173"
     command: ["npm", "run", "dev"]
+    restart: unless-stopped
 
 volumes:
   db_data:
