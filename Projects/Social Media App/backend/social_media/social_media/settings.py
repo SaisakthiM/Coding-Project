@@ -68,15 +68,14 @@ TEMPLATES = [
 WSGI_APPLICATION = "social_media.wsgi.application"
 ASGI_APPLICATION = "social_media.asgi.application"
 
-# Database (Postgres via Docker)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("POSTGRES_DB", default="socialdb"),
-        "USER": env("POSTGRES_USER", default="socialuser"),
-        "PASSWORD": env("POSTGRES_PASSWORD", default="socialpass"),
-        "HOST": env("POSTGRES_HOST", default="db"),
-        "PORT": env("POSTGRES_PORT", default="5432"),
+        "NAME": env("DB_NAME", default="socialmediaapp"),
+        "USER": env("DB_USER", default="postgres"),
+        "PASSWORD": env("DB_PASSWORD", default="postgres"),
+        "HOST": env("DB_HOST", default="db"),
+        "PORT": env("DB_PORT", default="5432"),
     }
 }
 
@@ -87,6 +86,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'  # adjust 'users' if your app name is different
+
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
