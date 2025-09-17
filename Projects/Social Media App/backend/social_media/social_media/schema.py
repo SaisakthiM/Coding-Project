@@ -19,10 +19,10 @@ class Query(graphene.ObjectType):
     all_posts = graphene.List(PostType)
     me = graphene.Field(UserType)
 
-    def resolve_all_posts(root, info):
+    def resolve_all_posts(self,root, info):
         return Post.objects.all().order_by("-created_at")
 
-    def resolve_me(root, info):
+    def resolve_me(self,root, info):
         user = info.context.user
         if user.is_anonymous:
             return None

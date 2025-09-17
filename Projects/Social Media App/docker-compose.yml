@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:15
-    container_name: socialmediaapp-db
     environment:
       POSTGRES_DB: socialmediaapp
       POSTGRES_USER: postgres
@@ -11,34 +10,48 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    ports:
+      - "9092:9092"
+
   backend:
     build: ./backend
-    container_name: socialmediaapp-backend
     depends_on:
       - db
+      - redis
+      - kafka
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=socialmediaapp
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/socialmediaapp
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BROKER=kafka:9092
     volumes:
       - ./backend:/app
     ports:
       - "8000:8000"
-    command: ["/wait-for-db.sh"]  # or your usual backend start command
+    command: ["./start-backend.sh"]
 
   frontend:
     build: ./frontend
-    container_name: socialmediaapp-frontend
-    ports:
-      - "5173:5173"    # Vite dev server port
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    stdin_open: true
-    tty: true
-    command: ["npm", "run", "dev", "--", "--host"]  # ensure Vite binds to 0.0.0.0
+    ports:
+      - "5173:5173"
+    command: ["npm", "run", "dev"]
 
 volumes:
   db_data:
