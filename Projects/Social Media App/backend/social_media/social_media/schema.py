@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth.models import User
-from .models import Post  # assuming you created Post model
+from apps.posts.models import Post  # assuming you created Post model
 
 # Types
 class UserType(DjangoObjectType):
