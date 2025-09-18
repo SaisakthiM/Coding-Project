@@ -2,16 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install bash & deps
-RUN apk add --no-cache bash
-
-# Install deps separately for caching
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest
+# Copy the rest of the frontend code
 COPY . .
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host"]
+# Start Vite dev server
+CMD ["npm", "run", "dev"]
