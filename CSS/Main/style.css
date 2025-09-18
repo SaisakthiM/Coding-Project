@@ -999,3 +999,8 @@ $: replaces with the number of the repetition.
 .greeting p:nth-of-type(2):hover {
 	display: block;
 }
+
+
+
+/* Box model CSS : 
+content : here is the place where the content resides  */
