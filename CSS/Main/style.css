@@ -1062,3 +1062,62 @@ to enhance user experience and manage large amounts of content efficiently.
 .dropdown:hover a:hover {
 	background-color: hsla(92, 86%, 59%, 0.81);
 }
+
+/* Navbar */
+
+.navbar-header {
+	color: rgb(60, 204, 252);
+	font-size: 2rem;
+	font-weight: 700;
+	text-align: center;
+	font-family: 'Times New Roman', Times, serif;
+}
+
+.navbar ul {
+	list-style-type: none;
+	background-color: hsl(145, 80%, 62%);
+	padding: 0px;
+	margin: 0px;
+	overflow: hidden;
+}
+.navbar a{
+	color: black;
+	text-decoration: none;
+	display: block;
+	padding: 15px;
+	text-align: center;
+}
+.navbar a:hover {
+	background-color: hsla(145, 100%, 59%, 0.719);
+}
+
+.navbar li {
+	float: left;
+}
+
+/*
+
+semantic tags = Keep your content organized
+Better for SEO
+Assists screen readers and
+other tech for accessibility
+header> = introductory content nav> = navigation bar, links
+main>
+= main content (section, aside, article,
+section>= dependent content
+aside> = side content
+article>= independent content footer> = closing content
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
