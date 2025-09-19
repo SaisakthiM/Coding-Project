@@ -1,7 +1,16 @@
 .title_website {
-    display: flex;
+    display: inline-block;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     height : 80px;
     
+}
+.menu_list{
+    display: inline-flex;
+
+    margin: auto;
+}
+
+.li_tag {
+    margin: 20px;
 }

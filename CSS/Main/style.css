@@ -1000,7 +1000,24 @@ $: replaces with the number of the repetition.
 	display: block;
 }
 
+/* Pagination Bar : 
 
+pagination is a process of dividing content into discrete pages.
+It is used in blogs, articles, search results, etc.,
+to enhance user experience and manage large amounts of content efficiently.
 
-/* Box model CSS : 
-content : here is the place where the content resides  */
+*/
+
+.pagination {
+	text-align: center;
+}
+
+.pagination a {
+	color: black;
+	text-decoration: none;
+	padding: 8px 16px;
+	display: inline-block;
+}
+.pagination a.active {
+	background-color: rgb(36, 184, 36);
+}
