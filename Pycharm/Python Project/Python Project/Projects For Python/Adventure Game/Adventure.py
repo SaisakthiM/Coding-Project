@@ -18,7 +18,7 @@ class Path(Adventure):
           "1) Jungle with Animals\n"
           "2) Dessert without water for 2 days \n"
           "3) Warzone without protection \n"
-          "4) Urban area without money"
+          "4) Urban area without money \n"
           "5) Secret Underground City with final treasure")
     k = input("Can We Start (Type Yes) : ")
 
