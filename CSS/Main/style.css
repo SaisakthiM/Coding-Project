@@ -1021,3 +1021,44 @@ to enhance user experience and manage large amounts of content efficiently.
 .pagination a.active {
 	background-color: rgb(36, 184, 36);
 }
+
+/* Dropdown Menu */
+
+.dropdown {
+	display: inline-block;
+}
+
+.dropdown button {
+	background-color: lab(42.28% 52.03 -91.26);
+	color: white;
+	padding : 10px 15px;
+	border : none;
+	cursor: pointer;
+	border-radius: 10px;
+}
+
+.dropdown a {
+	display : block;
+	color : black;
+	text-decoration: none;
+	padding: 10px 15px;
+}
+
+.dropdown .content {
+	display: none;
+	position: sticky;
+	background-color: hsla(0,0%, 95%, 0.9);
+	max-width: 100px;
+
+	box-shadow: 2px 2px 5px hsla(144, 76%, 63%, 0.747);
+}
+
+.dropdown:hover .content {
+	display: block;
+}
+.dropdown:hover button {
+	background-color: aquamarine;
+}
+.dropdown:hover a:hover {
+	background-color: hsla(92, 86%, 59%, 0.81);
+}
