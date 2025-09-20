@@ -1,27 +1,36 @@
 services:
+
+  # --- Databases ---
   db:
     image: postgres:15
     environment:
       POSTGRES_DB: socialmediaapp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
     volumes:
       - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
+    networks:
+      - backend-net
+
+  cassandra:
+    image: cassandra:4
+    networks:
+      - backend-net
+    volumes:
+      - cassandra_data:/var/lib/cassandra
 
   redis:
     image: redis:7
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
+    networks:
+      - backend-net
 
+  # --- Messaging ---
   zookeeper:
     image: wurstmeister/zookeeper
-    ports:
-      - "2181:2181"
-    restart: unless-stopped
+    networks:
+      - message-net
 
   kafka:
     image: wurstmeister/kafka
@@ -29,36 +38,112 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    ports:
-      - "9092:9092"
     depends_on:
       - zookeeper
-    restart: unless-stopped
+    networks:
+      - message-net
 
+  # --- Backend ---
   backend:
     build: ./backend
-    volumes:
-      - ./backend:/app
-    ports:
-      - "8000:8000"
-    command: ["/wait-for-db.sh"]
+    environment:
+      DATABASE_URL: postgres://postgres:$(POSTGRES_PASSWORD)@db:5432/socialmediaapp
     depends_on:
       - db
+      - cassandra
       - redis
       - kafka
-    restart: unless-stopped
+    networks:
+      - backend-net
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
+  # --- Frontend ---
+  frontend-dev:
+    build: ./frontend
+    command: npm run dev
     ports:
       - "5173:5173"
-    command: ["npm", "run", "dev"]
-    restart: unless-stopped
+    volumes:
+    - ./frontend:/app
+    networks:
+      - frontend-net
+    depends_on:
+      - backend
 
+  frontend-prod:
+    build: ./frontend
+    command: nginx -g 'daemon off;'
+    ports:
+      - "80:80"
+    networks:
+      - frontend-net
+    depends_on:
+      - backend
+
+  # --- Microservices ---
+  microservice-java:
+    build: ./microservice-java./sai-java
+    networks:
+      - backend-net
+    depends_on:
+      - kafka
+      - db
+
+  microservice-go:
+    build: ./microservice-go
+    networks:
+      - backend-net
+    depends_on:
+      - kafka
+      - redis
+
+  # --- Observability ---
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - backend-net
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - backend-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    ports:
+      - "9200:9200"
+    networks:
+      - backend-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.2
+    ports:
+      - "5601:5601"
+    networks:
+      - backend-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.49
+    ports:
+      - "16686:16686"
+    networks:
+      - backend-net
+
+# --- Volumes ---
 volumes:
   db_data:
-  frontend_node_modules:
+  cassandra_data:
+
+# --- Secrets ---
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+
+# --- Networks ---
+networks:
+  frontend-net:
+  backend-net:
+  message-net:
