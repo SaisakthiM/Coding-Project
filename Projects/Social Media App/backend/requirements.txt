@@ -10,6 +10,8 @@ pytest-django
 django-debug-toolbar
 Pillow
 djangorestframework
+gunicorn
+
 
 
 
