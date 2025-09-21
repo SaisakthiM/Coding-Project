@@ -1,11 +1,9 @@
-import Button from "./components/Button";
-import Header from "./components/Header";
+import React from "react";
 
-function App() {
-    return (<>
-        <Button></Button>
-        
-    </>);
-	
+export default function App() {
+  return (
+    <div className="App">
+      {/* All routes will be handled in Router.jsx */}
+    </div>
+  );
 }
-export default App;
