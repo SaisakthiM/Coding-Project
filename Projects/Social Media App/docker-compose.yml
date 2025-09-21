@@ -1,50 +1,129 @@
 services:
 
-  # --- Backend Services ---
-  db:
+  # --- Reverse Proxy (combined for frontend + APIs) ---
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend-prod
+      - django
+      - microservice-java
+      - microservice-go
+      - minio
+    networks:
+      - backend-net
+      - frontend-net
+
+  # --- Frontend Production ---
+  frontend-prod:
+    build:
+      context: ./frontend
+      target: prod
+    depends_on:
+      - nginx
+    networks:
+      - frontend-net
+
+  # --- Frontend Development (HMR / Vite Dev Server) ---
+  frontend-dev:
+    build:
+      context: ./frontend
+      target: dev
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - django
+      - microservice-java
+      - microservice-go
+    networks:
+      - frontend-net
+      - backend-net
+
+
+  # --- Backend (Django + Postgres) ---
+  django:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:example@postgres:5432/socialmediaapp
+      MEDIA_STORAGE_URL: http://minio:9000
+      MEDIA_STORAGE_KEY: minio
+      MEDIA_STORAGE_SECRET: minio123
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - backend-net
+
+  postgres:
     image: postgres:15
     environment:
       POSTGRES_DB: socialmediaapp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    secrets:
-      - postgres_password
+      POSTGRES_PASSWORD: example
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
       - backend-net
 
+  # --- Java Microservice + Cassandra ---
   cassandra:
     image: cassandra:4
+    container_name: cassandra
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
       - backend-net
 
+  microservice-java:
+    build: ./microservice-java
+    container_name: microservice-java
+    depends_on:
+      - cassandra
+      - kafka
+    environment:
+      CASSANDRA_HOST: cassandra
+      CASSANDRA_PORT: 9042
+      KAFKA_BROKER: kafka:9092
+    networks:
+      - backend-net
+
+  # --- Go Microservice + Redis ---
   redis:
     image: redis:7
+    container_name: redis
     networks:
       - backend-net
 
-  backend:
-    build: ./backend
-    environment:
-      DATABASE_URL: postgres://postgres:$(cat /run/secrets/postgres_password)@db:5432/socialmediaapp
+  microservice-go:
+    build: ./microservice-go
+    container_name: microservice-go
     depends_on:
-      - db
-      - cassandra
       - redis
+      - kafka
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BROKER: kafka:9092
     networks:
       - backend-net
 
-  # --- Messaging Services ---
+  # --- Messaging ---
   zookeeper:
     image: wurstmeister/zookeeper
+    container_name: zookeeper
     networks:
-      - message-net
+      - backend-net
 
   kafka:
     image: wurstmeister/kafka
+    container_name: kafka
     environment:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
@@ -52,96 +131,85 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - message-net
+      - backend-net
 
-  # --- Frontend Services ---
-  frontend-dev:
-    build: ./frontend
-    command: npm run dev
+  # --- Media Storage (MinIO) ---
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data
     ports:
-      - "5173:5173"
+      - "9000:9000"
     volumes:
-      - ./frontend:/app
-    depends_on:
-      - backend
-    networks:
-      - frontend-net
-
-  frontend-prod:
-    build: ./frontend
-    command: nginx -g 'daemon off;'
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - frontend-net
-
-  # --- Microservices ---
-  microservice-java:
-    build: ./microservice-java/sai-java
-    depends_on:
-      - kafka
-      - db
+      - minio_data:/data
     networks:
       - backend-net
 
-  microservice-go:
-    build: ./microservice-go
-    depends_on:
-      - kafka
-      - redis
-    networks:
-      - backend-net
-
-  # --- Observability ---
+  # --- Observability Stack ---
   prometheus:
     image: prom/prometheus
+    container_name: prometheus
     ports:
       - "9090:9090"
     networks:
       - backend-net
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana
+    container_name: grafana
     ports:
       - "3000:3000"
     networks:
       - backend-net
+    volumes:
+      - grafana_data:/var/lib/grafana
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
     ports:
-      - "9200:9200"
+      - "3100:3100"
     networks:
       - backend-net
+    volumes:
+      - ./observability/loki-config.yml:/etc/loki/local-config.yml
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.2
-    ports:
-      - "5601:5601"
+  promtail:
+    image: grafana/promtail:2.9.2
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./observability/promtail-config.yml:/etc/promtail/config.yml
     networks:
       - backend-net
+    depends_on:
+      - loki
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.49
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: tempo
     ports:
-      - "16686:16686"
+      - "3200:3200"
     networks:
       - backend-net
+    volumes:
+      - ./observability/tempo-config.yml:/etc/tempo/config.yml
 
 # --- Volumes ---
 volumes:
   db_data:
   cassandra_data:
-
-# --- Secrets ---
-secrets:
-  postgres_password:
-    file: ./secrets/postgres_password.txt
+  grafana_data:
+  minio_data:
 
 # --- Networks ---
 networks:
-  frontend-net:
   backend-net:
-  message-net:
+  frontend-net:
