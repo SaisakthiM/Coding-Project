@@ -1,6 +1,6 @@
 services:
 
-  # --- Databases ---
+  # --- Backend Services ---
   db:
     image: postgres:15
     environment:
@@ -16,17 +16,28 @@ services:
 
   cassandra:
     image: cassandra:4
-    networks:
-      - backend-net
     volumes:
       - cassandra_data:/var/lib/cassandra
+    networks:
+      - backend-net
 
   redis:
     image: redis:7
     networks:
       - backend-net
 
-  # --- Messaging ---
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:$(cat /run/secrets/postgres_password)@db:5432/socialmediaapp
+    depends_on:
+      - db
+      - cassandra
+      - redis
+    networks:
+      - backend-net
+
+  # --- Messaging Services ---
   zookeeper:
     image: wurstmeister/zookeeper
     networks:
@@ -43,58 +54,45 @@ services:
     networks:
       - message-net
 
-  # --- Backend ---
-  backend:
-    build: ./backend
-    environment:
-      DATABASE_URL: postgres://postgres:$(POSTGRES_PASSWORD)@db:5432/socialmediaapp
-    depends_on:
-      - db
-      - cassandra
-      - redis
-      - kafka
-    networks:
-      - backend-net
-
-  # --- Frontend ---
+  # --- Frontend Services ---
   frontend-dev:
     build: ./frontend
     command: npm run dev
     ports:
       - "5173:5173"
     volumes:
-    - ./frontend:/app
-    networks:
-      - frontend-net
+      - ./frontend:/app
     depends_on:
       - backend
+    networks:
+      - frontend-net
 
   frontend-prod:
     build: ./frontend
     command: nginx -g 'daemon off;'
     ports:
       - "80:80"
-    networks:
-      - frontend-net
     depends_on:
       - backend
+    networks:
+      - frontend-net
 
   # --- Microservices ---
   microservice-java:
-    build: ./microservice-java./sai-java
-    networks:
-      - backend-net
+    build: ./microservice-java/sai-java
     depends_on:
       - kafka
       - db
+    networks:
+      - backend-net
 
   microservice-go:
     build: ./microservice-go
-    networks:
-      - backend-net
     depends_on:
       - kafka
       - redis
+    networks:
+      - backend-net
 
   # --- Observability ---
   prometheus:
