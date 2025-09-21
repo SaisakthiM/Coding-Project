@@ -1,9 +1,11 @@
 import Button from "./components/Button";
+import Header from "./components/Header";
 
 function App() {
-    return (<Button>
-
-    </Button>);
+    return (<>
+        <Button></Button>
+        
+    </>);
 	
 }
 export default App;
