@@ -2,5 +2,8 @@ package main
 import "fmt"
 
 func main() {
-	const premiumPlanName = "";
+	var name string;
+	fmt.Print("Enter your name: ");
+	fmt.Scan(&name);
+	fmt.Print(name);
 }
