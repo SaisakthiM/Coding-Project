@@ -144,3 +144,16 @@ temperatureInt := int64(temperatureFloat)
 Casting a float to an integer in this way truncates the floating point portion.
 
 */
+
+/* const keywords
+
+Constants are declared with the const keyword. They can't use the := short declaration syntax.
+
+const pi = 3.14159
+
+Constants can be primitive types like strings, integers, booleans and floats. 
+They cannot be more complex types like slices, maps and structs, which are types we will explain later.
+
+
+*/
+
