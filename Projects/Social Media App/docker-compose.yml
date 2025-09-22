@@ -1,6 +1,6 @@
 services:
 
-  # --- Reverse Proxy (combined for frontend + APIs) ---
+  # --- Reverse Proxy ---
   nginx:
     image: nginx:latest
     ports:
@@ -22,12 +22,10 @@ services:
     build:
       context: ./frontend
       target: prod
-    depends_on:
-      - nginx
     networks:
       - frontend-net
 
-  # --- Frontend Development (HMR / Vite Dev Server) ---
+  # --- Frontend Development (Vite / HMR) ---
   frontend-dev:
     build:
       context: ./frontend
@@ -45,7 +43,6 @@ services:
     networks:
       - frontend-net
       - backend-net
-
 
   # --- Backend (Django + Postgres) ---
   django:
