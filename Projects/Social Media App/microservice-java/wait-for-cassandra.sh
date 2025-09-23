@@ -6,6 +6,13 @@ while ! nc -z cassandra 9042; do
 done
 echo "Cassandra is up! Starting microservice..."
 
-# Pick the jar dynamically
-JAR_FILE=\
-exec java -jar \
+# Find the jar file dynamically
+JAR_FILE=$(ls /app/*.jar | head -n 1)
+
+if [ -z "$JAR_FILE" ]; then
+  echo "Error: No JAR file found in /app/"
+  exit 1
+fi
+
+echo "Launching $JAR_FILE..."
+exec java -jar "$JAR_FILE"

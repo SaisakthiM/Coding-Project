@@ -1,4 +1,6 @@
-# Stage 1: build
+# --------------------------
+# Stage 1: Build the JAR
+# --------------------------
 FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /app
 
@@ -8,29 +10,27 @@ COPY mvnw .
 COPY .mvn .mvn
 
 # Download dependencies offline
-RUN mvn dependency:go-offline
+RUN ./mvnw dependency:go-offline
 
 # Copy source and build
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
-# Stage 2: runtime
+# --------------------------
+# Stage 2: Runtime
+# --------------------------
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Install required tools for wait script
-RUN apk add --no-cache bash curl netcat-openbsd
+# Install tools needed for wait script
+RUN apk add --no-cache bash curl netcat-openbsd coreutils
 
-# Copy the built jar
-COPY --from=build /app/target/*.jar app.jar
+# Copy the built jar from the build stage
+COPY --from=build /app/target/*.jar /app/
 
-# Copy the wait-for-Cassandra script
+# Copy the wait-for-cassandra script
 COPY wait-for-cassandra.sh /wait-for-cassandra.sh
 RUN chmod +x /wait-for-cassandra.sh
 
-# Start the service after waiting for Cassandra
-CMD ["/wait-for-cassandra.sh"]
-
-COPY wait-for-cassandra.sh /wait-for-cassandra.sh
-RUN chmod +x /wait-for-cassandra.sh
+# Run the wait script, which launches the JAR
 ENTRYPOINT ["/wait-for-cassandra.sh"]
