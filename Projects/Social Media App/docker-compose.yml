@@ -69,31 +69,36 @@ services:
     networks:
       - backend-net
 
-  # --- Java Microservice + Cassandra ---
+    # --- Java Microservice + Cassandra ---
   cassandra:
     image: cassandra:4
     container_name: cassandra
+    ports:
+      - "9042:9042"   # expose Cassandra to host if needed
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
       - backend-net
 
   microservice-java:
-    environment:
-      - SPRING_CASSANDRA_CONTACT-POINTS=cassandra
-      - SPRING_CASSANDRA_PORT=9042
-      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
     build: ./microservice-java
     container_name: microservice-java
+    ports:
+      - "8080:8080"   # expose Spring Boot port
+    environment:
+      SPRING_CASSANDRA_CONTACT-POINTS: cassandra
+      SPRING_CASSANDRA_PORT: 9042
+      SPRING_CASSANDRA_LOCAL-DATACENTER: datacenter1
     depends_on:
       - cassandra
       - kafka
-    environment:
-      CASSANDRA_HOST: cassandra
-      CASSANDRA_PORT: 9042
-      KAFKA_BROKER: kafka:9092
     networks:
       - backend-net
+    volumes:
+      - ./microservice-java/.m2:/root/.m2        # Maven cache
+      - ./microservice-java/target:/app/target   # share build output
+      - ./microservice-java/wait-for-cassandra.sh:/wait-for-cassandra.sh
+
 
   # --- Go Microservice + Redis ---
   redis:
@@ -107,13 +112,15 @@ services:
     container_name: microservice-go
     depends_on:
       - redis
-      - kafka
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      KAFKA_BROKER: kafka:9092
+    volumes:                        # <- This is per-service mount
+      - ./microservice-go:/app      # bind mount: local code → container
+      - go_cache:/go/pkg/mod        # named volume for Go module cache
     networks:
       - backend-net
+
 
   # --- Messaging ---
   zookeeper:
@@ -209,6 +216,7 @@ volumes:
   cassandra_data:
   grafana_data:
   minio_data:
+  go_cache:
 
 # --- Networks ---
 networks:
