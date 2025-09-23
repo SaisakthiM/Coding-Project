@@ -7,3 +7,4 @@ RUN chmod +x /usr/local/bin/start-minio.sh
 
 # Use custom entrypoint
 ENTRYPOINT ["/usr/local/bin/start-minio.sh"]
+
