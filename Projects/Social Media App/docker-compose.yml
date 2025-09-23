@@ -79,6 +79,10 @@ services:
       - backend-net
 
   microservice-java:
+    environment:
+      - SPRING_CASSANDRA_CONTACT-POINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
     build: ./microservice-java
     container_name: microservice-java
     depends_on:
