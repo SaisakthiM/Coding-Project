@@ -1,6 +1,6 @@
 services:
 
-  # --- Reverse Proxy ---
+  # -------- Reverse Proxy --------
   nginx:
     image: nginx:latest
     ports:
@@ -17,7 +17,7 @@ services:
       - backend-net
       - frontend-net
 
-  # --- Frontend Production ---
+  # -------- Frontend Production --------
   frontend-prod:
     build:
       context: ./frontend
@@ -25,7 +25,7 @@ services:
     networks:
       - frontend-net
 
-  # --- Frontend Development (Vite / HMR) ---
+  # -------- Frontend Dev (Vite/HMR) --------
   frontend-dev:
     build:
       context: ./frontend
@@ -44,7 +44,7 @@ services:
       - frontend-net
       - backend-net
 
-  # --- Backend (Django + Postgres) ---
+  # -------- Django + Postgres --------
   django:
     build: ./backend
     environment:
@@ -53,8 +53,10 @@ services:
       MEDIA_STORAGE_KEY: minio
       MEDIA_STORAGE_SECRET: minio123
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - backend-net
 
@@ -68,66 +70,80 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
 
-    # --- Java Microservice + Cassandra ---
+  # -------- Java Microservice + Cassandra --------
   cassandra:
     image: cassandra:4
     container_name: cassandra
-    ports:
-      - "9042:9042"   # expose Cassandra to host if needed
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 5s
+      retries: 10
 
   microservice-java:
     build: ./microservice-java
     container_name: microservice-java
     ports:
-      - "8080:8080"   # expose Spring Boot port
+      - "8080:8080"
     environment:
       SPRING_CASSANDRA_CONTACT-POINTS: cassandra
       SPRING_CASSANDRA_PORT: 9042
       SPRING_CASSANDRA_LOCAL-DATACENTER: datacenter1
     depends_on:
-      - cassandra
-      - kafka
+      cassandra:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - backend-net
     volumes:
-      - ./microservice-java/.m2:/root/.m2        # Maven cache
-      - ./microservice-java/target:/app/target   # share build output
-      - ./microservice-java/wait-for-cassandra.sh:/wait-for-cassandra.sh
+      - ./microservice-java/.m2:/root/.m2
+      - ./microservice-java/target:/app/target
 
-
-  # --- Go Microservice + Redis ---
+  # -------- Go Microservice + Redis --------
   redis:
     image: redis:7
     container_name: redis
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
 
   microservice-go:
     build: ./microservice-go
     container_name: microservice-go
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    volumes:                        # <- This is per-service mount
-      - ./microservice-go:/app      # bind mount: local code → container
-      - go_cache:/go/pkg/mod        # named volume for Go module cache
+    volumes:
+      - go_cache:/go/pkg/mod
+      - go_build_cache:/root/.cache/go-build
     networks:
       - backend-net
 
-
-  # --- Messaging ---
+  # -------- Messaging (Kafka + Zookeeper) --------
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "echo ruok | nc localhost 2181"]
+      interval: 5s
+      retries: 5
 
   kafka:
     image: wurstmeister/kafka
@@ -137,55 +153,65 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh --bootstrap-server kafka:9092 --list"]
+      interval: 5s
+      retries: 5
 
-  # --- Media Storage (MinIO) ---
+  # -------- Media Storage (MinIO) --------
   minio:
-    image: minio/minio
+    build:
+      context: ./minio
     container_name: minio
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-    command: server /data
     ports:
       - "9000:9000"
     volumes:
       - minio_data:/data
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "mc", "alias", "ls", "local"]
+      interval: 5s
+      retries: 5
 
-  # --- Observability Stack ---
+
+  # -------- Observability (Prometheus, Grafana, Loki, Tempo) --------
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     ports:
       - "9090:9090"
-    networks:
-      - backend-net
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - backend-net
 
   grafana:
     image: grafana/grafana
     container_name: grafana
     ports:
       - "3000:3000"
-    networks:
-      - backend-net
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - backend-net
 
   loki:
     image: grafana/loki:2.9.2
     container_name: loki
     ports:
       - "3100:3100"
-    networks:
-      - backend-net
     volumes:
       - ./observability/loki-config.yml:/etc/loki/local-config.yml
+    networks:
+      - backend-net
 
   promtail:
     image: grafana/promtail:2.9.2
@@ -195,30 +221,31 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./observability/promtail-config.yml:/etc/promtail/config.yml
-    networks:
-      - backend-net
     depends_on:
       - loki
+    networks:
+      - backend-net
 
   tempo:
     image: grafana/tempo:2.4.1
     container_name: tempo
     ports:
       - "3200:3200"
-    networks:
-      - backend-net
     volumes:
       - ./observability/tempo-config.yml:/etc/tempo/config.yml
+    networks:
+      - backend-net
 
-# --- Volumes ---
+# -------- Volumes --------
 volumes:
   db_data:
   cassandra_data:
   grafana_data:
   minio_data:
   go_cache:
+  go_build_cache:
 
-# --- Networks ---
+# -------- Networks --------
 networks:
   backend-net:
   frontend-net:
