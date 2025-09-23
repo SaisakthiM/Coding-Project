@@ -1,8 +1,12 @@
-# Stage 1: build Go binary
-FROM golang:1.21-alpine AS build
+# Stage 1: build
+FROM golang:1.25 AS build
 WORKDIR /app
+
+# Copy mod files for caching
 COPY go.mod go.sum ./
 RUN go mod download
+
+# Copy source and build
 COPY . .
 RUN go build -o microservice-go .
 
@@ -10,15 +14,10 @@ RUN go build -o microservice-go .
 FROM alpine:latest
 WORKDIR /app
 
-# Install tools for wait script
 RUN apk add --no-cache bash curl netcat-openbsd coreutils
 
-# Copy Go binary
-COPY --from=build /app/microservice-go ./
-
-# Copy wait script
+COPY --from=build /app/microservice-go . 
 COPY wait-for-redis.sh /wait-for-redis.sh
 RUN chmod +x /wait-for-redis.sh
 
-# Start service
 ENTRYPOINT ["/wait-for-redis.sh"]

@@ -6,5 +6,5 @@ while ! nc -z redis 6379; do
 done
 echo "Redis is up! Starting microservice..."
 
-# Start the Go binary
-exec ./microservice-go
+# Run the binary
+exec /app/microservice-go
