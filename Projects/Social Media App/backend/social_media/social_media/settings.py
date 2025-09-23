@@ -71,13 +71,14 @@ ASGI_APPLICATION = "social_media.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME", default="socialmediaapp"),
-        "USER": env("DB_USER", default="postgres"),
-        "PASSWORD": env("DB_PASSWORD", default="saisakthi2008"),
-        "HOST": env("DB_HOST", default="db"),
+        "NAME": env("DB_NAME", default="socialmedia"),
+        "USER": env("DB_USER", default="user"),
+        "PASSWORD": env("DB_PASSWORD", default="pass"),
+        "HOST": env("DB_HOST", default="postgres"),
         "PORT": env("DB_PORT", default="5432"),
     }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -132,3 +133,22 @@ GRAPHENE = {
 
 # Debug Toolbar
 INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+# --- MinIO Storage ---
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_ACCESS_KEY_ID = env("MINIO_ROOT_USER", default="minio")
+AWS_SECRET_ACCESS_KEY = env("MINIO_ROOT_PASSWORD", default="minio123")
+AWS_STORAGE_BUCKET_NAME = "media"
+AWS_S3_ENDPOINT_URL = "http://minio:9000"
+AWS_QUERYSTRING_AUTH = False
+
+# --- Redis (Go Microservice) ---
+REDIS_HOST = env("REDIS_HOST", default="microservice-go")
+REDIS_PORT = env.int("REDIS_PORT", default=6379)
+
+import redis
+REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+
+# --- Java Microservice (Cassandra) ---
+JAVA_API_URL = env("JAVA_API_URL", default="http://microservice-java:8080")
+
