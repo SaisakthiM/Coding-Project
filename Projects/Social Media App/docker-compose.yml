@@ -1,66 +1,26 @@
+version: "3.9"
+
 services:
 
-  # -------- Reverse Proxy --------
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - frontend-prod
-      - django
-      - microservice-java
-      - microservice-go
-      - minio
-    networks:
-      - backend-net
-      - frontend-net
-
-  # -------- Frontend Production --------
-  frontend-prod:
-    build:
-      context: ./frontend
-      target: prod
-    networks:
-      - frontend-net
-
-  # -------- Frontend Dev (Vite/HMR) --------
-  frontend-dev:
-    build:
-      context: ./frontend
-    command: npm run dev
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - django
-      - microservice-java
-      - microservice-go
-    networks:
-      - frontend-net
-      - backend-net
-
-  # -------- Django + Postgres --------
+  # -------- Django Backend --------
   django:
     build: ./backend
+    container_name: django
     environment:
-      DATABASE_URL: postgres://postgres:example@postgres:5432/socialmediaapp
+      DATABASE_URL: postgres://postgres:saisakthi2008@postgres:5432/socialmediaapp
       MEDIA_STORAGE_URL: http://minio:9000
       MEDIA_STORAGE_KEY: minio
       MEDIA_STORAGE_SECRET: minio123
     depends_on:
-      postgres:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
+      - postgres
+      - minio
     networks:
       - backend-net
 
+  # -------- Postgres DB --------
   postgres:
     image: postgres:15
+    container_name: postgres
     environment:
       POSTGRES_DB: socialmediaapp
       POSTGRES_USER: postgres
@@ -74,6 +34,54 @@ services:
       interval: 5s
       retries: 5
 
+  # -------- Frontend Production --------
+  frontend-prod:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      target: prod
+    container_name: frontend-prod
+    networks:
+      - frontend-net
+    expose:
+      - "80"
+
+  # -------- Frontend Dev (Vite/HMR) --------
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend-dev
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - django
+    networks:
+      - frontend-net
+      - backend-net
+
+  # -------- Nginx Reverse Proxy --------
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend-prod
+      - django
+      - microservice-java
+      - microservice-go
+      - minio
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - backend-net
+      - frontend-net
+
   # -------- Java Microservice + Cassandra --------
   cassandra:
     image: cassandra:4
@@ -82,25 +90,19 @@ services:
       - cassandra_data:/var/lib/cassandra
     networks:
       - backend-net
-    healthcheck:
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-      interval: 5s
-      retries: 10
 
   microservice-java:
     build: ./microservice-java
     container_name: microservice-java
     ports:
-      - "8080:8080"
+      - "8081:8080"  # Avoid conflict; container 8080 exposed on host 8081
     environment:
       SPRING_CASSANDRA_CONTACT-POINTS: cassandra
       SPRING_CASSANDRA_PORT: 9042
       SPRING_CASSANDRA_LOCAL-DATACENTER: datacenter1
     depends_on:
-      cassandra:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
+      - cassandra
+      - kafka
     networks:
       - backend-net
     volumes:
@@ -113,36 +115,27 @@ services:
     container_name: redis
     networks:
       - backend-net
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      retries: 5
 
   microservice-go:
     build: ./microservice-go
     container_name: microservice-go
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    networks:
+      - backend-net
     volumes:
       - go_cache:/go/pkg/mod
       - go_build_cache:/root/.cache/go-build
-    networks:
-      - backend-net
 
-  # -------- Messaging (Kafka + Zookeeper) --------
+  # -------- Kafka & Zookeeper --------
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
     networks:
       - backend-net
-    healthcheck:
-      test: ["CMD", "echo ruok | nc localhost 2181"]
-      interval: 5s
-      retries: 5
 
   kafka:
     image: wurstmeister/kafka
@@ -152,19 +145,13 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     networks:
       - backend-net
-    healthcheck:
-      test: ["CMD", "kafka-topics.sh --bootstrap-server kafka:9092 --list"]
-      interval: 5s
-      retries: 5
 
   # -------- Media Storage (MinIO) --------
   minio:
-    build:
-      context: ./minio
+    build: ./minio
     container_name: minio
     environment:
       MINIO_ROOT_USER: minio
@@ -176,13 +163,8 @@ services:
       - minio_data:/data
     networks:
       - backend-net
-    healthcheck:
-      test: ["CMD", "mc", "alias", "ls", "local"]
-      interval: 5s
-      retries: 5
 
-
-  # -------- Observability (Prometheus, Grafana, Loki, Tempo) --------
+  # -------- Observability --------
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -231,12 +213,13 @@ services:
     container_name: tempo
     ports:
       - "3200:3200"
+    environment:
+      TEMPO_STORAGE: "none" # Disable default backend to avoid unknown backend error
     volumes:
       - ./observability/tempo-config.yml:/etc/tempo/config.yml
     networks:
       - backend-net
 
-# -------- Volumes --------
 volumes:
   db_data:
   cassandra_data:
@@ -245,7 +228,6 @@ volumes:
   go_cache:
   go_build_cache:
 
-# -------- Networks --------
 networks:
   backend-net:
   frontend-net:
