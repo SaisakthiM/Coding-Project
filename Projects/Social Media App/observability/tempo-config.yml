@@ -1,26 +1,26 @@
 server:
   http_listen_port: 3200
+  grpc_listen_port: 9095
 
 distributor:
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-        http:
+  receivers: {}
 
 ingester:
-  trace_idle_period: 10s
-  max_block_bytes: 1_000_000
-  max_block_duration: 5m
-
-compactor:
-  compaction:
-    block_retention: 24h
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
 
 storage:
   trace:
-    backend: local
-    local:
-      path: /tmp/tempo
-    wal:
-      path: /tmp/tempo/wal
+    backend: s3
+    s3:
+      endpoint: minio:9000
+      bucket: tempo-traces
+      access_key: minio
+      secret_key: minio123
+      insecure: true
+
+compactor:
+  compaction:
+    block_retention: 168h

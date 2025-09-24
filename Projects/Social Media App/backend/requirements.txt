@@ -11,7 +11,7 @@ django-debug-toolbar
 Pillow
 djangorestframework
 gunicorn
-
+redis
 
 
 
