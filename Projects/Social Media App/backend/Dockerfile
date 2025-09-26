@@ -21,10 +21,14 @@ RUN pip install graphene-django
 # Copy project files
 COPY . .
 
+# Copy .env file explicitly (if not already included in COPY . .)
+COPY .env ./
+
 # Copy wait-for-db.sh and make it executable
 COPY wait-for-db.sh /wait-for-db.sh
 RUN dos2unix /wait-for-db.sh && chmod +x /wait-for-db.sh
 
+# Set working directory to the Django project root
 WORKDIR /app/social_media
 
 # Run wait-for-db.sh when container starts

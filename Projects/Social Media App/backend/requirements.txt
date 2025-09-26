@@ -12,6 +12,9 @@ Pillow
 djangorestframework
 gunicorn
 redis
+environ
+django-environ
+
 
 
 
