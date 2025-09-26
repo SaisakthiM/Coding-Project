@@ -69,13 +69,13 @@ WSGI_APPLICATION = "social_media.wsgi.application"
 ASGI_APPLICATION = "social_media.asgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME", default="socialmedia"),
-        "USER": env("DB_USER", default="user"),
-        "PASSWORD": env("DB_PASSWORD", default="pass"),
-        "HOST": env("DB_HOST", default="postgres"),
-        "PORT": env("DB_PORT", default="5432"),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 

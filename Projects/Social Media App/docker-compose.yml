@@ -9,6 +9,11 @@ services:
       MEDIA_STORAGE_URL: http://minio:9000
       MEDIA_STORAGE_KEY: minio
       MEDIA_STORAGE_SECRET: minio123
+      DB_NAME: socialmediaapp
+      DB_USER: postgres
+      DB_PASSWORD: saisakthi2008
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
       - postgres
       - minio
@@ -160,18 +165,21 @@ services:
 
   # -------- Media Storage (MinIO) --------
   minio:
-    image: minio/minio:latest
+    build:
+      context: ./minio
+      dockerfile: Dockerfile   # <-- rename your Dockerfile to this (or adjust path)
     container_name: minio
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-    command: server /data
     ports:
-      - "9000:9000"
+      - "9000:9000"   # MinIO API
+      - "9004:9004"   # MinIO Console WebUI
     volumes:
       - ./minio-data:/data
     networks:
       - backend-net
+
 
   # -------- Observability --------
   prometheus:
