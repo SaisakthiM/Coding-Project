@@ -1110,6 +1110,80 @@ article>= independent content footer> = closing content
 
 */
 
+/*
+Filter Functions : 
+
+we have come across the filters if you have used photo editor apps and 
+if you use the social media frequently 
+but ever you thought you can use those in css and html 
+here is the reality 
+here is the filter functions
+
+| Filter Function | Parameter Type               | Min Value | Max Effect | Interpolation Value | Default Value (No Effect)             |
+| --------------- | ---------------------------- | --------- | ---------- | ------------------- | ------------------------------------- |
+| `blur()`        | `<length>`                   | 0         | —          | 0                   | `blur(0)`                             |
+| `brightness()`  | `<number>` or `<percentage>` | 0         | —          | 1                   | `brightness(1)` or `brightness(100%)` |
+| `contrast()`    | `<length>`                   | 0         | —          | 1                   | `contrast(1)` or `contrast(100%)`     |
+| `drop-shadow()` | `<shadow>`                   | —         | —          | —                   | `drop-shadow(0 0 0 currentColor)`     |
+| `grayscale()`   | `<number>` or `<percentage>` | 0         | 100%       | 0                   | `grayscale(0)` or `grayscale(0%)`     |
+| `hue-rotate()`  | `<angle>`                    | —         | —          | 0                   | `hue-rotate(0deg)`                    |
+| `invert()`      | `<number>` or `<percentage>` | 0         | 100%       | 0                   | `invert(0)` or `invert(0%)`           |
+| `opacity()`     | `<number>` or `<percentage>` | 0         | 100%       | 1                   | `opacity(1)` or `opacity(100%)`       |
+| `saturate()`    | `<number>` or `<percentage>` | 0         | 100%       | 1                   | `saturate(100%)`                      |
+| `sepia()`       | `<number>` or `<percentage>` | 0         | 100%       | 0                   | `sepia(0%)`                           |
+
+*/
+
+/* CSS Display Properties
+
+Display, imagine a picture you want to show
+if you want to show it in a display or in a museum or at home
+
+displaying it has many variation in css
+that's what i am trying to say
+so now we come to the real definition
+
+"ChatGPT said:
+
+In CSS, display is a fundamental property that determines how an element is rendered 
+in the document flow—essentially, 
+how it behaves and interacts with other elements on the page. 
+It controls whether an element generates a block, inline, or other type of box."
+
+now we are clear on what's a display
+
+before that we have to know about what is normal flow
+a normal flow is a normal rendering of a element/tag 
+can't understand right 
+if we have to know how they rendered in css
+
+block - 
+1) rendered in a vertical flow (takes the full width and does not allow any other elemnets to take it's width)
+2) starts on a new line
+3) respects morgin, padding, width and height
+4) Vertical margins collapse with adjacent block elements
+
+for eg : <div>,<p>,<h1>
+
+inline - 
+1) renderend in a horizontal flow : only takes the width the element needed 
+2) does not satrt on a new line
+3) does not respect width and height property 
+4) margin and padding the horizontal spacing 
+
+for eg : <span>
+
+flex :
+1) it is literally block but even height can be changed 
+the elements under flex dispaly becomes flex childrens
+Note : A flex is not only horizontal or a vertical flow
+it is flexible so whiy it is called flexbox 
+
+it can change into horizontal flex with flex-direction : row
+it can chnage into vertical flow with flex-direction : column 
+
+and you can reverse the flow by using 
+row-reverse and column-reverse respectively 
 
 
 
@@ -1119,5 +1193,14 @@ article>= independent content footer> = closing content
 
 
 
+
+
+
+
+
+
+
+
+*/
 
 
