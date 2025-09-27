@@ -1185,22 +1185,46 @@ it can chnage into vertical flow with flex-direction : column
 and you can reverse the flow by using 
 row-reverse and column-reverse respectively 
 
+there is writing mode too
+for text purposes
+Keyword values 
+writing-mode: horizontal-tb;
+writing-mode: vertical-rl;
+writing-mode: vertical-lr;
+writing-mode: sideways-rl;
+writing-mode: sideways-lr;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Global values 
+writing-mode: inherit;
+writing-mode: initial;
+writing-mode: revert;
+writing-mode: revert-layer;
+writing-mode: unset;
 
 
 */
+
+
+.flexboxes {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: center;
+	align-items: center;
+}
+.flexboxes div {
+	display: flex;
+	width: 100px;
+	height: 100px;
+	background-color: red;
+	margin: 10px 10px;
+	
+}
+#flex_box4 {
+	margin: 20px 20px;
+}
+#flex_box2 {
+	margin: 20px 20px;
+}
+
 
 
