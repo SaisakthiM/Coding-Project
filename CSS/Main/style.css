@@ -1227,5 +1227,18 @@ writing-mode: unset;
 }
 
 
+/*
 
+⁡⁢⁣⁢Grid : ​⁡
+A grid is a set of intersecting horizontal and vertical lines defining rows and columns. 
+Elements can be placed onto the grid within these column and row lines. CSS grid layout has the following features:
+
+⁡⁢⁣⁢Grid tracks : ⁡
+We define rows and columns on our grid with the grid-template-rows and grid-template-columns properties.
+These define grid tracks. 
+A grid track is the space between any two adjacent lines on the grid. 
+
+
+
+*/
 
