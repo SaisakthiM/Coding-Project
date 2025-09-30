@@ -285,6 +285,12 @@ the name stores the initial state "name" and
 Note: very importnat, if you misconfigured the state of the app, most of the times
 the entire application will not work, but other apps do
 
+Hooks :
+Hooks are special functions that let your components use React features 
+(state is one of those features). The useState Hook lets you declare a state variable. 
+It takes the initial state and returns a pair of values: 
+the current state, and a state setter function that lets you update it.
+
 
 
 
