@@ -1,4 +1,4 @@
-/*
+/*!
 Hi this is rust hand-made instructions
 
 Rust : it is a compiler language like C or C++ which compiles its code to machine (binary) code and we get output.
