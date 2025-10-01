@@ -1,9 +1,8 @@
-import style from "./Header.module.css";
 
-export default function Header() {
+export default function Header({style}) {
     return (
         <header>
-            <h1 className={style.header}>Tic Tac Toe</h1>
+            <h1 className={style}>Tic Tac Toe</h1>
         </header>
     );
 }
