@@ -1,5 +1,5 @@
 [workspace]
 members = [
     "Main Files/Cargo/main_cargo",
-    "Project1"
+    "Project1",
 ]
