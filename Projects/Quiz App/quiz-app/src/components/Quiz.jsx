@@ -2,7 +2,7 @@ import './quiz.css'
 
 export default function Quiz() {
     return (<>
-        <div className='contaier'>
+        <div className='container'>
             <h1>Quiz App</h1>
             <hr></hr> 
             <h2>Which device is required for a internet connection ?</h2>
