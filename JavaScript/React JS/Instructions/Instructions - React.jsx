@@ -291,6 +291,20 @@ Hooks are special functions that let your components use React features
 It takes the initial state and returns a pair of values: 
 the current state, and a state setter function that lets you update it.
 
+Shallow Copy
+Definition: A shallow copy creates a new object or array only at the top level, 
+while nested objects/arrays still reference the original.
+
+Example:
+const newState = { ...state, nested: { ...state.nested, value: 42 } };
+Top-level properties are new, but deeper nested objects can still be shared.
+
+Deep Copy
+Definition: A deep copy creates a completely independent clone, including all nested objects and arrays.
+
+Example:
+const newState = JSON.parse(JSON.stringify(state));
+Changes at any level do not affect the original object.
 
 
 
