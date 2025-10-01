@@ -1,0 +1,23 @@
+.container {
+    width : 640px;
+    margin: auto;
+    margin-top: 150px;
+    border: 2px solid rgb(19,32,54);
+    padding: 40px 50px;
+    background-color: aliceblue;
+    border-radius: 12px;
+    font-family: 'Times New Roman', Times, serif;
+}
+.container hr {
+    height: 2px;
+    border: none;
+    background: rgb(26, 26, 199);
+}
+
+.container h2 {
+    font-size: 27px;
+    font-weight: bold;
+}
+.container ul li {
+    display: flex;
+}
