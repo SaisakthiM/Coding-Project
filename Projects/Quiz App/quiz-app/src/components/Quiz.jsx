@@ -1,19 +1,14 @@
 import './quiz.css';
 import { useState } from "react";
 
-export default function Quiz({Questions, Options, Answer, Mark=false}) {
+export default function Quiz({Questions, Options, Answer, onAnswer}) {
     const [selected, setSelected] = useState(null); // store which option user clicked
     const handleSelect = (index) => {
-        if (selected === null) { // allow only one choice
+        if (selected === null) {
             setSelected(index);
+            onAnswer(index === Answer); // send correctness to parent
         }
     };
-    if (selected === Answer) {
-        Mark = true
-    }
-    else {
-        Mark = false
-    }
     return (<>
         <div className='container'>
             <h1>Quiz App</h1>
