@@ -1,16 +1,17 @@
 import './quiz.css'
 
-export default function Quiz() {
+export default function Quiz({Questions, Options, Answer}) {
     return (<>
         <div className='container'>
             <h1>Quiz App</h1>
             <hr></hr> 
-            <h2>Which device is required for a internet connection ?</h2>
+            <h2>1. {Questions}</h2>
             <ul>
-                <li>Modem</li>
-                <li>Router</li>
-                <li>LAN Cable</li>
-                <li>Pen Drive</li>
+                <li>{Options[0]}</li>
+                <li>{Options[1]}</li>
+                <li>{Options[2]}</li>
+                <li>{Options[3]}</li>
+                
             </ul>
             <button>Next</button>
             
