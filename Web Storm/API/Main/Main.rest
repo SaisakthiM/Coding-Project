@@ -1,0 +1,14 @@
+// GET https://jsonplaceholder.typicode.com/posts/2
+
+// POST https://jsonplaceholder.typicode.com/posts
+
+// OPTIONS https://jsonplaceholder.typicode.com/posts
+
+// head https://jsonplaceholder.typicode.com/posts
+
+//GET https://www.w3schools.com/html/ HTTP/1.1
+//Accept: text/html
+
+//GET https://api.open-meteo.com/v1/forecast?latitude=13.08&longitude=80.27&current_weather=true HTTP/1.1
+//Accept: application/json
+
