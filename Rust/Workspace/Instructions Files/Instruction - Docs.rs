@@ -46,12 +46,28 @@ Note : Unsigned has the 2x capacity for signed + so if you want to purely use +,
 
 *) 8-bit, 16-bit, 32-bit, 64-bit : these are the no of the ways to store the integer in different ways
 
-8-bit has a limit of (0-255) - for unsigned, 
-(-128)-(127) for Signed
+formula for finding integer range :
 
-16-bit has a limit of (0 to 65,535) for unsigned
--32,768 to 32,767 for signed
+for unsigned : (0 to 2 ** n) - 1 
+where n is the bit range like 8, 16, 32 and 64
 
+for signed : (-2 ** n-1) to (2 ** n-1) -1
+
+variable declaration : there are 2 types of variable declaraion in rust
+
+static declaration : here the type is explicitely mentioned before declaring (explicit type declaration)
+example : let a: int32 = 10;
+
+dynamically typed (type inference)
+let a := 10;
+this declaration type is inferred when the program is in the compile time
+
+
+functions : they are a repetable bolck of code where you can give an input and it returns a output 
+like a function in math
+you can also create a void function where it does not input or output anything
+
+syntax : 
 
 
 

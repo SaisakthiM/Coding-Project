@@ -1,5 +1,3 @@
-mod Exercise;
-
 use std::io;
 
 fn main() {
