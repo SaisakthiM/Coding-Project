@@ -105,9 +105,44 @@ A Data that can be Created Read Updated and Deleted is known as Resource
 
 ------------------------------------------------------------------------------------------------------------------------------
 
-API in Terminal : 
+What's the Structure of API : 
 
-We also will be using most frequently a command called curl or Client URL for using API's in Terminal
+Ok first we can see how a REST API request looks like
+
+GET /users HTTP/1.1
+Host: api.example.com
+Authorization: Bearer YOUR_TOKEN
+
+here, 
+GET is the HTTP method used by an API to retrieve data from the server.
+this below is a table we can use diffrerent types of methods 
+
+| Method      | Purpose / Use Case                                   | Body Allowed? |
+| ----------- | ---------------------------------------------------- | ------------- |
+| **GET**     | Retrieve data from the server                        | No            |
+| **POST**    | Create new data on the server                        | Yes           |
+| **PUT**     | Update existing data completely                      | Yes           |
+| **PATCH**   | Update existing data partially                       | Yes           |
+| **DELETE**  | Delete data from the server                          | Rarely        |
+| **OPTIONS** | Check which HTTP methods are supported by the server | No            |
+| **HEAD**    | Retrieve headers only (no response body)             | No            |
+
+that HTTP/1.1 is the protocol used for establishing the network 
+
+| Protocol      | Layer           | Purpose / Use Case                                | Typical Port |
+| ------------- | --------------- | ------------------------------------------------- | ------------ |
+| **HTTP**      | Application     | Web pages, REST APIs                              | 80           |
+| **HTTPS**     | Application     | Secure web pages, REST APIs                       | 443          |
+| **FTP**       | Application     | File transfer                                     | 21           |
+| **SFTP**      | Application     | Secure file transfer over SSH                     | 22           |
+| **WebSocket** | Application     | Real-time communication (chat, live updates)      | 80/443       |
+| **SMTP**      | Application     | Sending emails                                    | 25           |
+| **IMAP**      | Application     | Reading emails                                    | 143          |
+| **POP3**      | Application     | Reading emails                                    | 110          |
+| **TCP**       | Transport       | Reliable communication, base for HTTP/FTP/SMTP    | N/A          |
+| **UDP**       | Transport       | Fast, unreliable communication (streaming, games) | N/A          |
+| **DNS**       | Application/UDP | Domain name resolution                            | 53           |
+
 
 
 
