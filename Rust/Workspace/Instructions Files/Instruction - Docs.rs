@@ -35,6 +35,24 @@ but only within rules set by the administrator.
 Immutable user (&T) → “Read-only account.” Can see everything, can’t modify.
 Mutable user (&mut T) → “Power user.” Can modify stuff, but only one power user at a time to avoid conflicts.
 
+Data-Types 
+
+1) Integer : There are 2 types of integer and 2 methods to store
+
+*) Unsigned : only + signed integer, starts from 0 N
+*) Signed : starts from - and +
+
+Note : Unsigned has the 2x capacity for signed + so if you want to purely use +, better to use unsigned
+
+*) 8-bit, 16-bit, 32-bit, 64-bit : these are the no of the ways to store the integer in different ways
+
+8-bit has a limit of (0-255) - for unsigned, 
+(-128)-(127) for Signed
+
+16-bit has a limit of (0 to 65,535) for unsigned
+-32,768 to 32,767 for signed
+
+
 
 
 
