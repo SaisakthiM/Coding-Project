@@ -67,13 +67,12 @@ functions : they are a repetable bolck of code where you can give an input and i
 like a function in math
 you can also create a void function where it does not input or output anything
 
-syntax : 
 
+*/
 
+/* Common Programming Concepts 
 
-
-
-
+1) Variables and Mutabilty :
 
 
 */
