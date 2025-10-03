@@ -73,6 +73,6 @@ you can also create a void function where it does not input or output anything
 /* Common Programming Concepts 
 
 1) Variables and Mutabilty :
-Note: sd
+Note: 
 
 */
