@@ -1,6 +1,7 @@
 # -------------------------------
 # Operating System files
 # -------------------------------
+
 # Windows
 Thumbs.db
 Desktop.ini
@@ -12,31 +13,32 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Linux
-*~ 
+*~
 .nfs*
 
 # -------------------------------
 # IDE / Editor files
 # -------------------------------
+
 .vscode/
 .idea/
+.PyCharm/
+.Web\ Storm/
 *.suo
 *.user
 *.userosscache
-*.sln.docstates
-*.swp
-*.tmp
-.PyCharm/
-.Web\ Storm/
 *.sln
+*.sln.docstates
 *.slnx
 *.code-workspace
+*.swp
+*.tmp
 
 # -------------------------------
 # Logs and temporary files
 # -------------------------------
+
 *.log
-*.tmp
 *.bak
 *.old
 *.cache
@@ -45,6 +47,7 @@ $RECYCLE.BIN/
 # -------------------------------
 # Python specific
 # -------------------------------
+
 __pycache__/
 *.pyc
 *.pyo
@@ -60,6 +63,7 @@ build/
 # -------------------------------
 # Node / JavaScript
 # -------------------------------
+
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -72,6 +76,7 @@ package-lock.json
 # -------------------------------
 # Java / JVM
 # -------------------------------
+
 *.class
 *.jar
 *.war
@@ -80,8 +85,9 @@ package-lock.json
 target/
 
 # -------------------------------
-# Large binary files (optional)
+# Large binary files
 # -------------------------------
+
 *.zip
 *.tar.gz
 *.rar
@@ -100,15 +106,16 @@ target/
 *.dylib
 
 # -------------------------------
-# Environment / config files
+# Environment / Config files
 # -------------------------------
+
 .env
 *.env
 .Dockerfile
 docker-compose.override.yml
 
 # -------------------------------
-# Project-specific folders to ignore
+# Project-specific folders
 # -------------------------------
 
 # Android asset folders
