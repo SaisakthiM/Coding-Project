@@ -12,20 +12,14 @@ There are some important thing in node js to learn
 so the main thing is that Node js runs on a single thread
 a normal program uses multiple threads for concurency and
 
-there is that event loop 
+*/
 
 
+/* Importing the module in js : 
 
+There are 2 ways to import modules in Node JS
 
-
-
-
-
-
-
-
-
-
+1) 
 
 
 
