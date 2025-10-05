@@ -2089,6 +2089,59 @@ Asking a user to select files using showOpenFilePicker()
 So before we go into what is a asynchronous programming really is 
 we have to see about what is synchronous prgramming is and what's the difference
 
+synchronous programming : it is a continuous programming where the code runs continuously without any interrupt
+if any interrupt is needed like (Getting a user input), the program stops and only runs after that task is over
+
+asynchronous programming : it is a non-continuous programmming where the program doesn't need to be continuous
+the task which needs time is taken care of afterwards and the program runs continuesly 
+
+there are 2 concept in JS for asynchronous programming
+
+1) promises
+2) async/await
+
+
+first we are going to see about promises
+
+
+Promise : An Object that manages asynchronous operations. 
+          Wrap a Promise object around (asynchronous code} "I promise to return a value"
+          PENDING -> RESOLVED or REJECTED
+          new Promise((resolve, reject) => (asynchronous code})
+
+DO THESE CHORES IN ORDER
+1. WALK THE DOG
+2. CLEAN THE KITCHEN 
+3. TAKE OUT THE TRASH
+
+function asynchronousProgramming() {
+    function clean_the_house(callback) {
+        setTimeout(() => {console.log("Cleaned the House");callback();}, 3000)
+        
+    }
+    function walk_the_dog(callback) {
+        setTimeout(() => {console.log("Walked the Dog");callback();}, 10000)
+        
+    }
+    function take_the_trash(callback) {
+        setTimeout(() => {console.log("Take the Trash");callback();}, 8000)
+    }
+
+    clean_the_house(() => {
+        walk_the_dog(() => {
+            take_the_trash(() => {
+                console.log("Completed  the Chores")
+            })
+        })
+    })
+
+}
+
+that code is called the "Callback Hell" which was the most common problem among coders before promise
+so the callback is chained and definitely not redable in any sense 
+so we introduced promises
+
+
 
 
 
