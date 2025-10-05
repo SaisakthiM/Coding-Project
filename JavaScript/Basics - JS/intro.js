@@ -1401,7 +1401,31 @@ document
     4. document.querySelector() // ELEMENT OR NULL
     5. document.querySelectorAll() // NODELIST 
     
-    
     */
     
 }
+
+function asynchronousProgramming() {
+    function clean_the_house(callback) {
+        setTimeout(() => {console.log("Cleaned the House");callback();}, 3000)
+        
+    }
+    function walk_the_dog(callback) {
+        setTimeout(() => {console.log("Walked the Dog");callback();}, 10000)
+        
+    }
+    function take_the_trash(callback) {
+        setTimeout(() => {console.log("Take the Trash");callback();}, 8000)
+    }
+
+    clean_the_house(() => {
+        walk_the_dog(() => {
+            take_the_trash(() => {
+                console.log("Completed  the Chores")
+            })
+        })
+    })
+
+}
+
+asynchronousProgramming()
