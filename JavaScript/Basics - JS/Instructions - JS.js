@@ -2140,6 +2140,9 @@ function asynchronousProgramming() {
 that code is called the "Callback Hell" which was the most common problem among coders before promise
 so the callback is chained and definitely not redable in any sense 
 so we introduced promises
+now we are going to use those
+
+
 
 
 
