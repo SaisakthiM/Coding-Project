@@ -1407,7 +1407,9 @@ document
 
 function asynchronousProgramming() {
     function clean_the_house(callback) {
-        setTimeout(() => {console.log("Cleaned the House");callback();}, 3000)
+        return new Promise((resolve, reject) => {
+            console.log("Cleaned the House")
+        })
         
     }
     function walk_the_dog(callback) {
