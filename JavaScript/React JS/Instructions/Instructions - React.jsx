@@ -308,30 +308,11 @@ this can be done normally but react has a special hook called useEffect() which 
 here is the syntax for it
 
 useEffect(() => {
-  // Code to run after render
+    Code to run after render
   return () => {
-    // Cleanup code (optional)
+    Cleanup code (optional)
   };
 }, [dependencies]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Shallow Copy
 Definition: A shallow copy creates a new object or array only at the top level, 
@@ -347,6 +328,13 @@ Definition: A deep copy creates a completely independent clone, including all ne
 Example:
 const newState = JSON.parse(JSON.stringify(state));
 Changes at any level do not affect the original object.
+
+
+Managing State : 
+It is a very important concept in react as we use it in almost all of the time 
+So we have really have options to manipulate the input of a react app 
+with state which is called controlled components
+and uncontrolled components which are controlled by the 
 
 
 
