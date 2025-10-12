@@ -291,6 +291,48 @@ Hooks are special functions that let your components use React features
 It takes the initial state and returns a pair of values: 
 the current state, and a state setter function that lets you update it.
 
+Types of Hooks : 
+1) useState() : It is for state management in react.
+A State is a Snapshot of the current events which can be stored in the useState hook 
+State are immutable and can be only changed using the updater function 
+Here is a sample declaration 
+
+const [count, setCount] = useState(0);
+the count is the current snapshot which is 0 and can be changed through the updater fucntion in react
+
+2) useEffect() : before we ho into this we have to go through what is a side-effect in react
+
+side-effect : it's any operations done outside the react component like fetching a api 
+this can be done normally but react has a special hook called useEffect() which is a better than raw JS
+
+here is the syntax for it
+
+useEffect(() => {
+  // Code to run after render
+  return () => {
+    // Cleanup code (optional)
+  };
+}, [dependencies]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Shallow Copy
 Definition: A shallow copy creates a new object or array only at the top level, 
 while nested objects/arrays still reference the original.
@@ -305,6 +347,10 @@ Definition: A deep copy creates a completely independent clone, including all ne
 Example:
 const newState = JSON.parse(JSON.stringify(state));
 Changes at any level do not affect the original object.
+
+
+
+
 
 
 
