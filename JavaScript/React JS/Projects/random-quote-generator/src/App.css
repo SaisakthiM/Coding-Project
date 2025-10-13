@@ -1,3 +1,4 @@
+/* App.css */
 body {
   margin: 0;
   height: 100vh;
@@ -5,21 +6,54 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: white;
-}
-
-/* This wrapper centers the container on the screen */
-.wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* fills the screen */
+  font-family: monospace;
+  font-size: larger;
 }
 
-/* This container centers its internal content */
-.container {
-  display: block;
-  border: 2px solid rgb(44,78,22);
-  padding: 20px;
-  padding : 150px;
+.wrapper {
+  border: 2px solid rgb(58, 181, 226);
+  padding: 120px;
+  background-image: radial-gradient(circle at center, rgb(70, 214, 183), rgb(64, 186, 40));
+  border-radius: 25px;
 }
-Easy.Easy. Clean.Easy clean up.Easy clean up you.Easy clean up you knowEasy clean up you know whatEasy clean up you know what easyEasy. Clean up. You know what? Easy. Chart Vegetables. Hey, Cortana. I swear, man, I just. OK. What's the best way to start today? Enemy they are as a bunch. Is that a logic? Are they supposed to? Currently opposite. This video has been sponsored by Oliver. That's extremely. The second main ingredient that I needed was seated. It's as much as I could. It should have been too much to the opposition there. Player of the match. Yeah. So. There is a. Hey, Cortana. What? I. Once cancer was released from the sanitarium. Champions League. Cancel. Hey, Cortana. J Robert. Hey, Cortana. Hey Cortana, apple laced with Post Office. This is exterior. The specifics are lost. Select. 
+
+.container > nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.headers {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.button_quote {
+  width: 160px;
+  height: 80px;
+  font-size: larger;
+  background-color: rgb(28, 209, 245);
+  color: azure;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button_quote:hover {
+  background-color: rgb(20, 180, 215);
+}
