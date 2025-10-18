@@ -1,0 +1,13 @@
+body {
+	background-image: radial-gradient(circle at center, rgb(217, 54, 111), rgb(82,32,112));
+}
+
+.wrapper {
+    position: relative; /* parent must be relative */
+}
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
