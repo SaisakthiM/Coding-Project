@@ -49,6 +49,7 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 40px;
+    padding: 20px;
 }
 
 .button_home button {
@@ -59,6 +60,8 @@ body {
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
+    margin: 10px;
+    
 }
 
 .button_home button:hover {
@@ -72,4 +75,32 @@ body {
 .container h1, .container p {
     color: #222222;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+/* Add this to your App.css */
+
+.selector select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.3); /* semi-transparent frosted */
+    backdrop-filter: blur(10px);           /* blur effect like container */
+    font-size: 16px;
+    margin-top: 10px;
+    color: #222;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.selector select option {
+    background-color: rgba(255, 255, 255, 0.9); /* slightly opaque for options */
+    color: #222;
+    border-radius: 12px;
 }

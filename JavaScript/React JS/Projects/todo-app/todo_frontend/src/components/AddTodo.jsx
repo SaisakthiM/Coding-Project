@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Select from "react-select";
-import "./App.css"
 
 // GraphQL Queries & Mutations
 const GET_TODOS = gql`
@@ -16,36 +15,32 @@ const GET_TODOS = gql`
 `;
 
 const CREATE_TODO = gql`
-  mutation CreateTodo($name: String!, $task_description: String, $is_completed: Boolean) {
+  mutation($name: String!, $task_description: String!, $is_completed: Boolean!) {
     createTodo(
       name: $name
-      taskDescription: $task_description
-      isCompleted: $is_completed
+      task_description: $task_description
+      is_completed: $is_completed
     ) {
-      todo {
-        id
-        name
-        taskDescription
-        isCompleted
-      }
+      id
+      name
+      taskDescription
+      isCompleted
     }
   }
 `;
 
 const UPDATE_TODO = gql`
-  mutation UpdateTodo($id: Int!, $name: String, $task_description: String, $is_completed: Boolean) {
+  mutation($id: Int!, $name: String!, $task_description: String!, $is_completed: Boolean!) {
     updateTodo(
       id: $id
       name: $name
-      taskDescription: $task_description
-      isCompleted: $is_completed
+      task_description: $task_description
+      is_completed: $is_completed
     ) {
-      todo {
-        id
-        name
-        taskDescription
-        isCompleted
-      }
+      id
+      name
+      taskDescription
+      isCompleted
     }
   }
 `;
@@ -75,29 +70,20 @@ function App() {
       alert("Please enter a task name");
       return;
     }
-    
-    const variables = {
-      name: taskName,
-      task_description: taskDescription,
-      is_completed: isCompleted,
-    };
-    
-    console.log("Sending create with variables:", variables);
-    
     try {
-      const result = await createTodo({ variables });
-      console.log("Create result:", result);
+      await createTodo({
+        variables: {
+          name: taskName,
+          task_description: taskDescription,
+          is_completed: isCompleted,
+        },
+      });
       await refetch();
       clearInputs();
       setPage(5);
     } catch (err) {
       console.error("Error adding task:", err);
-      console.error("GraphQL Errors:", err.graphQLErrors);
-      console.error("Network Error:", err.networkError);
-      if (err.networkError && err.networkError.result) {
-        console.error("Server Response:", err.networkError.result);
-      }
-      alert("Failed to add task. Check console for details.");
+      alert("Failed to add task. Please try again.");
     }
   };
 
@@ -107,30 +93,21 @@ function App() {
       alert("Please enter a task name");
       return;
     }
-    
-    const variables = {
-      id: parseInt(selectedTaskId),
-      name: taskName,
-      task_description: taskDescription,
-      is_completed: isCompleted,
-    };
-    
-    console.log("Sending update with variables:", variables);
-    
     try {
-      const result = await updateTodo({ variables });
-      console.log("Update result:", result);
+      await updateTodo({
+        variables: {
+          id: parseInt(selectedTaskId),
+          name: taskName,
+          task_description: taskDescription,
+          is_completed: isCompleted,
+        },
+      });
       await refetch();
       clearInputs();
       setPage(5);
     } catch (err) {
       console.error("Error updating task:", err);
-      console.error("GraphQL Errors:", err.graphQLErrors);
-      console.error("Network Error:", err.networkError);
-      if (err.networkError && err.networkError.result) {
-        console.error("Server Response:", err.networkError.result);
-      }
-      alert("Failed to update task. Check console for details.");
+      alert("Failed to update task. Please try again.");
     }
   };
 
