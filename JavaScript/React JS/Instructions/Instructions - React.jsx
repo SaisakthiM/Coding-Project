@@ -334,7 +334,9 @@ Managing State :
 It is a very important concept in react as we use it in almost all of the time 
 So we have really have options to manipulate the input of a react app 
 with state which is called controlled components
-and uncontrolled components which are controlled by the 
+and uncontrolled components which are controlled by the HTML DOM itself
+
+
 
 
 
