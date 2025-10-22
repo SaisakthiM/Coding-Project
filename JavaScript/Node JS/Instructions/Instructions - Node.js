@@ -29,6 +29,12 @@ Each musician (thread) performs a specific part of the composition.
 They all share the same sheet music and space (shared memory), but each one plays their own instrument (execution path).
 They can work in parallel — but if one plays the wrong note loudly enough (crashes), the whole performance (process) can be ruined.
 
+now we can talk about event loop
+
+The event loop is Node.js’s mechanism that allows it to handle multiple tasks at the same time without creating multiple threads.
+It constantly checks for tasks that are ready to run — running synchronous code first, then microtasks (Promises), and finally macrotasks (timers, I/O callbacks).
+This is how Node.js achieves non-blocking, asynchronous execution on a single main thread.
+
 
 
 
