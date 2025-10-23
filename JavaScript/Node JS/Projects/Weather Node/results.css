@@ -1,0 +1,30 @@
+body {
+    background: linear-gradient(135deg, #74ebd5, #9face6);
+    font-family: 'Times New Roman', Times, serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 400px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 8px 20px;
+    border: none;
+    background-color: #5f27cd;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+button:hover {
+    background-color: #341f97;
+}
