@@ -35,7 +35,8 @@ The event loop is Node.js’s mechanism that allows it to handle multiple tasks 
 It constantly checks for tasks that are ready to run — running synchronous code first, then microtasks (Promises), and finally macrotasks (timers, I/O callbacks).
 This is how Node.js achieves non-blocking, asynchronous execution on a single main thread.
 
-
+ok now we learnt the very basics of node 
+like asynchronous and like 
 
 
 */
