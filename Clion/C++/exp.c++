@@ -1,14 +1,9 @@
 #include <iostream>
 using namespace std;
-int x = 10;
-
-void change() {
-    int x = 20;
-    x++;
-    cout << x;
-}
 
 int main() {
-    change();
-    cout << x;
+    int *p = new int(10);
+cout << *p << endl;
+delete p;
+cout << *p;   // What happens if you uncomment this line?
 }
