@@ -2,8 +2,9 @@ import express from "express";
 
 let app = express();
 
+
 app.get("/", (req, res) => {
-    res.send("Hi I am sai");
+    res.send("Hello world");
 })
 
 app.listen(8000, () => {
