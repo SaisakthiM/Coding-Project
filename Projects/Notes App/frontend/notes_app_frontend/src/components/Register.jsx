@@ -1,6 +1,7 @@
 // RegisterPage.jsx
 import React, { useState } from "react";
-import RegisterAPI from "./retriever.js";
+import AuthService from "./AuthService.js";
+import "./register.css";
 
 export default function RegisterPage() {
     const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ export default function RegisterPage() {
         setLoading(true);
         setMessage(null);
         try {
-        const api = new RegisterAPI(username, password);
+        const api = new AuthService(username, password);
         const result = await api.register();
         setMessage("Registration successful.");
         console.log("register response:", result);
@@ -32,37 +33,41 @@ export default function RegisterPage() {
     }
 
     return (
-        <div>
-        <h2>Register</h2>
-        <div>
-            <label>
-            Username
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="username"
-            />
-            </label>
-        </div>
-        <div>
-            <label>
-            Password
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="password"
-            />
-            </label>
-        </div>
+        <div className="wrapper">
+            <div className="container">
+                <h1>Register</h1>
+                <div>
+                    <label>
+                    Username : &nbsp;
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder=" Username"
+                    />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                    Password : &nbsp;   
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                    />
+                    </label>
+                </div>
 
-        {/* Use type="button" so this doesn't submit a form automatically */}
-        <button type="button" onClick={handleRegister} disabled={loading}>
-            {loading ? "Registering..." : "Register"}
-        </button>
+                <div>
+                    {/* Use type="button" so this doesn't submit a form automatically */}
+                    <button type="button" onClick={handleRegister} disabled={loading}>
+                        {loading ? "Registering..." : "Register"}
+                    </button>
+                </div>
 
-        {message && <p>{message}</p>}
+                {message && <p>{message}</p>}
+            </div>
         </div>
     );
 }
