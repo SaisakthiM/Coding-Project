@@ -7,7 +7,7 @@ export default async function Register() {
 
     async function register(username, password) {
         let user = new Register(username, password);
-        
+        let response = await user.register()
     }
 
 }
