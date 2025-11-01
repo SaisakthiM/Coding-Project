@@ -1,37 +1,31 @@
-
+// retriever.js
 import axios from "axios";
 
-class Register {
+export default class AuthRetriever {
     constructor(username, password) {
-        this .username = username
-        this.password = password
+        this.username = username;
+        this.password = password;
     }
+
     async register() {
-        let url = "http://127.0.0.1:8000/api/user/register/";
-        let params = {
+        const url = "http://127.0.0.1:8000/api/user/register/";
+        const params = {
             username: this.username,
-            password : this.password,
-            
-        }
-        let headers = {
-                "Content-Type" : "application/json",
-        }
-        let response = await axios.post(url, params, {headers});
-        return (response.data)
+            password: this.password,
+        };
+        const headers = { "Content-Type": "application/json" };
+        const response = await axios.post(url, params, { headers });
+        return response.data;
     }
+
     async get_token() {
-        let url = "http://127.0.0.1:8000/api/token/";
-        let params = {
+        const url = "http://127.0.0.1:8000/api/token/";
+        const params = {
             username: this.username,
-            password : this.password,
-            
-        }
-        let headers = {
-                "Content-Type" : "application/json",
-        }
-        let response = await axios.post(url, params, {headers});
-        return (response.data)
+            password: this.password,
+        };
+        const headers = { "Content-Type": "application/json" };
+        const response = await axios.post(url, params, { headers });
+        return response.data;
     }
 }
-
-
