@@ -1,7 +1,7 @@
-// retriever.js
+// AuthService.js
 import axios from "axios";
 
-export default class AuthRetriever {
+export default class AuthService {
     constructor(username, password) {
         this.username = username;
         this.password = password;
@@ -18,7 +18,7 @@ export default class AuthRetriever {
         return response.data;
     }
 
-    async get_token() {
+    async login() {
         const url = "http://127.0.0.1:8000/api/token/";
         const params = {
             username: this.username,
