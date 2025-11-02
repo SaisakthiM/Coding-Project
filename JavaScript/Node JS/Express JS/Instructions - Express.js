@@ -52,6 +52,37 @@ app.listen(8000, () => {
     console.log("hi")
 })
 
+Routing : 
+It is a very important thing in backend as it determines which path the request are sent and some paths works, 
+some paths doesn't and some path are specialized
+
+Definitions : 
+Routing refers to determining how an application responds to a client request to a particular endpoint, 
+which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
+
+app.METHOD(PATH, HANDLER)
+
+this is the syntax
+
+Code :
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+here app is the express module (we decalred it in top)
+
+dxjas
+
+
+
+
+
+
+
+
+
+
+
 
 
 
