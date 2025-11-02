@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "path": "C:/Coding Project"
+    }
+  ],
+  "settings": {
+    // ⚙️ Performance optimizations
+    "files.watcherExclude": {
+      "**/node_modules/**": true,
+      "**/.git/**": true,
+      "**/dist/**": true,
+      "**/build/**": true,
+      "**/venv/**": true
+    },
+
+    // 🔍 Smart search exclusions
+    "search.exclude": {
+      "**/node_modules/**": true,
+      "**/.git/**": true,
+      "**/dist/**": true,
+      "**/build/**": true,
+      "**/venv/**": true
+    }
+  }
+}

@@ -30,7 +30,7 @@ $RECYCLE.BIN/
 *.sln
 *.sln.docstates
 *.slnx
-*.code-workspace
+
 *.swp
 *.tmp
 

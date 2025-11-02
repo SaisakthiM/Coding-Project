@@ -1,0 +1,136 @@
+{
+  "folders": [
+    {
+      "name": "Coding Project",
+      "path": ".."
+    }
+  ],
+  "settings": {
+    "workbench.colorCustomizations": {},
+    "workbench.colorTheme": "Night Owl X One Dark",
+    "workbench.preferredDarkColorTheme": "Visual Studio Dark - C++",
+    "files.associations": {
+      "array": "cpp",
+      "atomic": "cpp",
+      "*.tcc": "cpp",
+      "cctype": "cpp",
+      "clocale": "cpp",
+      "cmath": "cpp",
+      "cstdarg": "cpp",
+      "cstddef": "cpp",
+      "cstdint": "cpp",
+      "cstdio": "cpp",
+      "cstdlib": "cpp",
+      "cwchar": "cpp",
+      "cwctype": "cpp",
+      "deque": "cpp",
+      "unordered_map": "cpp",
+      "vector": "cpp",
+      "exception": "cpp",
+      "algorithm": "cpp",
+      "functional": "cpp",
+      "iterator": "cpp",
+      "memory": "cpp",
+      "memory_resource": "cpp",
+      "numeric": "cpp",
+      "random": "cpp",
+      "string": "cpp",
+      "system_error": "cpp",
+      "tuple": "cpp",
+      "type_traits": "cpp",
+      "utility": "cpp",
+      "fstream": "cpp",
+      "initializer_list": "cpp",
+      "iosfwd": "cpp",
+      "iostream": "cpp",
+      "istream": "cpp",
+      "limits": "cpp",
+      "new": "cpp",
+      "ostream": "cpp",
+      "sstream": "cpp",
+      "stdexcept": "cpp",
+      "streambuf": "cpp",
+      "typeinfo": "cpp",
+      "chrono": "cpp",
+      "ctime": "cpp",
+      "ratio": "cpp",
+      "thread": "cpp"
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "sqltools.connections": [
+      {
+        "mysqlOptions": {
+          "authProtocol": "default",
+          "enableSsl": "Disabled"
+        },
+        "previewLimit": 50,
+        "server": "127.0.0.1",
+        "port": 3306,
+        "driver": "MySQL",
+        "name": "Personal",
+        "group": "MySQL Connections",
+        "database": "saisakthi",
+        "username": "root"
+      }
+    ],
+    "java.project.sourcePaths": [
+      "Intellij"
+    ],
+    "java.project.referencedLibraries": [],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "python-envs.pythonProjects": [
+      {
+        "path": "Pycharm",
+        "envManager": "ms-python.python:venv",
+        "packageManager": "ms-python.python:pip"
+      }
+    ],
+    "dbcode.connections": [
+      {
+        "connectionId": "_SlR2gTPqBXS3hMhmt3IH",
+        "name": "Saisakthi",
+        "driver": "mysql",
+        "color": "#00E3A9",
+        "connectionType": "host",
+        "host": "localhost",
+        "port": 3306,
+        "ssl": false,
+        "username": "root",
+        "password": "",
+        "savePassword": "secretStorage",
+        "tunnelId": "9cIjiARHt2FmbptaJhfRe",
+        "database": "information_schema",
+        "readOnly": false,
+        "role": "development",
+        "connectionTimeout": 30,
+        "driverOptions": {
+          "retrievePublickey": true
+        }
+      }
+    ],
+
+    // ✅ Performance Optimizations Begin Here
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/build": true,
+      "**/dist": true,
+      "**/.git": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/build": true,
+      "**/dist": true,
+      "**/.git": true
+    },
+    "files.watcherExclude": {
+      "**/node_modules/**": true,
+      "**/build/**": true,
+      "**/dist/**": true,
+      "**/.git/**": true
+    },
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+    "javascript.suggest.autoImports": false
+    // ✅ Performance Optimizations End
+  }
+}

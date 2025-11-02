@@ -72,6 +72,8 @@ app.get('/', (req, res) => {
 here app is the express module (we decalred it in top)
 
 and / is the path which is root path
+saioj
+
 
 
 
