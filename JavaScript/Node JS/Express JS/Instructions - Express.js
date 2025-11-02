@@ -26,6 +26,35 @@ Why Use Express Instead of Plain Node.js?
 | Scalability  | Hard to manage routes            | Supports modular route files                      |
 | Community    | Smaller                          | Massive ecosystem (npm packages, templates, etc.) |
 
+CRUD Operations :
+
+the DRUD oprerations are the most important operations for a server to do
+after all it is made for this purpose 
+
+so we have a doubt how can we do this in express js 
+it's simple than you think 
+
+just import the module and use it like
+
+for GET (Read) request : app.get()
+for POST (Create) request : app.post()
+for PUT (Update) request: app.put()
+for DELETE (Delete) request : app.delete()
+
+Eg : 
+
+import express from "express";
+let app = express();
+app.get("/", (req, res) => {
+    res.send("Hello orld");
+})
+app.listen(8000, () => {
+    console.log("hi")
+})
+
+
+
+
 
 
 */
