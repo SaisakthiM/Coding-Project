@@ -75,7 +75,19 @@ and / is the path which is root path
 now we know basic routing we can move on to next level of routing 
 
 as you can see in the syntax itself, we know the method 
-Note: sakj
+Note: 
+
+! critical bug: check API key validation
+? should we replace with environment variable?
+todo: add pagination to this endpoint
+! Note: using cached data for now
+fix: handle empty response case
+! optimize: reduce DB round trips
+idea: use AI-based auto-tagging
+deprecated: old function kept for compatibility
+review: confirm with frontend team
+debug: print current session ID
+done: added logging middleware
 
 
 
