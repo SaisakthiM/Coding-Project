@@ -80,7 +80,7 @@ Note:
 ! critical bug: check API key validation
 ? should we replace with environment variable?
 todo: add pagination to this endpoint
-! Note: using cached data for now
+Note: using cached data for now
 fix: handle empty response case
 ! optimize: reduce DB round trips
 idea: use AI-based auto-tagging
