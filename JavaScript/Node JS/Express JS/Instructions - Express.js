@@ -75,8 +75,51 @@ and / is the path which is root path
 now we know basic routing we can move on to next level of routing 
 
 as you can see in the syntax itself, we know the method 
-
 Note: there is also a function called app.all() which i used to load all middleware for all requests
+
+now there is also may types of routing 
+
+1) Path/Static Routing : this is the mostcommon type of routing 
+so here we mention the routes via 
+Syntax : /path 
+
+the/ is the root point and after that you can have a specific end-point and you can also stack it like 
+/api/users/end
+like this
+
+2) Pattern Routing : 
+
+| Pattern | Meaning                          | Example                                          |
+| ------- | -------------------------------- | ------------------------------------------------ |
+| `?`     | Optional character               | `/ab?cd` matches `/acd` or `/abcd`               |
+| `+`     | One or more of previous char     | `/ab+cd` matches `/abcd`, `/abbcd`, `/abbbcd`    |
+| `*`     | Wildcard — any string in between | `/ab*cd` matches `/abcd`, `/ab123cd`, `/abXYZcd` |
+| `()`    | Grouping for optional sections   | `/a(bc)?d` matches `/ad` or `/abcd`              |
+
+this is a very good routing if you want to have multiple repetitive routing routes
+
+and here is a question
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get('/ab?cd', (req, res) => {
+  res.send('Matched pattern route!');
+});
+
+app.get('/ab+cd', (req,res) => {
+    res.send("Hi")
+})
+app.get('/ab*cd', (req,res) => {
+    res.send("Hi hello")
+})
+
+which will render first 
+hi or hi hello 
+it's hi because of request handling 
+if it found a match 
+
 
 
 
