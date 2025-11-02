@@ -74,7 +74,8 @@ and / is the path which is root path
 
 now we know basic routing we can move on to next level of routing 
 
-as you can see in the syntax itself, 
+as you can see in the syntax itself, we know the method 
+Note: sakj
 
 
 
