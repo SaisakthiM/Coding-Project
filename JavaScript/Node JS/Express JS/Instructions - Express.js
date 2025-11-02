@@ -28,7 +28,7 @@ Why Use Express Instead of Plain Node.js?
 
 CRUD Operations :
 
-the DRUD oprerations are the most important operations for a server to do
+the CRUD operations are the most important operations for a server to do
 after all it is made for this purpose 
 
 so we have a doubt how can we do this in express js 
@@ -46,7 +46,7 @@ Eg :
 import express from "express";
 let app = express();
 app.get("/", (req, res) => {
-    res.send("Hello orld");
+    res.send("Hello World");
 })
 app.listen(8000, () => {
     console.log("hi")
@@ -72,7 +72,7 @@ app.get('/', (req, res) => {
 here app is the express module (we decalred it in top)
 
 and / is the path which is root path
-saioj
+
 
 
 
