@@ -2,12 +2,15 @@
 import React, { useState } from "react";
 import AuthService from "./AuthService.js";
 import "./register.css";
+import { useContext } from "react";
+import { UserContext } from "./UserContext.js";
 
-export default function RegisterPage() {
+export default function RegisterPage({isRegistered}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState(null);
+    const [message, setMessage] = useState(null);   
+    const { registered, setRegistered } = useContext(UserContext);
 
     async function handleRegister() {
         setLoading(true);
@@ -67,6 +70,7 @@ export default function RegisterPage() {
                 </div>
 
                 {message && <p>{message}</p>}
+                {setRegistered(true)}
             </div>
         </div>
     );

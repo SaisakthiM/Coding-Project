@@ -1,32 +1,27 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import RegisterPage from './components/Register.jsx';
-import LoginPage from './components/Login.jsx';
+import React, { useContext, useState } from "react";
+import RegisterPage from "./components/Register";
+import LoginPage from "./components/Login";
+import { UserContext } from "./components/UserContext";
 
+export default function App() {
+  const { registered } = useContext(UserContext);
+  const [showLogin, setShowLogin] = useState(false);
 
-function App() {
-	return (
-        <Router>
-            <div>
-                <nav>
-                    <ul>
-                        <li>
-                            <Link to="/register">Register</Link>
-                        </li>
-                        <li>
-                            <Link to="/login">Login</Link>
-                        </li>
-                    </ul>
-                </nav>
+  // Case 1: user already registered -> show login
+  // Case 2: user not registered -> show register page
 
-                <hr />
-
-                <Routes>
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                </Routes>
-            </div>
-        </Router>
-    )
+  return (
+    <div>
+      {registered && !showLogin ? (
+        <div style={{ textAlign: "center", marginTop: "100px" }}>
+          <h2>Registration successful 🎉</h2>
+          <button onClick={() => setShowLogin(true)}>Go to Login</button>
+        </div>
+      ) : showLogin ? (
+        <LoginPage />
+      ) : (
+        <RegisterPage />
+      )}
+    </div>
+  );
 }
-
-export default App;

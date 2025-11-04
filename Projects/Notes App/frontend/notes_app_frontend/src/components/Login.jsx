@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AuthService from "./AuthService.js";
 import "./login.css";
 
-export default function LoginPage() {
+export default function LoginPage({isRegistered}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
