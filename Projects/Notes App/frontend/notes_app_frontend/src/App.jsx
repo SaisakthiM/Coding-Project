@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import RegisterPage from "./components/Register";
 import LoginPage from "./components/Login";
 import { UserContext } from "./components/UserContext";
+import RegistrationComplete from "./components/RegistrationComplete";
+import "./styles.css";
 
 export default function App() {
   const { registered } = useContext(UserContext);
@@ -12,16 +14,7 @@ export default function App() {
 
   return (
     <div>
-      {registered && !showLogin ? (
-        <div style={{ textAlign: "center", marginTop: "100px" }}>
-          <h2>Registration successful 🎉</h2>
-          <button onClick={() => setShowLogin(true)}>Go to Login</button>
-        </div>
-      ) : showLogin ? (
-        <LoginPage />
-      ) : (
-        <RegisterPage />
-      )}
+      {registered ? <RegistrationComplete></RegistrationComplete> : <RegisterPage></RegisterPage>}
     </div>
   );
 }

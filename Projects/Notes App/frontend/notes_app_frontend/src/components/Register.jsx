@@ -1,7 +1,7 @@
 // RegisterPage.jsx
 import React, { useState } from "react";
 import AuthService from "./AuthService.js";
-import "./register.css";
+import "../styles.css";
 import { useContext } from "react";
 import { UserContext } from "./UserContext.js";
 
@@ -62,15 +62,16 @@ export default function RegisterPage({isRegistered}) {
                     </label>
                 </div>
 
-                <div>
+                <div className="buttons">
                     {/* Use type="button" so this doesn't submit a form automatically */}
-                    <button type="button" onClick={handleRegister} disabled={loading}>
+                    <button type="button" onClick={() => {handleRegister; setRegistered(true)}} disabled={loading}>
                         {loading ? "Registering..." : "Register"}
                     </button>
+                    <button type="button" onClick={() => {setRegistered(true)}}>Go To Login</button>
                 </div>
 
                 {message && <p>{message}</p>}
-                {setRegistered(true)}
+                
             </div>
         </div>
     );
