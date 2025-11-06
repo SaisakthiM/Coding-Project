@@ -1,13 +1,15 @@
 // LoginPage.jsx
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthService from "./AuthService.js";
-import "./login.css";
+import "../styles.css";
+import { UserProvider } from "./UserProvider.jsx";
 
 export default function LoginPage({isRegistered}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
+    const {login, setLogin} = useContext(UserProvider);
 
     async function handleLogin() {
         setLoading(true);
@@ -17,7 +19,9 @@ export default function LoginPage({isRegistered}) {
             const tokens = await api.login();
             localStorage.setItem("access", tokens.access);
             localStorage.setItem("refresh", tokens.refresh);
+            console.log(api)
             setMessage("Login successful.");
+            setLogin(true)
         } catch (err) {
             console.error(err);
             const errMsg =
