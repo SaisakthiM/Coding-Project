@@ -1,20 +1,32 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
+import { UserContext } from "./components/UserContext";
 import RegisterPage from "./components/Register";
 import LoginPage from "./components/Login";
-import { UserContext } from "./components/UserContext";
 import RegistrationComplete from "./components/RegistrationComplete";
 import "./styles.css";
 
 export default function App() {
-  const { registered } = useContext(UserContext);
-  const [showLogin, setShowLogin] = useState(false);
+  const { registered, beforeLogin, login } = useContext(UserContext);
 
-  // Case 1: user already registered -> show login
-  // Case 2: user not registered -> show register page
+  if (!registered) {
+    return <RegisterPage />;
+  }
 
-  return (
-    <div>
-      {registered ? <RegistrationComplete></RegistrationComplete> : <RegisterPage></RegisterPage>}
-    </div>
-  );
+  if (registered && !beforeLogin) {
+    return <RegistrationComplete />;
+  }
+
+  if (beforeLogin && !login) {
+    return <LoginPage />;
+  }
+
+  if (login) {
+    return (
+      <div className="wrapper">
+        <h1>🎉 Welcome! You are logged in.</h1>
+      </div>
+    );
+  }
+
+  return null;
 }

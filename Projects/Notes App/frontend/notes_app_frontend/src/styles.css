@@ -67,7 +67,7 @@ button:active {
 }
 
 body {
-    background-image: url("../assets/Book.jpg");
+    background-image: url("../assets/Images.jpg");
     background-size: cover;       /* scales to fill the screen */
     background-position: center;  /* centers the image */
     background-repeat: no-repeat; /* no tiling */
@@ -158,7 +158,7 @@ button:active {
     align-items: center;
 }
 body {
-    background-image: url("./assets/Book.jpg");
+    background-image: url("./assets/Images.jpg");
     height: 100vh;
     background-size: cover;       /* scales to fill the screen */
     background-position: center;  /* centers the image */
