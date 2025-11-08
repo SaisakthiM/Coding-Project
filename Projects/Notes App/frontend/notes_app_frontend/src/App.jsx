@@ -1,38 +1,31 @@
-import React, { useContext, useEffect } from "react";
-import { UserContext } from "./components/UserContext";
-import RegisterPage from "./components/Register";
-import LoginPage from "./components/Login";
-import RegistrationComplete from "./components/RegistrationComplete";
-import "./styles.css";
-import Notes from "./notes/Notes";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./components/AuthContext.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AddNote from "./notes/AddNote.jsx";
+import HomePage from "./notes/Notes.jsx";
+import LoginPage from "./components/Login.jsx";
+import RegisterPage from "./components/Register.jsx";
+import RegistrationComplete from "./components/RegistrationComplete.jsx";
 
 export default function App() {
-  const { registered, beforeLogin, login, setLogin } = useContext(UserContext);
-
-  useEffect(() => {
-    const token = localStorage.getItem('access');
-    if (token) {
-      setLogin(true);
-    }
-  }, [setLogin]);
-
-  if (!registered) {
-    return <RegisterPage />;
-  }
-
-  if (registered && !beforeLogin) {
-    return <RegistrationComplete />;
-  }
-
-  if (beforeLogin && !login) {
-    return <LoginPage />;
-  }
-
-  if (login) {
-    return (
-      <Notes></Notes>
-    );
-  }
-
-  return null;
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/registered" element={<RegistrationComplete />} />
+          <Route path="/addnote" element={<AddNote></AddNote>}></Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
