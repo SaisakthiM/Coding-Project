@@ -1,7 +1,6 @@
-// RegisterPage.jsx
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "../styles.css";
-import { UserContext } from "./UserContext.js";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api/authServices.js";
 
 export default function RegisterPage() {
@@ -9,17 +8,17 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const { setRegistered } = useContext(UserContext);
+  const navigate = useNavigate();
 
-  // ✅ Add handler here
   async function handleRegister() {
     setLoading(true);
     setMessage(null);
     try {
-      const result = await registerUser(username, password); // pass inputs here
+      const result = await registerUser(username, password);
       console.log("Register response:", result);
       setMessage("Registration successful!");
-      setRegistered(true); // Move to next page
+      // ✅ Navigate to success page
+      setTimeout(() => navigate("/registered"), 1000);
     } catch (err) {
       console.error(err);
       const errMsg = err.response?.data || err.message || "Registration failed.";
@@ -57,7 +56,6 @@ export default function RegisterPage() {
         </div>
 
         <div className="buttons">
-          {/* ✅ Call the handler, not registerUser directly */}
           <button
             type="button"
             onClick={handleRegister}
@@ -66,10 +64,8 @@ export default function RegisterPage() {
             {loading ? "Registering..." : "Register"}
           </button>
 
-          <button
-            type="button"
-            onClick={() => setRegistered(true)}
-          >
+          {/* ✅ Simple navigation to login */}
+          <button type="button" onClick={() => navigate("/login")}>
             Go To Login
           </button>
         </div>

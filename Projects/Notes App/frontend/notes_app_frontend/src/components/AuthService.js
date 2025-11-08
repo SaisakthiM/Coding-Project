@@ -1,4 +1,4 @@
-// AuthService.js
+// src/api/AuthService.js
 import axios from "axios";
 
 export default class AuthService {
@@ -28,4 +28,15 @@ export default class AuthService {
         const response = await axios.post(url, params, { headers });
         return response.data;
     }
+}
+
+// ✅ Helper functions for easier use inside components
+export async function registerUser(username, password) {
+    const auth = new AuthService(username, password);
+    return await auth.register();
+}
+
+export async function loginUser(username, password) {
+    const auth = new AuthService(username, password);
+    return await auth.login();
 }

@@ -1,170 +1,163 @@
-
-.wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    
-}
-.container{
-    background-color: hsl(210, 20%, 95%);
-    padding: 20px 30px;
-    border-radius: 15px;
-}
-
-.container h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.container div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 30px;
-    font-size: large;
-}
-.container div label input{
-    background-color: aliceblue;
-    width: 200px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    transition: border-color 0.3s ease;
-}
-.container div label input[type="password"]:focus {
-    outline: none;
-    border-color: #c8788c;
-    box-shadow: 0 0 5px rgba(200, 120, 140, 0.3);
-}
-.container div label input[type="text"]:focus {
-    outline: none;
-    border-color: #c8788c;
-    box-shadow: 0 0 5px rgba(200, 120, 140, 0.3);
-}
-button {
-  padding: 12px 30px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #c8788c;
-  color: white;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-button:hover {
-  background-color: #b0636f;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-body {
-    background-image: url("../assets/Images.jpg");
-    background-size: cover;       /* scales to fill the screen */
-    background-position: center;  /* centers the image */
-    background-repeat: no-repeat; /* no tiling */
-    color: rgb(30, 60, 90);
-    margin: 0;
-}
-.wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    
-}
-.container{
-    background-color: hsl(210, 20%, 95%);
-    padding: 20px 30px;
-    border-radius: 15px;
-}
-
-.container h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.container div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 30px;
-    font-size: large;
-}
-.container div label input{
-    background-color: aliceblue;
-    width: 200px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    transition: border-color 0.3s ease;
-}
-.container div label input[type="password"]:focus {
-    outline: none;
-    border-color: #c8788c;
-    box-shadow: 0 0 5px rgba(200, 120, 140, 0.3);
-}
-.container div label input[type="text"]:focus {
-    outline: none;
-    border-color: #c8788c;
-    box-shadow: 0 0 5px rgba(200, 120, 140, 0.3);
-}
-button {
-  padding: 12px 30px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #c8788c;
-  color: white;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-button:hover {
-  background-color: #b0636f;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-.buttons button {
-    margin: 20px 30px;
-}
-
-.complete {
-    background-color: hsl(210, 20%, 95%);
-    padding: 20px 30px;
-    border-radius: 15px;
-}
-
-.complete {
-    display: flex;
-    height: 200px;
-    justify-content: center;
-    align-items: center;
-}
+/* Global Styles */
 body {
     background-image: url("./assets/Images.jpg");
-    height: 100vh;
-    background-size: cover;       /* scales to fill the screen */
-    background-position: center;  /* centers the image */
-    background-repeat: no-repeat; /* no tiling */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: rgb(30, 60, 90);
+    margin: 0;
+    min-height: 100vh;
 }
 
+/* Layout */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    background-color: hsl(210, 20%, 95%);
+    padding: 20px 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.complete {
+    background-color: hsl(210, 20%, 95%);
+    padding: 40px 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Headings */
+.container h1,
+.complete h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.container h1.main {
+    margin-bottom: 5px;
+}
+
+.container p {
+    text-align: center;
+    margin: 10px 0 20px;
+}
+
+/* Form Elements */
+.container > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    font-size: large;
+}
+
+.loginLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 20px;
+    
+
+}
+
+.inputLogin{
+    background-color: aliceblue;
+    width: 200px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.loginLabel input[type="password"]:focus,
+.loginLabel input[type="text"]:focus {
+    outline: none;
+    border-color: #c8788c;
+    box-shadow: 0 0 5px rgba(200, 120, 140, 0.3);
+}
+
+.loginButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+}
+/* Buttons */
+button {
+    padding: 12px 30px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #c8788c;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+.loginButtons {
+    margin: 12px 30px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #c8788c;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.1s ease;    
+}
+
+button:hover {
+    background-color: #b0636f;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.buttons button,
+.button_notes button {
+    margin: 10px;
+}
+
+.button_notes {
+    display: block;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 20px 30px;
+    font-size: larger;
+}
+
+
+/* Notes App Specific */
 .add-note-section {
     display: flex;
     gap: 10px;
@@ -173,6 +166,9 @@ body {
 
 .add-note-section input {
     flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .notes-list {
@@ -210,31 +206,24 @@ body {
 }
 
 .note-item button {
-    margin-left: 10px;
+    margin: 0;
     padding: 8px 15px;
     font-size: 14px;
     border-radius: 5px;
 }
 
-.add-note-section {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.add-note-section input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
+/* Messages */
 .error-message {
     color: #d9534f;
     background-color: #f2dede;
     border: 1px solid #ebccd1;
     padding: 10px;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin: 10px 0;
+    text-align: center;
 }
 
+.container > div p {
+    text-align: center;
+    margin: 10px 0;
+}
