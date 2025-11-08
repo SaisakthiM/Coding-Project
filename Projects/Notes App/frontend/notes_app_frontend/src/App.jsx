@@ -1,12 +1,20 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { UserContext } from "./components/UserContext";
 import RegisterPage from "./components/Register";
 import LoginPage from "./components/Login";
 import RegistrationComplete from "./components/RegistrationComplete";
 import "./styles.css";
+import Notes from "./notes/Notes";
 
 export default function App() {
-  const { registered, beforeLogin, login } = useContext(UserContext);
+  const { registered, beforeLogin, login, setLogin } = useContext(UserContext);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access');
+    if (token) {
+      setLogin(true);
+    }
+  }, [setLogin]);
 
   if (!registered) {
     return <RegisterPage />;
@@ -22,9 +30,7 @@ export default function App() {
 
   if (login) {
     return (
-      <div className="wrapper">
-        <h1>🎉 Welcome! You are logged in.</h1>
-      </div>
+      <Notes></Notes>
     );
   }
 

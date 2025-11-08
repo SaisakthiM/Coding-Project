@@ -1,4 +1,3 @@
-// LoginPage.jsx
 import React, { useContext, useState } from "react";
 import "../styles.css";
 import { UserContext } from "./UserContext.js";
