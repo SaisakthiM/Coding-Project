@@ -1,28 +1,27 @@
-"""
-URL configuration for social_media project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
 from django.urls import path, include
-from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
 
+# Custom GraphQL view to disable Debug Toolbar
+class NoDebugToolbarGraphQLView(GraphQLView):
+    def dispatch(self, *args, **kwargs):
+        if hasattr(self.request, "toolbar"):
+            self.request.toolbar = None  # disable Debug Toolbar for this request
+        return super().dispatch(*args, **kwargs)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/posts/', include('apps.posts.urls')), 
-    path("graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+
+    # Your apps
+    path("api/posts/", include("apps.posts.urls")),
+
+    # GraphQL endpoint (Debug Toolbar disabled)
+    path("graphql/", csrf_exempt(NoDebugToolbarGraphQLView.as_view(graphiql=True))),
+
+    # Debug Toolbar
+    path("__debug__/", include("debug_toolbar.urls")),
+
+    # Prometheus metrics
+    path("", include("django_prometheus.urls")),
 ]

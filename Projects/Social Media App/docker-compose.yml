@@ -14,11 +14,20 @@ services:
       DB_PASSWORD: saisakthi2008
       DB_HOST: postgres
       DB_PORT: 5432
+      RUNNING_IN_DOCKER: 1
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/graphql/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # -------- Postgres DB --------
   postgres:
@@ -35,14 +44,16 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
+      timeout: 5s
       retries: 5
 
   # -------- Frontend Dev (Vite/HMR) --------
   frontend-dev:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev    # Dev Dockerfile
-    command: npm run dev
+      dockerfile: Dockerfile
+      target: dev
+    container_name: frontend-dev
     ports:
       - "5173:5173"
     volumes:
@@ -53,50 +64,40 @@ services:
     networks:
       - frontend-net
       - backend-net
+    environment:
+      - VITE_DEV_SERVER_HOST=0.0.0.0
+    profiles:
+      - dev
 
-  # -------- Frontend Production (build only) --------
+  # -------- Frontend Production (Nginx) --------
   frontend-prod:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod   # Prod Dockerfile
-    networks:
-      - frontend-net
-
-  # -------- Frontend + Nginx --------
-  nginx-dev:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.nginx.dev
-      args:
-        COPY_FRONTEND: "false"
-    ports:
-      - "8080:80"
-    depends_on:
-      - frontend-dev
-      - django
-    networks:
-      - backend-net
-      - frontend-net
-    restart: always
-  
-  nginx-prod:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.nginx.prod
-      args:
-        COPY_FRONTEND: "true"
+      dockerfile: Dockerfile
+      target: production
+    container_name: frontend-prod
     ports:
       - "80:80"
     depends_on:
-      - frontend-prod
-      - django
-      - microservice-java
+      django:
+        condition: service_healthy
+      microservice-java:
+        condition: service_started
+      microservice-go:
+        condition: service_started
+      minio:
+        condition: service_started
     networks:
-      - backend-net
       - frontend-net
-    restart: always
+      - backend-net
+    restart: unless-stopped
+    profiles:
+      - prod
+    # Use wait-for script to ensure backends are ready
+    entrypoint: ["/wait-for.sh"]
+    command: ["django:8000", "microservice-java:8080", "microservice-go:8080", "minio:9000", "--", "nginx", "-g", "daemon off;"]
 
-  # -------- Java Microservice + Cassandra --------
+  # -------- Cassandra DB --------
   cassandra:
     image: cassandra:4
     container_name: cassandra
@@ -104,37 +105,59 @@ services:
       - cassandra_data:/var/lib/cassandra
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe cluster' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
+  # -------- Java Microservice --------
   microservice-java:
     build: ./microservice-java
     container_name: microservice-java
     ports:
-      - "8081:8080"  # Avoid conflict with nginx
+      - "8081:8080"
     environment:
       SPRING_CASSANDRA_CONTACT-POINTS: cassandra
       SPRING_CASSANDRA_PORT: 9042
       SPRING_CASSANDRA_LOCAL-DATACENTER: datacenter1
     depends_on:
-      - cassandra
-      - kafka
+      cassandra:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - backend-net
     volumes:
       - ./microservice-java/.m2:/root/.m2
       - ./microservice-java/target:/app/target
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
-  # -------- Go Microservice + Redis --------
+  # -------- Redis --------
   redis:
     image: redis:7
     container_name: redis
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
+  # -------- Go Microservice --------
   microservice-go:
     build: ./microservice-go
     container_name: microservice-go
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -143,14 +166,21 @@ services:
     volumes:
       - go_cache:/go/pkg/mod
       - go_build_cache:/root/.cache/go-build
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  # -------- Kafka & Zookeeper --------
+  # -------- Zookeeper --------
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
     networks:
       - backend-net
 
+  # -------- Kafka --------
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
@@ -167,21 +197,26 @@ services:
   minio:
     build:
       context: ./minio
-      dockerfile: Dockerfile   # <-- rename your Dockerfile to this (or adjust path)
+      dockerfile: Dockerfile
     container_name: minio
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
     ports:
-      - "9000:9000"   # MinIO API
-      - "9004:9004"   # MinIO Console WebUI
+      - "9000:9000"
+      - "9004:9004"
     volumes:
-      - ./minio-data:/data
+      - minio_data:/data
     networks:
       - backend-net
+    command: server /data --console-address ":9004"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-
-  # -------- Observability --------
+  # -------- Prometheus --------
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -189,9 +224,17 @@ services:
       - "9090:9090"
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     networks:
       - backend-net
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    profiles:
+      - prod
+      - observability
 
+  # -------- Grafana --------
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -199,9 +242,19 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
     networks:
       - backend-net
+    depends_on:
+      - prometheus
+      - loki
+    profiles:
+      - prod
+      - observability
 
+  # -------- Loki --------
   loki:
     image: grafana/loki:2.9.2
     container_name: loki
@@ -209,9 +262,16 @@ services:
       - "3100:3100"
     volumes:
       - ./observability/loki-config.yml:/etc/loki/local-config.yml
+      - loki_data:/loki
     networks:
       - backend-net
+    command: -config.file=/etc/loki/local-config.yml
+    user: root  # Needed for directory creation
+    profiles:
+      - prod
+      - observability
 
+  # -------- Promtail --------
   promtail:
     image: grafana/promtail:2.9.2
     container_name: promtail
@@ -220,19 +280,27 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./observability/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
     networks:
       - backend-net
+    profiles:
+      - prod
+      - observability
 
+  # -------- Tempo --------
   tempo:
     image: grafana/tempo:2.4.1
     container_name: tempo
     ports:
       - "3200:3200"
       - "9095:9095"
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
     volumes:
       - ./observability/tempo-config.yml:/etc/tempo/tempo.yaml
+      - tempo_data:/tmp/tempo
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     networks:
       - backend-net
@@ -246,7 +314,12 @@ volumes:
   minio_data:
   go_cache:
   go_build_cache:
+  prometheus_data:
+  loki_data:
+  tempo_data:
 
 networks:
   backend-net:
+    driver: bridge
   frontend-net:
+    driver: bridge
