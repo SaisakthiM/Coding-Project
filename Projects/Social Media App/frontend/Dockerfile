@@ -1,26 +1,25 @@
-# --------- Stage 0: Base Node Image ---------
-FROM node:20-bullseye AS base
+# Development stage
+FROM node:22-alpine AS dev
 WORKDIR /app
 COPY package*.json ./
-
-# Install dependencies with proper flags for Docker
-RUN npm ci --include=optional --legacy-peer-deps
-
-# --------- Stage 1: Dev Frontend (Vite/HMR) ---------
-FROM base AS dev
+RUN npm install
 COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
-# --------- Stage 2: Build Frontend for Production ---------
-FROM base AS builder
+# Build stage
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 COPY . .
 RUN npm run build
 
-# --------- Stage 3: Serve Production with Nginx ---------
+# Production stage
 FROM nginx:alpine AS production
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy built files from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

@@ -15,6 +15,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       RUNNING_IN_DOCKER: 1
+      DEBUG: "False"  # Disable debug mode in Docker
     depends_on:
       postgres:
         condition: service_healthy
@@ -23,11 +24,11 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/graphql/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
   # -------- Postgres DB --------
   postgres:
@@ -80,9 +81,9 @@ services:
       - "80:80"
     depends_on:
       django:
-        condition: service_healthy
-      microservice-java:
         condition: service_started
+      microservice-java:
+        condition: service_healthy
       microservice-go:
         condition: service_started
       minio:
@@ -93,9 +94,6 @@ services:
     restart: unless-stopped
     profiles:
       - prod
-    # Use wait-for script to ensure backends are ready
-    entrypoint: ["/wait-for.sh"]
-    command: ["django:8000", "microservice-java:8080", "microservice-go:8080", "minio:9000", "--", "nginx", "-g", "daemon off;"]
 
   # -------- Cassandra DB --------
   cassandra:
@@ -167,7 +165,7 @@ services:
       - go_cache:/go/pkg/mod
       - go_build_cache:/root/.cache/go-build
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -266,7 +264,7 @@ services:
     networks:
       - backend-net
     command: -config.file=/etc/loki/local-config.yml
-    user: root  # Needed for directory creation
+    user: root
     profiles:
       - prod
       - observability
@@ -296,8 +294,8 @@ services:
     ports:
       - "3200:3200"
       - "9095:9095"
-      - "4317:4317"  # OTLP gRPC
-      - "4318:4318"  # OTLP HTTP
+      - "4317:4317"
+      - "4318:4318"
     volumes:
       - ./observability/tempo-config.yml:/etc/tempo/tempo.yaml
       - tempo_data:/tmp/tempo
@@ -306,6 +304,9 @@ services:
       - backend-net
     depends_on:
       - minio
+    profiles:
+      - prod
+      - observability
 
 volumes:
   db_data:
