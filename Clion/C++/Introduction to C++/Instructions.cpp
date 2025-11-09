@@ -390,6 +390,18 @@ int main(){
 
 }
 
+random number generator :
+Note: The numbers generated are not truly random
+they are called pseudo-random for a reason
+
+int main() {
+    // pseudo-random = NOT truly random (but close)
+    srand(time(NULL));
+    int num = (rand() % 100)] + 1;
+    std::cout << num;
+    return 0;
+}
+
 
 
 

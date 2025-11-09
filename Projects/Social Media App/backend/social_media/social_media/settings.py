@@ -3,9 +3,6 @@ from pathlib import Path
 import environ
 from datetime import timedelta
 import socket
-hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS = ["127.0.0.1"] + [ip[:-1] + "1" for ip in ips]  # rough Docker fix
-
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,13 +29,17 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "graphene_django",
-    "debug_toolbar",
     'django_prometheus', 
 
     # Your apps
     "apps.users",
     "apps.posts",
 ]
+
+# Only add debug_toolbar if DEBUG is True AND not running in Docker production
+RUNNING_IN_DOCKER = env.bool("RUNNING_IN_DOCKER", default=False)
+if DEBUG and not RUNNING_IN_DOCKER:
+    INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
@@ -50,9 +51,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
+
+# Only add debug toolbar middleware if it's in INSTALLED_APPS
+if "debug_toolbar" in INSTALLED_APPS:
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+
+MIDDLEWARE.append('django_prometheus.middleware.PrometheusAfterMiddleware')
 
 ROOT_URLCONF = "social_media.urls"
 
@@ -86,7 +91,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -95,8 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'  # adjust 'users' if your app name is different
-
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
@@ -135,11 +138,17 @@ CORS_ALLOW_CREDENTIALS = True
 
 # GraphQL
 GRAPHENE = {
-    "SCHEMA": "social_media.schema.schema"  # points to schema.py in project root
+    "SCHEMA": "social_media.schema.schema"
 }
 
-# Debug Toolbar
-INTERNAL_IPS = ["127.0.0.1", "localhost"]
+# Debug Toolbar configuration
+if "debug_toolbar" in INSTALLED_APPS:
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = ["127.0.0.1", "localhost"] + [ip[:-1] + "1" for ip in ips]
+    
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG and not RUNNING_IN_DOCKER
+    }
 
 # --- MinIO Storage ---
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
@@ -158,13 +167,3 @@ REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=Tr
 
 # --- Java Microservice (Cassandra) ---
 JAVA_API_URL = env("JAVA_API_URL", default="http://microservice-java:8080")
-
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK": lambda request: (
-        DEBUG
-        and request.path.startswith("/admin/")  # only enable toolbar on /admin/
-    )
-}
-
-
-
