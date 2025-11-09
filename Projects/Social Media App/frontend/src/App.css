@@ -1,39 +1,42 @@
-body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f4;
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    margin: 0;
-    color: #333;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.header {
-    background-color: #3f51b5;
-    color: white;
-    padding: 10px 20px;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-.sidebar {
-    background-color: #fff;
-    border-right: 1px solid #ddd;
-    padding: 20px;
+.card {
+  padding: 2em;
 }
 
-.main-content {
-    padding: 20px;
-}
-
-.footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #3f51b5;
-    color: white;
+.read-the-docs {
+  color: #888;
 }

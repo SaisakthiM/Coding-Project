@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 import environ
 from datetime import timedelta
+import socket
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = ["127.0.0.1"] + [ip[:-1] + "1" for ip in ips]  # rough Docker fix
+
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +33,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "graphene_django",
     "debug_toolbar",
+    'django_prometheus', 
 
     # Your apps
     "apps.users",
@@ -36,6 +41,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -45,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "social_media.urls"
@@ -151,4 +158,13 @@ REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=Tr
 
 # --- Java Microservice (Cassandra) ---
 JAVA_API_URL = env("JAVA_API_URL", default="http://microservice-java:8080")
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: (
+        DEBUG
+        and request.path.startswith("/admin/")  # only enable toolbar on /admin/
+    )
+}
+
+
 

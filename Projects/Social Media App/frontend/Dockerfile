@@ -22,16 +22,5 @@ FROM nginx:alpine AS production
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Install netcat for wait-for script
-RUN apk add --no-cache netcat-openbsd
-
-# Copy wait-for script
-COPY wait-for.sh /wait-for.sh
-RUN chmod +x /wait-for.sh
-
 EXPOSE 80
-
-# Use wait-for script to wait for backends before starting nginx
-ENTRYPOINT ["/wait-for.sh"]
-CMD ["django:8000", "microservice-java:8080", "microservice-go:8080", "minio:9000", "--", "nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
