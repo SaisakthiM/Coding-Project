@@ -402,6 +402,15 @@ int main() {
     return 0;
 }
 
+memory allocation : 
+it is a important concept in c++ as it is the main for all variables to be declared
+there are pointers and references depend on it
+we have to know about what a pointer is and what a reference is
+
+pointer : 
+a pointer is just a address of a variable
+in low level language like c++ (but it is technically a mid level language), we can allocate these addresses 
+to other variables.
 
 
 
