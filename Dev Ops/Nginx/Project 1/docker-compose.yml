@@ -1,0 +1,20 @@
+services:
+  docker-1: 
+    build: .
+    environment:
+      - APP_NAME=App1
+    ports:
+      - 8001:8000
+  docker-2: 
+    build: .
+    environment:
+      - APP_NAME=App2
+    ports:
+      - 8002:8000
+  docker-3: 
+    build: .
+    environment:
+      - APP_NAME=App3
+    ports:
+      - 8003:8000
+      
