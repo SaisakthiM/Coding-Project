@@ -2,8 +2,8 @@
 
 int main() {
     int a = 10;
-int b(10);
-int c{10};
-std::cout << c;
+    int b(10);
+    int c{10};
+    std::cout << c;
 
 }
