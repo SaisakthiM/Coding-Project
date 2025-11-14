@@ -1,0 +1,12 @@
+C:\Users\saika\AppData\Roaming\npm
+├── @anthropic-ai/claude-code@2.0.22
+├── @google/gemini-cli@0.13.0
+├── eas-cli@16.24.1
+├── express-generator@4.16.1
+├── npm@11.4.1
+├── sass@1.91.0
+├── tailwindcss@4.1.13
+├── ts-node@10.9.2
+├── typescript@5.9.3
+└── vsce@2.15.0
+
