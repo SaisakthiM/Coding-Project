@@ -20,7 +20,6 @@ $RECYCLE.BIN/
 # IDE / Editor files
 # -------------------------------
 
-.vscode/
 .idea/
 .PyCharm/
 .Web\ Storm/
@@ -42,7 +41,7 @@ $RECYCLE.BIN/
 *.bak
 *.old
 *.cache
-*.ps1
+
 
 # -------------------------------
 # Python specific
@@ -71,7 +70,7 @@ yarn-error.log*
 .pnp/
 .pnp.js
 package-lock.json
-*.json
+
 
 # -------------------------------
 # Java / JVM
@@ -111,7 +110,7 @@ target/
 
 .env
 *.env
-.Dockerfile
+
 docker-compose.override.yml
 
 # -------------------------------
@@ -125,4 +124,3 @@ Configurations and Scripts/Android CMD Tools/platforms/android-34/data/res/
 Pycharm/Python Framework/Django/Main/main_static/admin/js/vendor/
 
 # Script files
-filename.ps1

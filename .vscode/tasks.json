@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        /*
+        {
+            "label": "Start Starcoder2-3B Ollama GPU (Auto Server & Wait)",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-Command",
+                "& { if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port 11434).TcpTestSucceeded) { Write-Host '🚀 Starting Ollama server...'; Start-Process -NoNewWindow ollama -ArgumentList 'serve' -PassThru | Out-Null; Start-Sleep -Seconds 5 }; Write-Host '💾 Preloading Starcoder2-3B model on GPU...'; try { ollama run starcoder-2 'Warmup for GPU caching' | Out-Null } catch { $_ | Out-File \"$env:TEMP\\starcoder2_task_error.log\" -Append; Write-Host \"⚠️ Error logged to $env:TEMP\\starcoder2_task_error.log\" }; Write-Host '✅ Starcoder2-3B ready for Cline or AI Toolkit connection.' }"
+            ],
+            "isBackground": true,
+            "problemMatcher": []
+        }
+        */
+        {
+            "label": "Monthly Wine Tools Update",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/.vscode/Scripts/update-wine-check.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Screenshot OCR",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "C:\\Coding Project\\Configurations and Scripts\\Scripts\\screenshot_to_text.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Daily Git Auto Commit",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/.vscode/Scripts/auto-commit.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run All Startup Tasks",
+            "dependsOn": [
+                "Start Starcoder2-3B Ollama GPU (Auto Server & Wait)",
+                "Daily Git Auto Commit"
+            ],
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}

@@ -1,0 +1,201 @@
+{
+    "files.autoSave": "afterDelay",
+    "cmake.sourceDirectory": "C:/Coding Project/Clion",
+    "cSpell.words": [
+        "Adistar",
+        "Adizero",
+        "Atleast",
+        "autoplay",
+        "columnname",
+        "cristiano",
+        "dotenv",
+        "DRUD",
+        "endfor",
+        "floatarrays",
+        "Headboy",
+        "hovermode",
+        "Inresion",
+        "insestive",
+        "intarrays",
+        "Krabs",
+        "lastname",
+        "Lene",
+        "lexographical",
+        "maxlength",
+        "minlength",
+        "myclass",
+        "mymember",
+        "mymembers",
+        "Numpy",
+        "onclick",
+        "Quering",
+        "Refsnes",
+        "rgba",
+        "Saisakthi",
+        "sakthi",
+        "simplely",
+        "Stalikken",
+        "statment",
+        "statments",
+        "stylesheet",
+        "Ultraboost",
+        "Uncategorized",
+        "varinside",
+        "Withdrawls"
+    ],
+    "C_Cpp.errorSquiggles": "enabled",
+    "workbench.colorCustomizations": {
+    
+    },
+    "workbench.colorTheme": "City Lights",
+    "workbench.preferredDarkColorTheme": "Visual Studio Dark - C++",
+    "python-envs.pythonProjects": [
+        {
+            "path": "Pycharm",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+    "files.associations": {
+        "array": "cpp",
+        "atomic": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "string": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "fstream": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "typeinfo": "cpp",
+        "chrono": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp"
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "Personal",
+            "group": "MySQL Connections",
+            "database": "saisakthip",
+            "username": "root"
+        }
+    ],
+    "java.project.sourcePaths": [
+        "Intellij"
+    ],
+    "java.project.referencedLibraries": [],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+    "search.exclude": {
+        "**/node_modules": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "env-*": true
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "env*": true
+    },
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "dotnet.defaultSolution": "Project 1.slnx",
+    "dbcode.connections": [
+        {
+            "connectionId": "A7KIE2SyPf--UFP4Tw2yD",
+            "name": "Saisakthi",
+            "driver": "mysql",
+            "connectionType": "host",
+            "host": "localhost",
+            "port": 3306,
+            "ssl": false,
+            "username": "root",
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "saisakthi",
+            "readOnly": false,
+            "connectionTimeout": 30,
+            "driverOptions": {
+                "retrievePublickey": true
+            }
+        },
+        {
+            "connectionId": "wptps3D8MvWrnkLio9udH",
+            "name": "Saisakthi",
+            "driver": "mongodb",
+            "color": "#004A37",
+            "connectionType": "host",
+            "driverOptions": {
+                "protocol": "mongodb://"
+            },
+            "host": "localhost",
+            "port": 27017,
+            "ssl": false,
+            "savePassword": "secretStorage",
+            "database": "admin",
+            "readOnly": false,
+            "connectionTimeout": 30
+        }
+    ],
+    "python.REPL.enableREPLSmartSend": false,
+    "yaml.schemas": {
+        "file:///c%3A/Users/saika/.vscode/extensions/continue.continue-1.2.2-win32-x64/config-yaml-schema.json": [
+            ".continue/**/*.yaml",
+            "file:///c%3A/Users/saika/.continue/config.yaml"
+        ]
+    },
+    "cSpell.customDictionaries": {
+        "custom-dictionary-workspace": {
+            "name": "custom-dictionary-workspace",
+            "path": "${workspaceFolder:Coding Project}/.cspell/custom-dictionary-workspace.txt",
+            "addWords": true,
+            "scope": "workspace"
+        }
+    },
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "master"
+    ]
+}
