@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-undef": "warn",         // Warn if you use variables not defined
+    "no-unused-vars": "warn",   // Warn if you declare something but don't use it
+    "no-redeclare": "warn",     // Warn on redeclaring variables
+    "no-dupe-keys": "warn",     // Warn on duplicate object keys
+    "no-unreachable": "warn"    // Warn if code can never run
+  }
+}
+

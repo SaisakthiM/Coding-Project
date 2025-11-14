@@ -1,0 +1,31 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "enabled": true,
+
+  // Scan only real project files
+  "files": [
+    "**/*.{js,jsx,ts,tsx,html,css,scss,md,txt,py,java,cpp}"
+  ],
+
+  // Ignore all dependency and build folders
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "venv/**",
+    ".venv/**",
+    "coverage/**",
+    ".git/**",
+    "*.lock",
+    "package-lock.json",
+    "yarn.lock"
+  ],
+
+  "words": [
+    "Saisakthi",
+    "Saika"
+  ],
+
+  "flagWords": []
+}

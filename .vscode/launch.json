@@ -1,0 +1,83 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+            
+        {
+            "type": "java",
+            "name": "Others",
+            "request": "launch",
+            "mainClass": "Exercises.Others.Others",
+            "projectName": "Coding Project_3ddd251b"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "Coding Project_3ddd251b"
+        },
+        {
+            "type": "java",
+            "name": "Vehicle",
+            "request": "launch",
+            "mainClass": "Vehicle",
+            "projectName": "Coding Project_3ddd251b"
+        },
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Cargo test",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib"
+                ]
+            },
+            "args": []
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Cargo run",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib"
+                ]
+            },
+            "args": []
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SaisakthiApplication<saisakthi>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "spring_boot.saisakthi.SaisakthiApplication",
+            "projectName": "saisakthi",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application2<spring>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "spring_project.spring.Application2",
+            "projectName": "spring",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
