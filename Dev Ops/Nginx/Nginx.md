@@ -36,6 +36,7 @@ so nginx as a proxy redirects the request and the request fetches the data and s
 sound's good but think of millions of request now
 it's unnecessary
 what NGINX also can do is store the most fetched request and instead of redirecting, it just sends the data directly
+to the client if it sees that it has that data
 
 
 
