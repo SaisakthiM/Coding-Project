@@ -197,5 +197,6 @@
     },
     "githubPullRequests.ignoredPullRequestBranches": [
         "master"
-    ]
+    ],
+    "python.languageServer": "None"
 }

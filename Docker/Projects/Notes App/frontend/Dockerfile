@@ -2,9 +2,17 @@ FROM node:22-slim
 
 WORKDIR /app
 
+# Copy only dependency files first (better caching)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy project files
 COPY . .
 
-RUN npm install
+# Expose Vite port
+EXPOSE 5173
 
-CMD ["npm", "run", "dev", ]
-
+# Enable HMR + container access
+CMD ["npm", "run", "dev", "--", "--host"]
