@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 5173
 
 # Enable HMR + container access
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--host"]
