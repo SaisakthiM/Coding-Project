@@ -12,7 +12,7 @@ export default function UpdateNote() {
     async function fetchNotes() {
       try {
         const token = localStorage.getItem("access");
-        const res = await axios.get("http://localhost:8000/api/notes/", {
+        const res = await axios.get("http://notes-backend:8000/api/notes/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setNotes(res.data);
