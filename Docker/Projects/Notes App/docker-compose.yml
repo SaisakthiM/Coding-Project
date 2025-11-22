@@ -3,7 +3,18 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - POSTGRES_DB=notesdb
+      - POSTGRES_USER=saisakthi
+      - POSTGRES_PASSWORD=saisakthi2008
+      - DB_HOST=notes-postgres
+    depends_on:
+      - notes-postgres
     container_name: notes-backend
+    networks:
+      - notes-net
 
   frontend:
     build: ./frontend
@@ -12,3 +23,25 @@ services:
     container_name: notes-frontend
     depends_on:
       - backend
+    networks:
+      - notes-net
+
+  notes-postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: saisakthi
+      POSTGRES_PASSWORD: saisakthi2008
+    volumes:
+      - notes_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - notes-net
+
+networks:
+  notes-net:
+    driver: bridge
+
+volumes:
+  notes_pgdata:
