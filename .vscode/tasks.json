@@ -17,40 +17,37 @@
         }
         */
         {
-            "label": "Monthly Wine Tools Update",
-            "type": "shell",
-            "command": "powershell.exe",
-            "args": [
-                "-ExecutionPolicy", "Bypass",
-                "-File", "${workspaceFolder}/.vscode/Scripts/update-wine-check.ps1"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Run Screenshot OCR",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "C:\\Coding Project\\Configurations and Scripts\\Scripts\\screenshot_to_text.py"
-            ],
-            "problemMatcher": []
-        },
-        {
             "label": "Daily Git Auto Commit",
             "type": "shell",
-            "command": "powershell.exe",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}/.vscode/Scripts/auto-commit.ps1"
-            ],
+
+            // Default — will be overwritten by platform-specific options
+            "command": "echo Platform not supported",
+
+            // Windows-specific
+            "windows": {
+                "command": "powershell.exe",
+                "args": [
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    "${workspaceFolder}/.vscode/Scripts/auto-commit.ps1"
+                ]
+            },
+
+            // Linux-specific
+            "linux": {
+                "command": "/bin/bash",
+                "args": [
+                    "${workspaceFolder}/.vscode/Scripts/auto-commit.sh"
+                ]
+            },
+
             "problemMatcher": []
         },
+
         {
             "label": "Run All Startup Tasks",
             "dependsOn": [
-                "Start Starcoder2-3B Ollama GPU (Auto Server & Wait)",
                 "Daily Git Auto Commit"
             ],
             "runOptions": {
