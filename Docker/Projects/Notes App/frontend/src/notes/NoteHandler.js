@@ -31,28 +31,29 @@ export async function addNote(title, content, deadline, importance) {
   }
 }
 
-// 🟨 REFRESH TOKEN
 export async function refreshAccessToken() {
   const url = `${API_BASE_URL}/token/refresh/`;
 
   const body = {
-    refresh: getRefreshKey(), // must be function call, not variable
+    refresh: getRefreshKey(),
   };
 
   try {
     const response = await axios.post(url, body, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
-    // Save new access token
     localStorage.setItem("access", response.data.access);
     console.log("🔁 Access token refreshed successfully");
     return response.data.access;
 
   } catch (err) {
     console.error("❌ Error refreshing token:", err.response?.data || err.message);
+
+    // if token invalid or expired → logout
+    if (err.response?.status === 401) {
+      logoutUser();
+    }
   }
 }
 
@@ -93,4 +94,11 @@ export async function deleteNote(id) {
   } catch (err) {
     console.error("❌ Error deleting note:", err.response?.data || err.message);
   }
+}
+
+export function logoutUser() {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    console.log("🔓 User logged out. Tokens cleared.");
 }
