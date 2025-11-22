@@ -1,1 +1,4 @@
-class 
+package 
+class Main {
+
+}
