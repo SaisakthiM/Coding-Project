@@ -6,6 +6,8 @@ import HomePage from "./notes/Notes.jsx";
 import LoginPage from "./components/Login.jsx";
 import RegisterPage from "./components/Register.jsx";
 import RegistrationComplete from "./components/RegistrationComplete.jsx";
+import UpdateNote from "./notes/ModifyNote.jsx";
+import DeleteNote from "./notes/DeleteNote.jsx";
 
 export default function App() {
   return (
@@ -24,6 +26,9 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/registered" element={<RegistrationComplete />} />
           <Route path="/addnote" element={<AddNote></AddNote>}></Route>
+          <Route path="/updatenote" element={<UpdateNote></UpdateNote>}></Route>
+          <Route path="/deletenote" element={<DeleteNote></DeleteNote>}></Route>
+
         </Routes>
       </Router>
     </AuthProvider>
