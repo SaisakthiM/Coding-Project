@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { updateNote, deleteNote, refreshAccessToken } from "./NoteHandler";
+import { updateNote, refreshAccessToken } from "./NoteHandler";
 import "../styles.css";
 
 export default function UpdateNote() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingNote, setEditingNote] = useState(null);
+  const API_BASE_URL = "http://192.168.31.227:8000/api"; // LAN IP
 
   useEffect(() => {
     async function fetchNotes() {
       try {
         const token = localStorage.getItem("access");
-        const res = await axios.get("http://notes-backend:8000/api/notes/", {
+        const res = await axios.get(`${API_BASE_URL}/notes/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log(res);
         setNotes(res.data);
       } catch (err) {
         console.error("Failed to fetch notes:", err);
@@ -30,11 +32,6 @@ export default function UpdateNote() {
     setEditingNote(note); // store the selected note
   };
 
-  const handleDelete = async (id) => {
-    await deleteNote(id);
-    setNotes(notes.filter((n) => n.id !== id));
-  };
-
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -42,10 +39,13 @@ export default function UpdateNote() {
       <div className="container">
         <h1>All Notes</h1>
         {editingNote ? (
-          <EditNoteForm note={editingNote} onUpdate={(updated) => {
-            setNotes(notes.map(n => n.id === updated.id ? updated : n));
-            setEditingNote(null);
-          }} />
+          <EditNoteForm
+            note={editingNote}
+            onUpdate={(updated) => {
+              setNotes(notes.map(n => n.id === updated.id ? updated : n));
+              setEditingNote(null);
+            }}
+          />
         ) : (
           <div className="notes-list">
             {notes.map((note) => (
@@ -53,7 +53,6 @@ export default function UpdateNote() {
                 <p>{note.title} - {note.content}</p>
                 <div className="actions">
                   <button onClick={() => handleEdit(note)}>Edit</button>
-                  <button onClick={() => handleDelete(note.id)}>Delete</button>
                 </div>
               </div>
             ))}
@@ -83,7 +82,12 @@ function EditNoteForm({ note, onUpdate }) {
       <h2>Edit Note</h2>
       <input name="title" value={task.title} onChange={handleChange} />
       <input name="content" value={task.content} onChange={handleChange} />
-      <input name="deadline" type="date" value={task.deadline?.slice(0,10)} onChange={handleChange} />
+      <input
+        name="deadline"
+        type="date"
+        value={task.deadline?.slice(0, 10)}
+        onChange={handleChange}
+      />
       <select name="importance" value={task.importance} onChange={handleChange}>
         <option value="low">Low</option>
         <option value="medium">Medium</option>

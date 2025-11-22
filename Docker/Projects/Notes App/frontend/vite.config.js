@@ -1,16 +1,15 @@
-// vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true, // allows access via LAN / Docker network
-    port: 5173,
+    host: "0.0.0.0",       // allow access from LAN
+    port: 5173,             // optional, default is 5173
+    strictPort: true,
     hmr: {
-      protocol: "ws",
-      host: "localhost", // or your host IP if accessing from other device
-      port: 5173,
-    },
-  },
+      host: "192.168.31.227", // LAN IP for WebSocket HMR
+      port: 5173
+    }
+  }
 });

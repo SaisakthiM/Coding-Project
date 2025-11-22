@@ -6,6 +6,7 @@ from .models import Note
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
 class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer

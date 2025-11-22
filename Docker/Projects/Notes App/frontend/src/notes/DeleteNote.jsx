@@ -1,66 +1,63 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { deleteNote, refreshAccessToken } from "./NoteHandler";
+import axios from "axios";
 import "../styles.css";
 
-export default function DeleteNote({ noteId }) {
-    const [note, setNote] = useState(null);
-    const [loading, setLoading] = useState(true);
+export default function DeleteNote() {
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const API_BASE_URL = "http://192.168.31.227:8000/api"; // LAN IP
 
-    useEffect(() => {
-        async function fetchNote() {
-            try {
-                const token = localStorage.getItem("access");
+  useEffect(() => {
+    async function fetchNotes() {
+      try {
+        await refreshAccessToken();
+        const token = localStorage.getItem("access");
+        const res = await axios.get(`${API_BASE_URL}/notes/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setNotes(res.data);
+      } catch (err) {
+        console.error("Failed to fetch notes:", err.response || err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-                const res = await axios.get(
-                    `http://localhost:8000/api/notes/${noteId}/`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+    fetchNotes();
+  }, []);
 
-                setNote(res.data);
-            } catch (error) {
-                console.error("Failed to fetch note:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this note?");
+    if (!confirmDelete) return;
 
-        if (noteId) fetchNote();
-    }, [noteId]);
+    const success = await deleteNote(id);
+    if (success) {
+      setNotes(notes.filter((n) => n.id !== id));
+    }
+  };
 
-    const handleDelete = async () => {
-        try {
-            await refreshAccessToken();
-            await deleteNote(noteId);
-            alert("Note deleted successfully!");
-        } catch (err) {
-            console.error("Delete failed:", err);
-            alert("Failed to delete note.");
-        }
-    };
+  if (loading) return <p>Loading...</p>;
 
-    if (loading) return <h2>Loading...</h2>;
-    if (!note) return <h2>Note not found.</h2>;
-
-    return (
-        <div className="wrapper">
-            <div className="container">
-                <h1>Delete Note</h1>
-
-                <div className="note-preview">
-                    <p><strong>Title:</strong> {note.title}</p>
-                    <p><strong>Content:</strong> {note.content}</p>
-                    <p><strong>Deadline:</strong> {note.deadline}</p>
-                    <p><strong>Importance:</strong> {note.importance}</p>
-                </div>
-
-                <button
-                    style={{ backgroundColor: "red", color: "white" }}
-                    onClick={handleDelete}
-                >
-                    Delete Note
+  return (
+    <div className="wrapper">
+      <div className="container">
+        <h1>All Notes</h1>
+        <div className="notes-list">
+          {notes.map((note) => (
+            <div key={note.id} className="note-item">
+              <p>
+                <strong>{note.title}</strong> - {note.content}
+              </p>
+              <div className="actions">
+                <button className="delete-btn" onClick={() => handleDelete(note.id)}>
+                  Delete
                 </button>
+              </div>
             </div>
+          ))}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
