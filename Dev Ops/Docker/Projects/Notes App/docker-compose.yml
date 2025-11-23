@@ -38,6 +38,17 @@ services:
       - "5432:5432"
     networks:
       - notes-net
+    
+
+  notes-nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "80:80"
+    container_name: notes-nginx
+    networks:
+      - notes-net
 
 networks:
   notes-net:
