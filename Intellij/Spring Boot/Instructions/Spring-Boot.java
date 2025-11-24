@@ -62,16 +62,42 @@ what is loosely coupled application and tightly coupled application
 take a application and services inside it
 in a big application, there will he always a dependency on other services to complete it's task
 but most of the times, that other service which is also dependent is also having a separate task ot finish
+so if one service is down all other is also wil be down
 
+that's where loosely coupled comes in, 
+with asynchronous functions and dependency injection we can achieve it
 
+Disadvantages of Spring and Spring framework and use of Spring Boot:
+there is a disadvantage in spring framework which is manual configuration 
+you have to configure from scratch everything you need 
+but with spring boot and pre-configured with servers
 
+what server is built in 
+it's tomcat
+which was a apache project and used Java EE which was under oracle and they donated it to eclipse 
 
+then we can also build API's in minutes with java spring boot
 
+there are 2 types of API's we can build
+1) REST API's : GET,POST,PUT,DELETE
+2) Spring Data JPA
 
+You can also build standalone (less or zero configured) applications
+these are advantages of spring boot
 
-
-
-
-
+This is a introduction to spring boot
 
  */
+
+/* 
+
+IOC and DI in Spring and Spring Boot
+
+There are actually 3 types of injections
+1)Field injection
+2) Getter and Setter injection
+3) Object injection
+
+Dependency injection 
+
+*/
