@@ -38,27 +38,30 @@ SPRING FRAMEWORK
 
 
 
-Before we dive deeper about spring boot we have to learn or revise Java a bit
+What's the use of java and spring boot : 
+Java and spring is mostly used for building enterprise level application
 
-Java Variables
-Variables are containers for storing data values.
+SO what is even a Spring is 
+it is a ecosystem of java which has all the tools and to build a application 
+we can also say "so it is a set of tools used for building applications with java collectively named as spring"
+one of the tools in spring is spring framework 
 
-In Java, there are different types of variables, for example:
+now what does spring and spring framework provide that java cannot
+it is Dependency Injection (DI) and Inversion of Control (IoC)
 
-String - stores text, such as "Hello". String values are surrounded by double quotes
-int - stores integers (whole numbers), without decimals, such as 123 or -123
-float - stores floating point numbers, with decimals, such as 19.99 or -19.99
-char - stores single characters, such as 'a' or 'B'. Char values are surrounded by single quotes
-boolean - stores values with two states: true or false
+what is dependency injection and IoC
 
-Declaring (Creating) Variables
-To create a variable in Java, you need to:
+IoC : it is like inverting the power to control to create objects (from humans creating manually to code/framework creating it)
+DI : it is a method to achieve IoC, Instead of creating the dependency yourself, someone injects it into your class
+we use the Annonations/Metadata for this purpose
+the weird @ symbol you see everywhere in spring boot, it's metadata for spring to tell it how to run 
 
-Choose a type (like int or String)
-Give the variable a name (like x, age, or name)
-Optionally assign it a value using =
+then another advantage is it can create loosely coupled applications 
+what is loosely coupled application and tightly coupled application
 
-
+take a application and services inside it
+in a big application, there will he always a dependency on other services to complete it's task
+but most of the times, that other service which is also dependent is also having a separate task ot finish
 
 
 
