@@ -4,7 +4,7 @@ FROM nginx:latest
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy React build files
-COPY ../frontend/ /usr/share/nginx/html/
+COPY ../frontend/dist/ /usr/share/nginx/html/
 
 # Copy NGINX config
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
