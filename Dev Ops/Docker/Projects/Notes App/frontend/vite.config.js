@@ -10,6 +10,12 @@ export default defineConfig({
     hmr: {
       host: "192.168.31.227", // LAN IP for WebSocket HMR
       port: 5173
+    },
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      }
     }
   }
 });
