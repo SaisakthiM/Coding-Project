@@ -160,7 +160,65 @@ A simple node contains the following things
 this is the diagram 
 it contains the runtime of the docker (we call it pod),
 and data base service to connect two instances of the node data base and communicate with each other
-kubelet is the process of kubernetes to 
+kubelet is the process of kubernetes which does what the kubernetes master node want to do
+
+here is a master node structure
+
+ ┌──────────────────────────────────────────────┐
+ │                    Client                    │
+ │   • Sends Update & Query requests            │
+ └──────────────────────────────────────────────┘
+                    │
+                    ▼
+ ┌──────────────────────────────────────────────┐
+ │                  MASTER 1                    │
+ │                                              │
+ │   ┌────────────────────────────────────────┐ │
+ │   │              API Server                │ │
+ │   │  • Entry point of cluster              │ │
+ │   │  • Validates requests & talks to etcd  │ │
+ │   └────────────────────────────────────────┘ │
+ │                                              │
+ │   ┌────────────────────────────────────────┐ │
+ │   │                Scheduler               │ │
+ │   │  • Assigns pods to worker nodes        │ │
+ │   │  • Chooses best node based on usage    │ │
+ │   └────────────────────────────────────────┘ │
+ │                                              │
+ │   ┌────────────────────────────────────────┐ │
+ │   │           Controller Manager           │ │
+ │   │  • Runs control loops                  │ │
+ │   │  • Maintains desired cluster state     │ │
+ │   └────────────────────────────────────────┘ │
+ │                                              │
+ │   ┌────────────────────────────────────────┐ │
+ │   │                   etcd                 │ │
+ │   │  • Key–value store for all cluster     │ │
+ │   │    data                                │ │
+ │   │  • Source of truth for cluster state   │ │
+ │   └────────────────────────────────────────┘ │
+ │                                              │
+ └──────────────────────────────────────────────┘
+
+these control the worker nodes and consumes less resources
+
+Minikube and kubectl:
+ok it is easy to do in speaking but we have to use it in production 
+how can we do that
+there comes the minikube 
+here both the master and worker node runs on the same machine removing the 
+requirements for high resource needs like servers
+
+then what is kubectl 
+it is a kube controller 
+how will you create services, locks, configmaps
+there comes kubernetes API 
+how will you communicate with it
+there are 3 ways
+1) UI 2) API directly 
+and the most powerful one 3) CLI which is kubectl
+
+
 
 
 

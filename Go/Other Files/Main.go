@@ -2,5 +2,8 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Print("Hi hello world")
+	var nmae rune = 'A';
+	fmt.Print(nmae);
+
+	
 }
