@@ -34,6 +34,23 @@ still most companies use Java because their legacy code depends on it
 this is the basic structure of what JDK has inside it
 the most important part is JVM and JRE here
 
+Basics:
+Things to Remember in Java
+1) Java is a heavily OOP Oriented programming language, everything we do is Classes and Objects
+2) Java is heavily and purely used for it's stability so many enterprise companies used it and still uses it
+
+As I said, Java is all about classes, the variables you see, the datatypes and the every dam built in feature you use
+it is a class
+
+class is java
+java is class
+
+in java version 1.0.2 which was the first public version, it had 230 classes 
+now in java 5.0+ it has 3200 classes which is enormous comapred ot other languages
+
+so also everything we and will run will be a .class file which is converted into bytecode file
+ 
+
 
 
 
