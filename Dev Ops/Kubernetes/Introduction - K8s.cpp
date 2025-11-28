@@ -218,6 +218,7 @@ there are 3 ways
 1) UI 2) API directly 
 and the most powerful one 3) CLI which is kubectl
 
+Basic kubectl commands : 
 
 
 
