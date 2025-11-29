@@ -49,9 +49,5 @@ in java version 1.0.2 which was the first public version, it had 230 classes
 now in java 5.0+ it has 3200 classes which is enormous comapred ot other languages
 
 so also everything we and will run will be a .class file which is converted into bytecode file
- 
-
-
-
 
  */
