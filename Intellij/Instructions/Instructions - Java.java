@@ -114,7 +114,27 @@ this is how we can create one
 
 ok also you know we can create like many instances of a same class 
 with different properties
-so this is encapsulation
 
+Note: There is also another way of using a object like creating a pointer/reference for the object and you can manipulate from there
+in C++, you can directly create a pointer but in Java you can only create a reference only 
+not any other things like pointers and any other things
 
- */
+now take a car right 
+so each car differes like ferrari is fast and lightweight
+and bugatti is popular and many models have different things
+and they want to keep it secret
+still we don't know the coke reciepe do we
+
+like that each classes has some values which it thinks it should not expose to 
+this in java we can achieve that using private keyword 
+also there is public and protected also 
+
+these are collectively called access modifiers in java
+so let's see what each modifies
+
+public : it allows access to the properties/functions to all instance, packages and sub modules which uses the class
+protected : it allows access to the properties/function to just the sub modules and packages, not for all instaces outside it
+private : only for the class and no access anywhere 
+
+so now we know that 
+*/ 
