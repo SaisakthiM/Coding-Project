@@ -50,4 +50,71 @@ now in java 5.0+ it has 3200 classes which is enormous comapred ot other languag
 
 so also everything we and will run will be a .class file which is converted into bytecode file
 
+OOP in Java:
+
+We know the basics mostly now
+so we now jump on what is even OOP means
+
+OOP : Object oriented Programming with classes and objects
+take a car
+how it looks 
+what it has
+
+these are properties of a car
+so if we consider Car as a class, then all these like looks, engines and others are properties
+
+class Car {
+    String engine; 
+    String Model;
+    String accelerator; // Properties
+}
+
+so we know about properties right 
+now if we want to say run a car
+what we have to do 
+start the engine and press the accelerator
+
+now it has a method
+method is a block of code which runs when called
+here, take this class
+
+class Car {
+    String engine; 
+    String Model;
+    String accelerator; // Properties
+    startCar() {
+        engine = "start";
+        acceleration = "press";
+    }
+}
+
+see, when i call this startCar(), it just runs
+that's method
+
+now you also need to make a good structure
+you just can't create any car now 
+you have to get like the model and engine of each car definitely 
+others are optional 
+here is where constructors comes in 
+think of it like a set of rules, when a class is initialized, 
+you have to follow or give these properties 
+else you cannot create Car
+
+and also we have to know about object 
+what is it
+it is just a instance of a class 
+what's a instance 
+they are entity created in the moment with unique or 
+same property of the class
+that's objects
+we can create a object with new keyword
+
+Car ford = new Car();
+this is how we can create one
+
+ok also you know we can create like many instances of a same class 
+with different properties
+so this is encapsulation
+
+
  */
