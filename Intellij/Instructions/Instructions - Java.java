@@ -28,7 +28,7 @@ still most companies use Java because their legacy code depends on it
                   │  └────────────────────────────────────────────────────┘  │
                   │                                                          │
                   │  Development Tools                                       │
-                  │  (e.g., compiler, debugger, archiver)                    │
+                  │  (e.g., compiler, debugger, archive)                    │
                   └──────────────────────────────────────────────────────────┘
 
 this is the basic structure of what JDK has inside it
@@ -120,10 +120,10 @@ in C++, you can directly create a pointer but in Java you can only create a refe
 not any other things like pointers and any other things
 
 now take a car right 
-so each car differes like ferrari is fast and lightweight
+so each car differs like ferrari is fast and lightweight
 and bugatti is popular and many models have different things
 and they want to keep it secret
-still we don't know the coke reciepe do we
+still we don't know the coke recipe do we
 
 like that each classes has some values which it thinks it should not expose to 
 this in java we can achieve that using private keyword 
@@ -136,5 +136,93 @@ public : it allows access to the properties/functions to all instance, packages 
 protected : it allows access to the properties/function to just the sub modules and packages, not for all instaces outside it
 private : only for the class and no access anywhere 
 
-so now we know that 
+so now we know that let's talk about what is instance variable is
+so we create a class and a object right 
+this object is just a instance of a class 
+so what it does is it follows the blueprint of the class
+and creates it's own variation 
+and that variation is called instance variable
+
+so how can you access these variables
+we can use the . operator 
+which can access and help to modify the values inside the object 
+
+so now let's talk about how to create a object in 
+we normally use new keyword which is fine
+
+so also take this statement which os 
+Student student;
+what does it mean 
+it means we are creating a reference in java for that class
+
+we are allocating a memory for the object we are creating 
+and if we allocate it like above it will store on stack memory 
+which is temporary memory and
+it also dynamically allocates memory 
+
+so when the actual logic is written down like this with new keyword
+
+Student student = new Student();
+this creates a heap memory of the class Student and then points the reference there 
+becoming that reference a heap variable
+
+so new keyword makes a stack reference to a heap reference 
+
+then come to this
+like this 
+this is a keyword bro 
+yes it is
+what is this
+this in java means the object/reference name
+
+take a scenario where you have to use a variable / function inside the class itself
+how can you do that 
+use this
+keyword i told 
+ok i will not do that again
+use "this" keyword to reference/use the variable inside a class
+
+Note: it is not necessary to use this keyword if it is global inside a class like this
+public class Student {
+        int rno;
+        String name;
+        float mark;
+
+        void greet() {
+            System.out.print("Hello my name is", name);
+        }
+    }
+see you don't have to 
+but here in this case
+public class Student {
+        int rno;
+        String name;
+        float mark;
+
+        void greet() {
+            System.out.print("Hello my name is", name);
+        }
+        void special() {
+            String name2 = "sai";
+        }
+        void k() {
+            System.out.print(name2);
+        }
+    }
+you have to use this keyword as this throw error
+Main.java:19: error: cannot find symbol
+            System.out.print(name2);
+                             ^
+  symbol:   variable name2
+  location: class Main.Student
+
+
+
+
+
+
+
+
+
+
 */ 
