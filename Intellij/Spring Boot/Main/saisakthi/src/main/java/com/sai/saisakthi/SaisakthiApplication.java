@@ -14,8 +14,7 @@ public class SaisakthiApplication {
 	public static void main(String[] args) {
 		ApplicationContext context = new ClassPathXmlApplicationContext("springconfig.xml");
 		Student student = (Student) context.getBean("class1");
-		System.out.println();
-		System.out.print(student.getAge());
+		student.writeExam();
 		
 		SpringApplication.run(SaisakthiApplication.class, args);
 	}
