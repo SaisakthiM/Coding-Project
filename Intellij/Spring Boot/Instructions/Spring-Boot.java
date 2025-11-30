@@ -233,6 +233,58 @@ think of it like this
 you have to at some point give control to edit variables like age etc
 but why full control 
 we can set some conditions to edit those 
+there comes getters and setters 
+
+what is getters : it get's the value we need to edit
+how think of it like this
+we told that private variable belongs to the class
+so it also means it belongs to the functions inside the class
+what if we give a variable inside a function and tell that function to edit the variable
+technically it's ok and that's setter 
+the function which get's the variable is getters
+
+here is a eg : 
+package com.sai.saisakthi;
+
+public class Student {
+    int marks;
+    Student(int marks) {
+        this.marks = marks;
+        System.out.println("Student is created");
+    }
+    private int age;
+    
+    public void setAge(int age) {
+        if (age < 0) {
+            System.out.print("Age Cannot be negative");
+        }
+        else {
+            this.age = age;
+        }
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    void show() {
+        System.out.print("Hi i am a Student");
+    }
+}
+
+
+like you cannot access or modify these variable normally 
+so we use a loophole (you can call it like that) for editing or getting that variable
+
+now how can we do the same in the xml 
+we can use the <property> tag in xml with name and value like this
+<property name="age" value="92"></property>
+this will automatically call the function and get the value 
+Note: If we change the name of the setter, it will not work and also there is no properties for getters in xml
+
+so now what we did is for a primary datatype 
+what about a reference datatype take this eg 
+
 
 
 */
