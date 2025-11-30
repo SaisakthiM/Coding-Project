@@ -219,6 +219,38 @@ there are 3 ways
 and the most powerful one 3) CLI which is kubectl
 
 Basic kubectl commands : 
+kubectl get pods : get the running pods
+kubectl version : get's the current client and server version of kubernetes
+
+now the most important of them all is kubectl create 
+
+Available Commands:
+  clusterrole           Create a cluster role
+  clusterrolebinding    Create a cluster role binding for a particular cluster role
+  configmap             Create a config map from a local file, directory or literal value
+  cronjob               Create a cron job with the specified name
+  deployment            Create a deployment with the specified name
+  ingress               Create an ingress with the specified name
+  job                   Create a job with the specified name
+  namespace             Create a namespace with the specified name
+  poddisruptionbudget   Create a pod disruption budget with the specified name
+  priorityclass         Create a priority class with the specified name
+  quota                 Create a quota with the specified name
+  role                  Create a role with single rule
+  rolebinding           Create a role binding for a particular role or cluster role
+  secret                Create a secret using a specified subcommand
+  service               Create a service using a specified subcommand
+  serviceaccount        Create a service account with the specified name
+  token                 Request a service account token
+
+these are the roles you can create 
+notice that there is no create for pod
+we cannot directly create a pod 
+we can create a deployment which is a abstraction over pod
+controlling when and where the pod should be created
+so we can create a deployment for now
+
+so for this sample, we can create a nginx deployment 
 
 
 
