@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Define your beans here -->
+     <bean id="class1" class="com.sai.saisakthi.Student">
+       <constructor-arg value="95" />
+     </bean>
+     <bean id="class2" class="com.sai.saisakthi.Student">
+       <constructor-arg value="95" />
+     </bean>
+     <bean class="com.sai.saisakthi.Teacher" ></bean>
+</beans>
