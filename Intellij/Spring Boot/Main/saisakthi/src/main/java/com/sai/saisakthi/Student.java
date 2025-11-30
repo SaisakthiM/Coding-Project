@@ -2,45 +2,57 @@ package com.sai.saisakthi;
 
 public class Student {
     int marks;
+
     Student(int marks) {
         this.marks = marks;
         System.out.println("Student is created");
     }
-    private int age;
-    private String pen;
 
+    private Pen pen;
+    int age;
+    int rno;
+    private Writer writer;
+
+    public Student(int age, Writer writer, int rno) {
+        this.age = age;
+        this.writer = writer;
+        this.rno = rno;
+    }
 
     void show() {
-        System.out.print("Hi i am a Student");
+        System.out.print("Hi i aPm a Student");
+    }
+
+    public void writeExam() {
+        writer.write();
     }
 
     /**
-     * @param age the age to set
+     * @return Pen return the pen
      */
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    /**
-     * @return String return the pen
-     */
-    public String getPen() {
+    public Pen getPen() {
         return pen;
     }
 
     /**
      * @param pen the pen to set
      */
-    public void setPen(String pen) {
+    public void setPen(Pen pen) {
         this.pen = pen;
     }
 
+    /**
+     * @return Writer return the writer
+     */
+    public Writer getWriter() {
+        return writer;
+    }
 
     /**
-     * @return int return the age
+     * @param writer the writer to set
      */
-    public int getAge() {
-        return age;
+    public void setWriter(Writer writer) {
+        this.writer = writer;
     }
 
 }
