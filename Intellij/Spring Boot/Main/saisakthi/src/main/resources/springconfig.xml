@@ -8,6 +8,7 @@
     <!-- Define your beans here -->
      <bean id="class1" class="com.sai.saisakthi.Student">
        <constructor-arg value="95" />
+       <property name="age" value="92"></property>
      </bean>
      <bean id="class2" class="com.sai.saisakthi.Student">
        <constructor-arg value="95" />
