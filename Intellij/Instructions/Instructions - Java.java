@@ -216,7 +216,28 @@ Main.java:19: error: cannot find symbol
   symbol:   variable name2
   location: class Main.Student
 
+so now we also get on touch with the
+constructor overloading 
 
+what is that 
+take a scenario where you have to like have a 2 constructor 
+one for default and other if like they input a data
+
+like this 
+
+class Car {
+    String model;
+    String name;
+    int price;
+    Car() {
+        this.model = "ford";
+        this.name = "hyundai";
+        this.price = 1299999;
+    }
+    Car(String model, String name, int price) {
+        
+    }
+}
 
 
 
