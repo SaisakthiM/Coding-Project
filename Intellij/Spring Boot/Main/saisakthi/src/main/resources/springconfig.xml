@@ -11,7 +11,6 @@
        <constructor-arg index="1" ref="writer"></constructor-arg>
        <constructor-arg index="2" value="92"></constructor-arg>
 
-       <property name="pen" ref="p1"></property>
        
        <!--<property name="writer" ref="p1"></property>-->
      </bean>

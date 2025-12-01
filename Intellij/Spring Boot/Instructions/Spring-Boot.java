@@ -397,7 +397,50 @@ so you won't get these error
 
 now come to constructor injection now
 we aldready touched that 
-so it is nothing but injecting parameters into a
+so it is nothing but injecting parameters into a constructor
+there is also indexing in this which means if there is multiple parameter you can treat it like array and set it with index order like this
+<bean id="class1" class="com.sai.saisakthi.Student" autowire="byType">
+       <constructor-arg index="0" value="15" />
+       <constructor-arg index="1" ref="writer"></constructor-arg>
+       <constructor-arg index="2" value="92"></constructor-arg>
+
+       <property name="pen" ref="p1"></property>
+       
+       <!--<property name="writer" ref="p1"></property>-->
+     </bean>
+see, this is how you can also do the indexing 
+
+now we can also see how difficult it is to create these getters and setters
+you have to create it for every single property 
+like if you have 100 what can you do 
+you cannot go and create 200 getters and setters
+so there comes project lombok 
+this is a package which can create getters and setters for you using annonation
+annonation is java is important as we use it everywhere
+so here 
+
+package com.sai.saisakthi;
+import lombok.Data;
+
+@Data
+public class Student {
+    int age;
+    int rno;
+    private Writer writer;
+
+    public Student(int age, Writer writer, int rno) {
+        this.age = age;
+        this.writer = writer;
+        this.rno = rno;
+    }
+
+    public void writeExam() {
+        writer.write();
+    }
+
+}
+
+you can see there is there is no 
 
 
 
