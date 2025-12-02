@@ -440,7 +440,51 @@ public class Student {
 
 }
 
-you can see there is there is no 
+you can see there is there is no setters and getters and it still works
+
+
+II) Class based COnfig in Spring Framework
+
+now we can also use Classes as a config in Spring for it's work 
+here's how
+1) Create or use a previous class for congig like this
+
+package com.java.sai.config;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    
+}
+
+Note: You have to use that Annonation compulsory to tell spring that this is a config class
+2) Use it in Application
+package com.java.sai;
+
+import java.io.ObjectInputFilter.Config;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+@SpringBootApplication
+public class SaiApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
+		System.out.print("hello world");
+		SpringApplication.run(SaiApplication.class, args);
+	}
+
+}
+
+see we normally use XmlConfig now we use Annonation Config to use class 
+Note: you cannot directly use class here 
+you have to mention the class name with .class so framework can know it is a class and not an object
+
 
 
 
