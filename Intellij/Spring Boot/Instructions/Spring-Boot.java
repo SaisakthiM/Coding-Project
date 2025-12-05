@@ -484,6 +484,71 @@ public class SaiApplication {
 see we normally use XmlConfig now we use Annonation Config to use class 
 Note: you cannot directly use class here 
 you have to mention the class name with .class so framework can know it is a class and not an object
+now there are 2 parts in Class based configuration like in XML based
+
+1) The Beaned Classes : The Classes which are going to be beaned are the beaned classes
+2) The Config Class : The Classes which we are going to use for config 
+
+here is a example for both
+1) Student Class : 
+package com.java.sai;
+
+public class Student {
+    public Student() {
+        System.out.println("Student is Created");
+    }
+    public void show() {
+        System.out.println("this is a show method");
+    }
+}
+
+2) The Config Class
+package com.java.sai.config;
+import com.java.sai.Student;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    @Bean
+    public Student student() {
+        return new Student();
+    }
+}
+
+3) The Main App 
+package com.java.sai;
+import com.java.sai.config.Config;  // ✅ correct import
+
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+@SpringBootApplication
+public class SaiApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
+		System.out.println("hello world");
+		Student st = (Student) context.getBean("student");
+		
+	}
+
+}
+
+these are the main parts let's start with how it flows 
+so first the application context goes into the class config 
+it sees there the class and creates a bean for it 
+then it goes into the app again and creates a object as the user requested
+so also we have different configuration names actually for different classes
+and we can set different names for each bean which will be created 
+the default one will be the method name
+
+
+
 
 
 

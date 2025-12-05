@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: bank_postgres
+    environment:
+      POSTGRES_USER: bankmanagement
+      POSTGRES_PASSWORD: bankmanagement@2008
+      POSTGRES_DB: bank
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: "./backend/bank_management"     # ✔ correct relative path
+      dockerfile: Dockerfile   # ✔ reference the Dockerfile inside backend
+    container_name: bank_app
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bank
+      SPRING_DATASOURCE_USERNAME: bankmanagement
+      SPRING_DATASOURCE_PASSWORD: bankmanagement@2008
+
+volumes:
+  pgdata:
