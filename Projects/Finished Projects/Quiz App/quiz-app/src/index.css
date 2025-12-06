@@ -1,0 +1,4 @@
+body {
+    background-image: radial-gradient(circle at center, hsl(272, 62%, 58%), hsl(300, 100%, 25%));
+    height : 100vh;
+}

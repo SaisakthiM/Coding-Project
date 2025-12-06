@@ -1,0 +1,68 @@
+.container {
+    width : 640px;
+    margin: auto;
+    margin-top: 150px;
+    border: 2px solid rgb(19,32,54);
+    padding: 40px 50px;
+    background-color: aliceblue;
+    border-radius: 12px;
+    font-family: 'Times New Roman', Times, serif;
+    
+}
+.container hr {
+    height: 2px;
+    border: none;
+    background: rgb(26, 26, 199);
+}
+
+.container h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container h2 {
+    font-size: 27px;
+    font-weight: bold;
+}
+.container ul li {
+    display: flex;
+    border: 1px solid rgb(119, 200, 27);
+    margin: 10px;
+    padding: 15px;
+    background-image: linear-gradient(rgb(159, 220, 174), rgb(60, 185, 189));
+    justify-content: center;
+}
+.container ul li:hover {
+    background-image: linear-gradient(rgb(100, 200, 120), rgb(30, 150, 160));
+}
+.container ul li:active {
+  background-image: linear-gradient(rgb(40, 160, 100), rgb(10, 110, 120));
+}
+.container ul li.selected {
+  background-image: linear-gradient(rgb(255, 200, 120), rgb(220, 160, 40)); 
+  border: 2px solid rgb(200, 150, 30);
+  font-weight: bold;
+}
+
+.button_quiz {
+    margin-top: 30px;
+    margin-right: 10px;
+    margin-left: 45px;
+}
+
+.button_quiz button {
+    width: 100%;
+    border-radius: 15px;
+    background-color: rgb(157, 85, 238);
+    padding: 10px 20px;
+}
+.button_quiz button:hover {
+    background-color: rgb(129, 44, 227);
+}
+.button_quiz button:active {
+    background-color: rgb(157, 71, 255);
+}
+.index p {
+    font-size: 20px;
+}
