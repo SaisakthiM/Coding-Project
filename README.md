@@ -11,7 +11,7 @@ A comprehensive repository documenting technical growth from foundational progra
 
 ## Overview
 
-This repository represents a self-directed learning journey in software engineering, with particular emphasis on systems architecture, backend development, and infrastructure management. The collection spans multiple programming languages, frameworks, and infrastructure technologies, with a focus on understanding underlying mechanisms rather than surface-level implementation.
+This repository represents a self-directed learning journey in software engineering by a 17-year-old developer, with particular emphasis on systems architecture, backend development, and infrastructure management. The collection spans multiple programming languages, frameworks, and infrastructure technologies, with a focus on understanding underlying mechanisms rather than surface-level implementation.
 
 **Current Focus Areas:**
 - Backend API development with Spring Boot
@@ -258,7 +258,8 @@ Languages:                8+
 Projects:                 15+
 DSA Problems:             100+
 Open Source PRs:          2 (merged)
-Years of Learning:        5+
+Years of Learning:        3+
+Current Age:              17
 ```
 
 ---
@@ -293,7 +294,8 @@ Years of Learning:        5+
 
 ## Contact Information
 
-**GitHub:** [@SaisakthiM](https://github.com/SaisakthiM)
+**GitHub:** [@SaisakthiM](https://github.com/SaisakthiM)  
+**LinkedIn:** [Connect with me](https://www.linkedin.com/in/saisakthi-m/)
 
 **Open to:** Backend engineering internships, open-source collaborations, technical discussions on systems architecture and infrastructure engineering.
 
