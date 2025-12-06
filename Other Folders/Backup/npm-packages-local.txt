@@ -1,0 +1,12 @@
+Coding Project@ C:\Users\saika\OneDrive\Documents\Coding Project
+├── autoprefixer@10.4.21
+├── axios@1.13.2
+├── express@5.1.0
+├── framer-motion@12.23.16
+├── mysql@2.18.1
+├── postcss@8.5.6
+├── react-router-dom@7.9.5
+├── tailwindcss@4.1.13
+├── typescript@5.9.3
+└── vite@7.1.5
+

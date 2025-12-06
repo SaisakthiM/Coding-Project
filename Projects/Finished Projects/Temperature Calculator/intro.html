@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="temp">
+        <div id="divLabel">
+            <label id="tempLabel">Temperature Converter</label>
+        </div>
+        <br>
+        <br>
+        <div class="celLabel">
+            <label class="labelCel">Celsius : <input class="readInput" type="number" placeholder="Temperature in C&deg;"> 
+            <input type="radio" class="radioCle" name="choice"> <label class="convertLabel" >Celsius &rarr; Fahrenheit</label></label>
+        </div>
+        <div class="celLabel">
+            <label class="labelCel">Fahrenheit : <input class="readInput" type="number" placeholder="Temperature in F&deg;">
+            <input type="radio" class="radioCle" name="choice"> <label class="convertLabel">Fahrenheit &rarr; Celsius</label> <br><br></button></label>
+        </div>
+        <div id="buttonResult">
+            <button type="submit" id="buttonTemp">Submit</button>
+        </div>
+        <br>
+        <div class="celLabel" id="resultLabel">
+            <label class="labelCel">Result : <input class="readInput" id="input2" type="number" placeholder="Result" readonly></label>
+        </div>
+
+    </div>
+    <div id="errorBox"></div>
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,4 +1,0 @@
-autoprefixer
-postcss
-tailwindcss
-typescript

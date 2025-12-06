@@ -1,0 +1,6 @@
+axios
+express
+framer-motion
+mysql
+react-router-dom
+vite
