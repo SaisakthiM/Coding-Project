@@ -1,0 +1,78 @@
+body {
+    background-color : slategray;
+    margin: 0px;
+}
+#p1 {
+    color: aqua;
+    font-family: 'JetBrains Mono';
+    font-size: 13px;
+}
+
+#p2{
+    color : rgb(22, 223, 156);
+
+}
+#p3 {
+    color : #a42;
+}
+#p4 {
+    color : hsla(98, 100%, 50%, 0.755);
+}
+
+/* We are going to see about fonts in css. 
+There is sans-serif font which has a brush stroke at corners of the letter.
+Note: if you are wondering why there is multiple fonts, they are fallback font. css use them if browser did not support original form*/
+
+#sans{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px;
+}
+#heading     {
+    font-family:  'JetBrains Mono', 'Courier New', Courier, monospace;
+    border-style: solid;
+    border-width: 3px;
+    border-color: purple;
+    border-radius: 5px;
+}
+/* There are different types of border in CSS for Heading Tag
+Like
+Dotted
+Solid
+Rigid
+groove 
+inlet 
+outlet 
+and you can remove a border using setting it none
+
+There is also border bottom which is used as underlines
+
+ */
+#p5 { 
+    border-bottom: 7px solid rgba(22, 223, 156, 0.63);
+}
+#h2 {
+    text-shadow: 3px 3px 5px hsla(259, 100%, 50%, 0.755), -3px -3px 5px hsla(312, 100%, 50%, 0.755);
+}
+/* text-shadow is a variable for displaying shadow in a text
+a user have to give two variables 
+horizontal offset and vertical offset both in pixels
+The shadows moves horizontally if vertical is set to 1 and horizontal set to n
+and vice versa
+
+We can also set colors for the shadow*/
+#box {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 5px 5px 10px ;
+}
+/*
+
+combinators : explain the relationship between listed sectors
+blank  = desendant
+> = child
+~ = general sibling 
++ = adjacent sibling
+
+eg : div > p 
+*/
