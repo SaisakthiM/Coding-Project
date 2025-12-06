@@ -70,7 +70,7 @@ This repository represents a self-directed learning journey in software engineer
 
 ---
 
-## Repository Structure
+## Repository Structure (Not Exact!)
 
 ```
 Coding-Project/ (2000+ files)
