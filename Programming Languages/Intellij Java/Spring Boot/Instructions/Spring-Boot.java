@@ -549,7 +549,58 @@ the default one will be the method name
 
 
 
+this is Java based config 
+everything is same except we do that in classes 
+the below class can give you a idea of class based config
 
+package com.java.sai.config;
+import com.java.sai.Pen;
+import com.java.sai.Pencil;
+import com.java.sai.Student;
+import com.java.sai.Writer;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    @Bean(name = "s1")
+    public Student student(@Autowired Writer writer) {
+        Student s1 = new Student();
+        s1.setRno(10);
+        s1.setWriter(writer);
+        return s1;
+    }
+    @Bean(name = "writer")
+    @Primary
+    public Pen pen() {
+        return new Pen();
+    }
+    @Bean(name = "writer1")
+    public Pencil pencil() {
+        return new Pencil();
+    }
+}
+
+see concepts like autowiring is too there and also there is also another config
+think if there is 2 primary 
+in that case java throws error
+so in that case we can use @Qualification for that
+
+
+*/
+
+/* 
+
+Spring Boot and Advantages over spring framework:
+
+1) The main advantage of Spring boot over spring framework is Convention over configuration 
+this is the main advantage of spring boot 
+Note : Spring boot is not a alternative to the spring, spring boot is built on top of the spring framework 
 
 
 
