@@ -1,0 +1,8 @@
+/* 
+This is a DSA based on Java
+
+We are going to learn about what is Arrays first and then move on to linked list 
+
+
+
+*/
