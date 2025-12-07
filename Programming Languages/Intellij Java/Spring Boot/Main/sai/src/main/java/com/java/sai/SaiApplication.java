@@ -14,7 +14,8 @@ public class SaiApplication {
 		ApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
 		System.out.println("hello world");
 		Student st = (Student) context.getBean("s1");
-		
+		st.writeExam();
+		System.out.println(st.getRno());
 	}
 
 }

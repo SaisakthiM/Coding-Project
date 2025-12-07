@@ -1,5 +1,8 @@
 package com.java.sai;
 
-public class Pen {
-    
+public class Pen implements Writer{
+    @Override
+    public void write() {
+        System.out.print("Writing using pen");
+    }
 }
