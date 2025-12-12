@@ -602,6 +602,74 @@ Spring Boot and Advantages over spring framework:
 this is the main advantage of spring boot 
 Note : Spring boot is not a alternative to the spring, spring boot is built on top of the spring framework 
 
+now we start to write spring boot 
+what's it's main advantage over spring boot
+we already talked about convention over configuration
 
+so instead of manually typing out all the classes needed in java class or xml
+we can do just use annotation
+we have to discuss about what is annotation 
+which is just a metadata about the class
+
+so now for creating a bean (or object we say)
+you can just use the annonation component
+just that and spring boot manages rest 
+hears like magic 
+
+here is a example
+
+@Component
+public class Student {
+    public void show() {
+        System.out.println("this is student class");
+    }
+}
+
+see just that and you got a bean right there
+no config xml or class
+
+now we can go to scope of classes
+there is two
+1) Singleton
+2) Prototype
+
+what's that 
+in default if a bean is created in IoC container, we know it is only created once for each class
+so in a case like this
+Student student = (Student) context.getBean(Student.class);
+		Student student1 = (Student) context.getBean(Student.class);
+
+		student.age = 10;
+		student.show();
+		student1.show();
+		System.out.print(student1.age);
+here what we get is 10
+even though we only setted the age for student 
+not for student1
+this concept is also we can call reference
+yes the pointers and reference
+
+this scope of object reference and access is called singeton 
+now we go to prototype
+this creates separate one
+no it will not
+just use a serperate original reference and will not use the modified ones
+
+
+now we come to more important one which is dependency injection 
+this is a very important concept as it is very frequently used in spring boot 
+so now we can see what is dependency injection and how it works clearly 
+so we know that a spring managed object is called bean 
+
+we have actually seen what are the types of injection in the spring framework
+so we have to just revise how all works together
+
+there are 3 types of injection in spring boot
+1) Dependency injection 
+2) Setter injection
+3) Constructor injection 
+we have all seen these in spring framework itself
+now we are also going to see how autowired is also used here
+Note: Autowire is just another notation which automatically wires all the dependency needed for the object instance we create 
 
 */
