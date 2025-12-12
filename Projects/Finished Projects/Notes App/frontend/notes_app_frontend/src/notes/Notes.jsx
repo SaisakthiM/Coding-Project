@@ -11,8 +11,8 @@ export default function Notes(){
                 <p>This is Notes App. Here, You can </p>
                 <ol className="button_notes">
                     <li><button onClick={() => navigate('/addnote')}>Add a Note</button></li>
-                    <li><button>Delete a Note</button></li>
-                    <li><button>Modify a Note</button></li>
+                    <li><button onClick={() => navigate('/deletenote')}>Delete a Note</button></li>
+                    <li><button onClick={() => navigate('/modifynote')}>Modify a Note</button></li>
                 </ol>
             </div>
         </div>

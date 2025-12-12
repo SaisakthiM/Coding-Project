@@ -94,3 +94,20 @@ export async function deleteNote(id) {
     console.error("❌ Error deleting note:", err.response?.data || err.message);
   }
 }
+
+// 🟩 GET ALL NOTES
+export async function getAllNotes() {
+  const url = `${API_BASE_URL}/notes/`;
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${getAccessKey()}`,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    console.error("❌ Error fetching notes:", err.response?.data || err.message);
+    return [];
+  }
+}
+

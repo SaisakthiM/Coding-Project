@@ -2,12 +2,14 @@ package com.springboot.saispring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class SaispringApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SaispringApplication.class, args);
+		ApplicationContext context = SpringApplication.run(SaispringApplication.class, args);	
+		Student student = (St udent) context.getBean("s1");
+		student.show();
 	}
-
 }
