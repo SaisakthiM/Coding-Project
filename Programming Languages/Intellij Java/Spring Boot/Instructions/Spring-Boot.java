@@ -672,6 +672,50 @@ we have all seen these in spring framework itself
 now we are also going to see how autowired is also used here
 Note: Autowire is just another notation which automatically wires all the dependency needed for the object instance we create 
 
+1) Field Injection :
+it is just injecting field for the class needed by a component 
+an eg will make it clear
+ @Autowired
+    private Pen pen;
+    public void show() {
+        System.out.println("this is student class");
+    }
+    public void writeExam() {
+        pen.write();
+    }
+}
 
+see we injected the field for the classes
+
+2) Setter injection 
+so when we use private keyword for encapsulation 
+we cannot use normal autowired for field injection 
+so we go to setter injection 
+eg:
+package com.springboot.saispring;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import lombok.Setter;
+
+@Component("s1")
+@Scope("prototype")
+public class Student {
+    int age;
+    @Setter(onMethod_ = @Autowired)
+    private Pen pen;
+    
+    public void show() {
+        System.out.println("this is student class");
+    }
+    public void writeExam() {
+        pen.write();
+    }
+}
+
+here lombok creates all the needed setter and it injects
+remember to use onMethod parameter wih autowired
 
 */
