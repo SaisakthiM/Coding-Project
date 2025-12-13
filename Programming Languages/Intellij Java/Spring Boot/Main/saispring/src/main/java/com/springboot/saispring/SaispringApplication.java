@@ -9,7 +9,9 @@ public class SaispringApplication {
 
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(SaispringApplication.class, args);	
-		Student student = (St udent) context.getBean("s1");
+		Student student = (Student) context.getBean("s1");
 		student.show();
+		student.writeExam();
+		
 	}
 }
