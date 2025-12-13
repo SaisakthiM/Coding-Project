@@ -7,7 +7,7 @@ export default function AddNote() {
         name: "",
         content: "",
         deadline: "",
-        importance: "<l></l>ow",
+        importance: "low",
     });
 
     const handleChange = (e) => {
