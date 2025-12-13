@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAllNotes, deleteNote } from "./NoteHandler";
-import { Link } from "react-router-dom";
+import "../styles.css";
 
-function DeleteNote() {
+export default function DeleteNote() {
   const [notes, setNotes] = useState([]);
+  const [selectedId, setSelectedId] = useState("");
 
   const fetchNotes = async () => {
     const data = await getAllNotes();
@@ -14,47 +15,40 @@ function DeleteNote() {
     fetchNotes();
   }, []);
 
-  const handleDelete = async (id) => {
-    await deleteNote(id);
+  const handleDelete = async () => {
+    if (!selectedId) return;
+    await deleteNote(selectedId);
+    alert("Note deleted");
     fetchNotes();
+    setSelectedId("");
   };
 
   return (
     <div className="wrapper">
       <div className="container">
-        <h1 className="main">Your Notes</h1>
+        <h1>Delete Note</h1>
 
-        <div className="notes-list">
-          {notes.length === 0 ? (
-            <p>No notes available.</p>
-          ) : (
-            notes.map((note) => (
-              <div key={note.id} className="note-item">
-                <div style={{ flexGrow: 1 }}>
-                  <h3 style={{ margin: "0 0 8px" }}>{note.title}</h3>
-                  <p>{note.content}</p>
-                  <p>
-                    <strong>Deadline:</strong> {note.deadline}
-                  </p>
-                  <p>
-                    <strong>Importance:</strong> {note.importance}
-                  </p>
-                </div>
+        <div className="loginLabel">
+          <select
+            className="inputLogin"
+            onChange={(e) => setSelectedId(e.target.value)}
+            value={selectedId}
+          >
+            <option value="">Select a note</option>
+            {notes.map((note) => (
+              <option key={note.id} value={note.id}>
+                {note.title}
+              </option>
+            ))}
+          </select>
+        </div>
 
-                <div className="actions">
-                  <Link to={`/edit/${note.id}`}>
-                    <button>Edit</button>
-                  </Link>
-
-                  <button onClick={() => handleDelete(note.id)}>Delete</button>
-                </div>
-              </div>
-            ))
-          )}
+        <div className="loginButton">
+          <button onClick={handleDelete} disabled={!selectedId}>
+            Delete
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-export default DeleteNote;

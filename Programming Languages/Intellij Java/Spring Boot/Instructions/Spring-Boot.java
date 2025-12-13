@@ -672,4 +672,6 @@ we have all seen these in spring framework itself
 now we are also going to see how autowired is also used here
 Note: Autowire is just another notation which automatically wires all the dependency needed for the object instance we create 
 
+
+
 */
