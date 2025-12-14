@@ -8,8 +8,9 @@ import org.springframework.context.ApplicationContext;
 public class SaispringApplication {
 
 	public static void main(String[] args) {
-		ApplicationContext context = SpringApplication.run(SaispringApplication.class, args);	
-		Student student = (Student) context.getBean("s1");
+		ApplicationContext context = SpringApplication.run(SaispringApplication.class, args);
+
+		Student student = (Student) context.getBean("writer");
 		student.show();
 		student.writeExam();
 		
