@@ -1,5 +1,11 @@
 package com.springboot.saispring;
 
-public class Pencil {
-    
+import org.springframework.stereotype.Component;
+
+@Component
+public class Pencil implements Writer{
+    @Override
+    public void write(){
+        System.out.println("writing using pencil");
+    }
 }
