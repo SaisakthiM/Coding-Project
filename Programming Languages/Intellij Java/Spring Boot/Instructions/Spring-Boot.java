@@ -718,4 +718,29 @@ public class Student {
 here lombok creates all the needed setter and it injects
 remember to use onMethod parameter wih autowired
 
+
 */
+
+
+/*
+
+Now we finally move on to API and REST
+in java spring boot this is important as spring boot is used as a web framework actually 
+
+i know what is API Application Programming Interface 
+and more important thing the server is no need to be created
+we can use tomcat   
+
+there are also you need to know about layers of servers we are creating
+Controller 
+Service 
+Repository 
+
+so Spring boot can actually handle all of this and without any issue 
+so we can start with controller and there is even a architecture fo that which is MVC or o
+Model View Controller
+
+this is a important one as it enables clients to interact with us easily 
+
+
+ */
