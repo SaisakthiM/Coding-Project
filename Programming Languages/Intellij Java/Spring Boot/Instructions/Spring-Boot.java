@@ -742,5 +742,30 @@ Model View Controller
 
 this is a important one as it enables clients to interact with us easily 
 
+so this is how we can write API for a hello world program, see
+package com.api.saiapi;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloWorld {
+    @GetMapping("/")
+    public String hello() {
+        return "Hello World";
+    }
+}
+this is yes long if you compare to 
+import express 
+    
+const app = express()
+app.get("/", () => "Hello World")
+
+this is the same thing in express actually 
+see it is long buy the express is actually unopinitated and not frequently used in servers directly 
+instead an framework built on top of it like say next js is used actually 
+
+so this we move on to what is even a controller 
+what is a controller actually mean 
 
  */
