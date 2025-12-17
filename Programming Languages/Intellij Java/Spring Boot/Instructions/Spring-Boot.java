@@ -767,5 +767,57 @@ instead an framework built on top of it like say next js is used actually
 
 so this we move on to what is even a controller 
 what is a controller actually mean 
+a controller can listen to a request and send a response according to the page 
+so here we can have multiple controllers in java
+like HelloController and LoginController we created in here
+package com.api.saiapi.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloWorld {
+    @GetMapping("/")
+    public String hello() {
+        return "Hello World";
+    }
+    @GetMapping("aboutus/")
+    public String about() {
+        return "this is sai";
+
+    }
+}
+package com.api.saiapi.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LoginController {
+    @GetMapping("/login")
+    public String login() {
+        return "Logged in ";
+    }
+}
+this is the both HelloController and LoginController
+these can redirect any request to anything 
+
+so now another important thing to note here is that 
+you cannot actually duplicate a path in both controller 
+that is if you have a path in one controller and you again redeclare in another one 
+it will not be accepted and will throw a error 
+now we can also talk about other layers in a server now
+
+there is service layer
+the answer in the name itself
+it is responsible for services 
+
+then also if you want to communicate with a database now
+you can use the repository layer which is responsible for communicating with the database 
+
+these are the 3 layers in a server 
+all these can be created in Java Spring Boot
+
+
 
  */
