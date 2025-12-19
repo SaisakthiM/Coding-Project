@@ -821,3 +821,20 @@ all these can be created in Java Spring Boot
 
 
  */
+
+/*
+Now also we can talk about what is hibernate and how it is used 
+so what is even a hibernate even means actually 
+
+it is a dependency for java for database related works with java 
+
+so now we can use that in spring boot to create tables and manage data in that 
+
+how we can do that actually now 
+we can use the @Entity annotation 
+with that we can essentially create a database which is much faster than 
+creating the same with like in a relational database 
+
+
+
+ */
