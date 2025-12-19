@@ -9,4 +9,8 @@
         public String login() {
             return "Logged in ";
         }
+        @GetMapping("/ping")
+        public String ping() {
+            return "pong";
+        }
     }
