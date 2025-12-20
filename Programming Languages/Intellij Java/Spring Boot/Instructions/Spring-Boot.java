@@ -811,6 +811,7 @@ now we can also talk about other layers in a server now
 there is service layer
 the answer in the name itself
 it is responsible for services 
+for this the @Service is used and you can directly use that service by creating the object for it
 
 then also if you want to communicate with a database now
 you can use the repository layer which is responsible for communicating with the database 
@@ -818,23 +819,80 @@ you can use the repository layer which is responsible for communicating with the
 these are the 3 layers in a server 
 all these can be created in Java Spring Boot
 
+Now we move on to CRUD operation 
+
+CRUD - Get Post Put Delete
+
+First Let us see about the Get and Post Part of the REST framework now
+
+so now what we are working on now
+we are working on with a data 
+a data in java, we can represent it with classes
+we call it models
+this is what we will be using to design a schema for databases using ORM object relational mapper
+
+the model is the blueprint or a schema for a data for a database or you can use it as a normal schema and use it normally 
+
+here is a example 
+Controller:
+package com.crud.saicrud.controller;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.crud.saicrud.model.Student;
+import com.crud.saicrud.service.StudentService;
+
+@RestController
+public class StudentController {
+    @Autowired
+    StudentService service;
+
+    @GetMapping("student")
+    public List<Student> getStudents() {
+        return service.students_list();
+    }
+
+}
+Service:
+package com.crud.saicrud.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.crud.saicrud.model.Student;
+
+@Service
+public class StudentService {
+    List<Student> students = new ArrayList<>(
+        Arrays.asList(
+            new Student(1, "sai", "AI"),
+            new Student(2,"sai", "Ai")
+        )
+    );
+    public List<Student> students_list() {
+        return students;
+    }
+}
+Model Student
+package com.crud.saicrud.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 
- */
-
-/*
-Now also we can talk about what is hibernate and how it is used 
-so what is even a hibernate even means actually 
-
-it is a dependency for java for database related works with java 
-
-so now we can use that in spring boot to create tables and manage data in that 
-
-how we can do that actually now 
-we can use the @Entity annotation 
-with that we can essentially create a database which is much faster than 
-creating the same with like in a relational database 
-
-
+@Data
+@AllArgsConstructor
+public class Student {
+    private int id;
+    private String name;
+    private String technology;
+}
 
  */
