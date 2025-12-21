@@ -2,29 +2,29 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bankService from "./bankService";
 
-export default function Withdraw() {
+export default function AddDeposit() {
     const navigate = useNavigate();
-    const [accountId, setAccountId] = useState("");
-    const [amount, setAmount] = useState("");
+    const [accountId, setAccountId] = useState(0);
+    const [amount, setAmount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
-    const handleWithdraw = async (e) => {
+    const handleDeposit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage("");
         setError("");
 
         try {
-            const response = await bankService.withdraw(parseInt(accountId), parseInt(amount));
+            const response = await bankService.deposit(parseInt(accountId), parseInt(amount));
             if (response.success) {
-                setMessage(`Successfully withdrew $${amount}! New balance: $${response.data.balance}`);
-                setAccountId("");
-                setAmount("");
+                setMessage(`Successfully deposited $${amount}! New balance: $${response.data.balance}`);
+                setAccountId(0);
+                setAmount(0);
             }
         } catch (err) {
-            setError(err.message || "Failed to withdraw money");
+            setError(err.message || "Failed to deposit money");
         } finally {
             setLoading(false);
         }
@@ -33,12 +33,12 @@ export default function Withdraw() {
     return (
         <div className="wrapper">
             <div className="container">
-                <h1>Withdraw Money</h1>
+                <h1>Add Deposit</h1>
                 
                 {message && <div className="success-message">{message}</div>}
                 {error && <div className="error-message">{error}</div>}
 
-                <form onSubmit={handleWithdraw}>
+                <form onSubmit={handleDeposit}>
                     <div className="form-group">
                         <label>Account ID:</label>
                         <input
@@ -58,13 +58,13 @@ export default function Withdraw() {
                             onChange={(e) => setAmount(e.target.value)}
                             required
                             min="1"
-                            placeholder="Enter amount to withdraw"
+                            placeholder="Enter amount to deposit"
                         />
                     </div>
 
                     <div className="button-group">
                         <button type="submit" disabled={loading}>
-                            {loading ? "Processing..." : "Withdraw"}
+                            {loading ? "Processing..." : "Deposit"}
                         </button>
                         <button type="button" onClick={() => navigate("/")}>
                             Back to Home

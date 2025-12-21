@@ -1,207 +1,604 @@
 {
-    "files.autoSave": "afterDelay",
-    "cmake.sourceDirectory": "C:/Coding Project/Clion",
-    "cSpell.words": [
-        "Adistar",
-        "Adizero",
-        "Atleast",
-        "autoplay",
-        "columnname",
-        "cristiano",
-        "dotenv",
-        "DRUD",
-        "endfor",
-        "floatarrays",
-        "Headboy",
-        "hovermode",
-        "Inresion",
-        "insestive",
-        "intarrays",
-        "Krabs",
-        "lastname",
-        "Lene",
-        "lexographical",
-        "maxlength",
-        "minlength",
-        "myclass",
-        "mymember",
-        "mymembers",
-        "Numpy",
-        "onclick",
-        "Quering",
-        "Refsnes",
-        "rgba",
-        "Saisakthi",
-        "sakthi",
-        "simplely",
-        "Stalikken",
-        "statment",
-        "statments",
-        "stylesheet",
-        "Ultraboost",
-        "Uncategorized",
-        "untill",
-        "varinside",
-        "Withdrawls"
-    ],
-    "C_Cpp.errorSquiggles": "enabled",
-    "workbench.colorCustomizations": {
-    
-    },
-    "workbench.colorTheme": "Night Owl X One Dark",
-    "workbench.preferredDarkColorTheme": "Visual Studio Dark - C++",
-    "python-envs.pythonProjects": [
-        {
-            "path": "Pycharm",
-            "envManager": "ms-python.python:venv",
-            "packageManager": "ms-python.python:pip"
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairsHorizontal": false,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.indentation": true,
+  "workbench.colorCustomizations": {
+    "editorWarning.background": "#ffcc5555",
+    "editorInfo.background": "#5ec6ff55",
+    "editorError.foreground": "#ff5c5c55",
+    "terminal.background": "#0f1117",
+    "terminal.foreground": "#b3eaff",
+    "terminal.ansiBlack": "#1b1d23",
+    "terminal.ansiRed": "#e06c75",
+    "terminal.ansiGreen": "#7fd0c3",
+    "terminal.ansiYellow": "#e0dcbf",
+    "terminal.ansiBlue": "#88cfff",
+    "terminal.ansiMagenta": "#a9a1e1",
+    "terminal.ansiCyan": "#9de2f9",
+    "terminal.ansiWhite": "#e6f7ff",
+    "terminal.ansiBrightBlack": "#3c4048",
+    "terminal.ansiBrightRed": "#ff8e91",
+    "terminal.ansiBrightGreen": "#a4f9dd",
+    "terminal.ansiBrightYellow": "#f9f5c7",
+    "terminal.ansiBrightBlue": "#c2f0ff",
+    "terminal.ansiBrightMagenta": "#c5b4e3",
+    "terminal.ansiBrightCyan": "#d2f8ff",
+    "terminal.ansiBrightWhite": "#f3fdff",
+    "editorBracketHighlight.foreground1": "#89b4fa",
+    "editorBracketHighlight.foreground2": "#94e2d5",
+    "editorBracketHighlight.foreground3": "#f9e2af",
+    "editorBracketHighlight.foreground4": "#f38ba8",
+    "editorBracketHighlight.foreground5": "#cba6f7",
+    "editorBracketHighlight.foreground6": "#a6e3f1",
+    "editorBracketHighlight.unexpectedBracket.foreground": "#ff5555",
+    "editorBracketPairGuide.activeBackground1": "#89b4faAA",
+    "editorBracketPairGuide.activeBackground2": "#94e2d5AA",
+    "editorBracketPairGuide.activeBackground3": "#f9e2afAA",
+    "editorBracketPairGuide.activeBackground4": "#f38ba8AA",
+    "editorBracketPairGuide.activeBackground5": "#cba6f7AA",
+    "editorBracketPairGuide.activeBackground6": "#a6e3f1AA",
+    "editorBracketPairGuide.background1": "#89b4fa77",
+    "editorBracketPairGuide.background2": "#94e2d577",
+    "editorBracketPairGuide.background3": "#f9e2af77",
+    "editorBracketPairGuide.background4": "#f38ba877",
+    "editorBracketPairGuide.background5": "#cba6f777",
+    "editorBracketPairGuide.background6": "#a6e3f177",
+    "editorIndentGuide.background1": "#44444499",
+    "editorIndentGuide.activeBackground1": "#00e0ffDD",
+    "editor.selectionBackground": "#5ec6ff55",
+    "editor.selectionHighlightBackground": "#5ec6ff33",
+    "editor.lineHighlightBackground": "#1073cf2d",
+    "editor.lineHighlightBorder": "#9fced11f",
+    "chat.requestBorder": "#FFFFFF",
+    "chat.requestBackground": "#222222",
+    "chat.responseBackground": "#111111",
+    "chat.responseBorder": "#FFFFFF",
+    "chat.responseForeground": "#FFFFFF"
+  },
+  "extensions.ignoreRecommendations": false,
+  "indentRainbow.colors": [
+    "rgba(129,161,193,0.1)",
+    "rgba(163,190,140,0.1)",
+    "rgba(180,142,173,0.1)",
+    "rgba(136,192,208,0.1)",
+    "rgba(216,222,233,0.1)",
+    "rgba(94,129,172,0.1)",
+    "rgba(143,188,187,0.1)"
+  ],
+  "indentRainbow.errorColor": "rgba(94,129,172,0.6)",
+  "workbench.iconTheme": "material-icon-theme",
+  "files.associations": {
+    "*.css": "css",
+    "*.asm": "asm-intel-x86-generic",
+    "*.html": "html"
+  },
+  // OPTIMIZED: Expanded file watcher exclusions to reduce background scanning
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/*.log": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/target/**": true,
+    "**/out/**": true,
+    "**/.vscode/**": true
+  },
+  // OPTIMIZED: Expanded search exclusions
+  "search.exclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/venv/**": true,
+    "**/__pycache__/**": true,
+    "**/target/**": true,
+    "**/out/**": true
+  },
+  // OPTIMIZED: Disabled symlink following for better performance
+  "search.followSymlinks": false,
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "*.html": "default",
+    "*.lnk": "default"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[python]": {
+    "editor.defaultFormatter": null
+  },
+  "[csv]": {
+    "editor.inlayHints.maximumLength": 0
+  },
+  "python.defaultInterpreterPath": "/bin/python",
+  // OPTIMIZED: Disabled resource-heavy Python analysis features
+  "python.analysis.autoImportCompletions": false,
+  "python.analysis.indexing": false,
+  "python.analysis.extraPaths": [
+    "./src"
+  ],
+  "python.languageServer": "Jedi",
+  "python.experiments.enabled": false,
+  "python.analysis.completeFunctionParens": false,
+  "python.linting.enabled": false,
+  "python.createEnvironment.contentButton": "show",
+  "python.useEnvironmentsExtension": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.globalModuleInstallation": true,
+  "black-formatter.path": "c:\\Coding Project\\.venv-13\\Scripts\\black.exe",
+  "black-formatter.interpreter": "c:\\Coding Project\\.venv-13\\Scripts\\python.exe",
+  "editor.fontFamily": "Jetbrains Mono,Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.smoothScrolling": true,
+  "editor.mouseWheelZoom": true,
+  "editor.tabSize": 4,
+  "editor.tabMovesFocus": false,
+  "editor.insertSpaces": true,
+  "editor.linkedEditing": true,
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.suggestSelection": "first",
+  "editor.snippetSuggestions": "none",
+  "editor.inlineSuggest.enabled": true,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": [
+          "comment",
+          "comment.block",
+          "comment.line",
+          "comment.block.documentation"
+        ],
+        "settings": {
+          "foreground": "#4FC1E9",
+          "fontStyle": "italic"
         }
-    ],
-    "files.associations": {
-        "array": "cpp",
-        "atomic": "cpp",
-        "*.tcc": "cpp",
-        "cctype": "cpp",
-        "clocale": "cpp",
-        "cmath": "cpp",
-        "cstdarg": "cpp",
-        "cstddef": "cpp",
-        "cstdint": "cpp",
-        "cstdio": "cpp",
-        "cstdlib": "cpp",
-        "cwchar": "cpp",
-        "cwctype": "cpp",
-        "deque": "cpp",
-        "unordered_map": "cpp",
-        "vector": "cpp",
-        "exception": "cpp",
-        "algorithm": "cpp",
-        "functional": "cpp",
-        "iterator": "cpp",
-        "memory": "cpp",
-        "memory_resource": "cpp",
-        "numeric": "cpp",
-        "random": "cpp",
-        "string": "cpp",
-        "system_error": "cpp",
-        "tuple": "cpp",
-        "type_traits": "cpp",
-        "utility": "cpp",
-        "fstream": "cpp",
-        "initializer_list": "cpp",
-        "iosfwd": "cpp",
-        "iostream": "cpp",
-        "istream": "cpp",
-        "limits": "cpp",
-        "new": "cpp",
-        "ostream": "cpp",
-        "sstream": "cpp",
-        "stdexcept": "cpp",
-        "streambuf": "cpp",
-        "typeinfo": "cpp",
-        "chrono": "cpp",
-        "ctime": "cpp",
-        "ratio": "cpp",
-        "thread": "cpp"
-    },
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "127.0.0.1",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "Personal",
-            "group": "MySQL Connections",
-            "database": "saisakthip",
-            "username": "root"
+      },
+      {
+        "scope": [
+          "source",
+          "meta.embedded",
+          "meta.block",
+          "meta.function"
+        ],
+        "settings": {
+          "foreground": "#FFFFFF"
         }
-    ],
-    "java.project.sourcePaths": [
-        "Intellij"
-    ],
-    "java.project.referencedLibraries": [],
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
-    "search.exclude": {
-        "**/node_modules": true
-    },
-    "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-        "**/node_modules/**": true,
-        "env-*": true
-    },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.DS_Store": true,
-        "**/node_modules": true,
-        "env*": true
-    },
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "dotnet.defaultSolution": "Project 1.slnx",
-    "dbcode.connections": [
-        {
-            "connectionId": "A7KIE2SyPf--UFP4Tw2yD",
-            "name": "Saisakthi",
-            "driver": "mysql",
-            "connectionType": "host",
-            "host": "localhost",
-            "port": 3306,
-            "ssl": false,
-            "username": "root",
-            "password": "",
-            "savePassword": "secretStorage",
-            "database": "saisakthi",
-            "readOnly": false,
-            "connectionTimeout": 30,
-            "driverOptions": {
-                "retrievePublickey": true
-            }
-        },
-        {
-            "connectionId": "wptps3D8MvWrnkLio9udH",
-            "name": "Saisakthi",
-            "driver": "mongodb",
-            "color": "#004A37",
-            "connectionType": "host",
-            "driverOptions": {
-                "protocol": "mongodb://"
-            },
-            "host": "localhost",
-            "port": 27017,
-            "ssl": false,
-            "savePassword": "secretStorage",
-            "database": "admin",
-            "readOnly": false,
-            "connectionTimeout": 30
+      },
+      {
+        "scope": [
+          "variable",
+          "variable.other",
+          "variable.other.readwrite",
+          "meta.definition.variable.name",
+          "meta.definition.parameter",
+          "support.variable"
+        ],
+        "settings": {
+          "foreground": "#40E0D0"
         }
-    ],
-    "python.REPL.enableREPLSmartSend": false,
-    "yaml.schemas": {
-        "file:///c%3A/Users/saika/.vscode/extensions/continue.continue-1.2.2-win32-x64/config-yaml-schema.json": [
-            ".continue/**/*.yaml",
-            "file:///c%3A/Users/saika/.continue/config.yaml"
-        ]
-    },
-    "cSpell.customDictionaries": {
-        "custom-dictionary-workspace": {
-            "name": "custom-dictionary-workspace",
-            "path": "${workspaceFolder:Coding Project}/.cspell/custom-dictionary-workspace.txt",
-            "addWords": true,
-            "scope": "workspace"
+      },
+      {
+        "scope": [
+          "entity.name.function",
+          "support.function"
+        ],
+        "settings": {
+          "foreground": "#00F5FF",
+          "fontStyle": "bold"
         }
+      },
+      {
+        "scope": [
+          "keyword",
+          "keyword.control",
+          "storage.type"
+        ],
+        "settings": {
+          "foreground": "#7A5FFF",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": [
+          "string",
+          "string.quoted",
+          "string.template"
+        ],
+        "settings": {
+          "foreground": "#6BEF6B"
+        }
+      },
+      {
+        "scope": [
+          "constant.numeric",
+          "constant.language",
+          "constant.character"
+        ],
+        "settings": {
+          "foreground": "#2ECCFA"
+        }
+      },
+      {
+        "scope": [
+          "support.type",
+          "entity.name.type",
+          "meta.type"
+        ],
+        "settings": {
+          "foreground": "#00D0FF"
+        }
+      },
+      {
+        "scope": [
+          "support.class",
+          "entity.name.class"
+        ],
+        "settings": {
+          "foreground": "#00D9B5",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": [
+          "meta.object-literal.key",
+          "support.type.property-name",
+          "entity.name.property"
+        ],
+        "settings": {
+          "foreground": "#12CAD6"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.definition.tag",
+          "punctuation.separator",
+          "punctuation.terminator"
+        ],
+        "settings": {
+          "foreground": "#5BC0DE"
+        }
+      },
+      {
+        "scope": [
+          "chat.response"
+        ],
+        "settings": {
+          "foreground": "#FFFFFF"
+        }
+      }
+    ]
+  },
+  "better-comments.tags": [
+    {
+      "tag": "!",
+      "color": "#FF6B6B",
+      "bold": true
     },
-    "githubPullRequests.ignoredPullRequestBranches": [
-        "master"
-    ],
-    "python.languageServer": "None",
-    "java.format.settings.url": ".vscode/java-formatter.xml",
-    "[java]": {
-        "editor.insertSpaces": false
+    {
+      "tag": "?",
+      "color": "#91DDFF",
+      "italic": true
+    },
+    {
+      "tag": "todo",
+      "color": "#FFD369",
+      "bold": true
+    },
+    {
+      "tag": "note",
+      "color": "#5EEAD4",
+      "italic": true
+    },
+    {
+      "tag": "fix",
+      "color": "#F38BA8",
+      "bold": true
+    },
+    {
+      "tag": "optimize",
+      "color": "#95FFA4",
+      "italic": true
+    },
+    {
+      "tag": "debug",
+      "color": "#CBA6F7",
+      "italic": true
+    },
+    {
+      "tag": "review",
+      "color": "#FFE9AA",
+      "underline": true
+    },
+    {
+      "tag": "deprecated",
+      "color": "#E0Dcbf",
+      "strikethrough": true
+    },
+    {
+      "tag": "done",
+      "color": "#A4F9DD",
+      "italic": true
     }
+  ],
+  "dbcode.tunnels": [
+    {
+      "id": "l4El3TNGBnS5_rqfVZFwc",
+      "type": "ssh",
+      "name": "Saisakthi",
+      "host": "localhost",
+      "port": 27188,
+      "username": "Saisakthi",
+      "authType": "password",
+      "password": "",
+      "savePassword": "secretStorage"
+    }
+  ],
+  "breadcrumbs.enabled": false,
+  "explorer.confirmDelete": false,
+  "dbcode.connections": [],
+  "explorer.confirmDragAndDrop": false,
+  "material-icon-theme.folders.theme": "specific",
+  "material-icon-theme.folders.color": "#b3d9ff",
+  "code-runner.runInTerminal": true,
+  "C_Cpp.default.compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "dbcode.resultLocation": "below",
+  // OPTIMIZED: Disabled GitHub Copilot completely to save resources
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "sql": false
+  },
+  "windows": {
+    "code-runner.executorMap": {
+      "c": "Set-Location -Path $dir ; if ($?) { gcc $fileName -o $fileNameWithoutExt } ; if ($?) { & (Join-Path $dir $fileNameWithoutExt) }",
+      "cpp": "Set-Location -Path $dir ; if ($?) { g++ $fileName -o $fileNameWithoutExt } ; if ($?) { & (Join-Path $dir $fileNameWithoutExt) }",
+      "java": "Set-Location -Path $dir ; if ($?) { javac $fileName } ; if ($?) { java $fileNameWithoutExt }",
+      "python": "Set-Location -Path $dir ; if ($?) { python $fileName }",
+      "javascript": "Set-Location -Path $dir ; if ($?) { node $fileName }",
+      "typescript": "Set-Location -Path $dir ; if ($?) { tsc $fileName ; if ($?) { node ($fileName -replace '.ts$', '.js') } }",
+      "go": "Set-Location -Path $dir ; if ($?) { go run $fileName }",
+      "ruby": "Set-Location -Path $dir ; if ($?) { ruby $fileName }",
+      "php": "Set-Location -Path $dir ; if ($?) { php $fileName }",
+      "perl": "Set-Location -Path $dir ; if ($?) { perl $fileName }",
+      "rust": "Set-Location -Path $dir ; if ($?) { rustc $fileName } ; if ($?) { & (Join-Path $dir $fileNameWithoutExt) }",
+      "swift": "Set-Location -Path $dir ; if ($?) { swift $fileName }",
+      "kotlin": "Set-Location -Path $dir ; if ($?) { kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar } ; if ($?) { java -jar (Join-Path $dir \"$fileNameWithoutExt.jar\") }",
+      "scala": "Set-Location -Path $dir ; if ($?) { scala $fileName }",
+      "r": "Set-Location -Path $dir ; if ($?) { Rscript $fileName }",
+      "bash": "Set-Location -Path $dir ; if ($?) { bash $fileName }",
+      "powershell": "Set-Location -Path $dir ; if ($?) { & $fileName }",
+      "nasm": "cd $(wslpath -a $(pwd)) && nasm -f elf64 $fileName -o $fileNameWithoutExt.o && ld $fileNameWithoutExt.o -o $fileNameWithoutExt && ./$fileNameWithoutExt",
+      "asm-intel-x86-generic": "powershell -ExecutionPolicy Bypass -File \"C:/Coding Project/run-asm.ps1\""
+    }
+  },
+  "linux": {
+    "code-runner.executorMap": {
+      "c": "gcc $fileName -o $fileNameWithoutExt && ./$fileNameWithoutExt",
+      "cpp": "g++ $fileName -o $fileNameWithoutExt && ./$fileNameWithoutExt",
+      "java": "javac $fileName && java $fileNameWithoutExt",
+      "python": "python3 $fileName",
+      "javascript": "node $fileName",
+      "typescript": "tsc $fileName && node ${fileName/.ts/.js}",
+      "go": "go run $fileName",
+      "ruby": "ruby $fileName",
+      "php": "php $fileName",
+      "perl": "perl $fileName",
+      "rust": "rustc $fileName && ./$fileNameWithoutExt",
+      "swift": "swift $fileName",
+      "kotlin": "kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar && java -jar $fileNameWithoutExt.jar",
+      "scala": "scala $fileName",
+      "r": "Rscript $fileName",
+      "bash": "bash $fileName",
+      "powershell": "pwsh $fileName",
+      "nasm": "nasm -f elf64 $fileName -o $fileNameWithoutExt.o && ld $fileNameWithoutExt.o -o $fileNameWithoutExt && ./$fileNameWithoutExt",
+      "asm-intel-x86-generic": "pwsh '/mnt/c/Coding Project/run-asm.ps1'"
+    }
+  },
+  "rubyLsp.rubyExecutablePath": "c:\\Ruby31-x64\\bin\\ruby.exe",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell 7": {
+      "path": "C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7",
+  "html.validate.scripts": false,
+  "html.validate.styles": false,
+  "emmet.showSuggestionsAsSnippets": true,
+  "emmet.includeLanguages": {
+    "django-html": "html",
+    "css": "css",
+    "javascript": "javascriptreact",
+    "javascriptreact": "html",
+    "typescriptreact": "html"
+  },
+  "html.customData": [],
+  "editor.inlayHints.enabled": "off",
+  "editor.wordWrap": "off",
+  "diffEditor.wordWrap": "off",
+  "blockman.n03MaxDepth": 4,
+  "blockman.n04ColorComboPreset": "Classic Dark 1 (Gradients)",
+  "blockman.n05CustomColorOfDepth0": "none",
+  "blockman.n06CustomColorOfDepth1": "none",
+  "blockman.n07CustomColorOfDepth2": "none",
+  "blockman.n08CustomColorOfDepth3": "none",
+  "blockman.n09CustomColorOfDepth4": "none",
+  "blockman.n19CustomColorOfBlockBorder": "#a3be8c",
+  "blockman.n20CustomColorOfDepth0Border": "none",
+  "blockman.n17CustomColorOfFocusedBlock": "none",
+  "blockman.n18CustomColorOfFocusedBlockBorder": "none",
+  "redhat.telemetry.enabled": false,
+  "editor.guides.highlightActiveIndentation": true,
+  "rubyLsp.rubyVersionManager": {
+    "identifier": "custom"
+  },
+  "rubyLsp.customRubyCommand": "C:\\Ruby31-x64\\bin\\ruby.exe",
+  "rust-analyzer.linkedProjects": [
+    "C:/Coding Project/Rust/Workspace/Cargo.toml"
+  ],
+  "rust-analyzer.diagnostics.enable": true,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "terminal.integrated.fontFamily": "CaskaydiaCove Nerd Font, JetBrainsMono NF, Consolas, monospace",
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "yaml.schemas": {
+    "file:///c%3A/Users/saika/.vscode/extensions/continue.continue-1.2.4-win32-x64/config-yaml-schema.json": [
+      ".continue/**/*.yaml"
+    ]
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "continue.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/venv": true,
+    "path/to/my-subfolder": false
+  },
+  "git.enableSmartCommit": true,
+  "emmet.useInlineCompletions": true,
+  "emmet.syntaxProfiles": {
+    "css": "css"
+  },
+  "security.workspace.trust.untrustedFiles": "open",
+  // OPTIMIZED: Disabled C++ IntelliSense to reduce resource usage
+  "C_Cpp.intelliSenseEngine": "disabled",
+  // OPTIMIZED: Disabled git autofetch - fetch manually when needed
+  "git.autofetch": false,
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.stickyScroll.enabled": false,
+  "vs-kubernetes": {
+    "vscode-kubernetes.helm-path-windows": "C:\\Users\\saika\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe",
+    "vscode-kubernetes.minikube-path-windows": "C:\\Users\\saika\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe"
+  },
+  "editor.stickyScroll.enabled": false,
+  "terminal.integrated.suggest.enabled": true,
+  "docker.extension.enableComposeLanguageServer": false,
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "javascriptreact": "javascriptreact",
+    "typescriptreact": "typescriptreact"
+  },
+  "docker.extension.dockerEngineAvailabilityPrompt": false,
+  // OPTIMIZED: Disabled Continue tab autocomplete for better performance
+  "continue.enableTabAutocomplete": false,
+  "github.copilot.selectedCompletionModel": "",
+  "tabnine.experimentalAutoImports": true,
+  // OPTIMIZED: Disabled Codeium for resource-heavy languages
+  "codeium.enableConfig": {
+    "*": true,
+    "html": false,
+    "css": false,
+    "python": false
+  },
+  "liveServer.settings.donotVerifyTags": true,
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "glassit.alpha": 10,
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "explorer.confirmPasteNative": false,
+  "powershell.promptToUpdatePowerShell": false,
+  "markdown-preview-enhanced.enablePreviewZenMode": true,
+  "dbcode.ai.inlineCompletion": false,
+  "emulator.emulatorPath": "C:\\Android\\emulator\\",
+  "emulator.emulatorPathWindows": "C:\\Android\\emulator\\",
+  "gemini-cli-vscode.qwen.enabled": true,
+  "gemini-cli-vscode.migration.v3.notified": true,
+  "cSpell.enabled": true,
+  "cSpell.language": "en",
+  // OPTIMIZED: Reduced spell check limit for better performance
+  "cSpell.checkLimit": 5000,
+  "cSpell.enabledFileTypes": {
+    "*": true
+  },
+  "cSpell.ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "out/**",
+    "coverage/**",
+    "tmp/**",
+    ".git/**",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "cSpell.words": [
+    "Saisakthi",
+    "Saika"
+  ],
+  // OPTIMIZED: Increased spell check delay to reduce CPU usage
+  "cSpell.spellCheckDelayMs": 300,
+  "cSpell.allowCompoundWords": true,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  // OPTIMIZED: Changed to explicit for manual control
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "cSpell.checkVSCodeSystemFiles": true,
+  "terminal.integrated.defaultLocation": "view",
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.allowedLinkSchemes": [
+    "file",
+    "http",
+    "https",
+    "mailto",
+    "vscode",
+    "vscode-insiders",
+    "docker-desktop"
+  ],
+  "editor.unicodeHighlight.allowedLocales": {
+    "cs": true
+  },
+  "maven.terminal.useJavaHome": true,
+  "git.confirmSync": false,
+  // OPTIMIZED: Disabled automatic null analysis for Java
+  "java.compile.nullAnalysis.mode": "disabled",
+  // OPTIMIZED: Changed to interactive for manual control
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "git.ignoreRebaseWarning": true,
+  "jdk.telemetry.enabled": false,
+  "chat.instructionsFilesLocations": {
+    ".github/instructions": true,
+    "/home/saisakthi/.aitk/instructions/": true
+  },
+  // OPTIMIZED: Add these new performance settings
+  "extensions.autoUpdate": false,
+  "extensions.autoCheckUpdates": false,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  "npm.autoDetect": "off",
+  "java.autobuild.enabled": false,
+  "files.autoSave": "off",
+  "editor.formatOnSave": false,
+  "java.jdt.ls.vmargs": "-XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1G -Xms256m"
 }

@@ -2,29 +2,26 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bankService from "./bankService";
 
-export default function Withdraw() {
+export default function GetAccount() {
     const navigate = useNavigate();
     const [accountId, setAccountId] = useState("");
-    const [amount, setAmount] = useState("");
+    const [account, setAccount] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
-    const handleWithdraw = async (e) => {
+    const handleGetAccount = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setMessage("");
         setError("");
+        setAccount(null);
 
         try {
-            const response = await bankService.withdraw(parseInt(accountId), parseInt(amount));
+            const response = await bankService.getAccountById(parseInt(accountId));
             if (response.success) {
-                setMessage(`Successfully withdrew $${amount}! New balance: $${response.data.balance}`);
-                setAccountId("");
-                setAmount("");
+                setAccount(response.data);
             }
         } catch (err) {
-            setError(err.message || "Failed to withdraw money");
+            setError(err.message || "Failed to fetch account");
         } finally {
             setLoading(false);
         }
@@ -33,12 +30,11 @@ export default function Withdraw() {
     return (
         <div className="wrapper">
             <div className="container">
-                <h1>Withdraw Money</h1>
+                <h1>Get Account Details</h1>
                 
-                {message && <div className="success-message">{message}</div>}
                 {error && <div className="error-message">{error}</div>}
 
-                <form onSubmit={handleWithdraw}>
+                <form onSubmit={handleGetAccount}>
                     <div className="form-group">
                         <label>Account ID:</label>
                         <input
@@ -50,27 +46,27 @@ export default function Withdraw() {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Amount:</label>
-                        <input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            required
-                            min="1"
-                            placeholder="Enter amount to withdraw"
-                        />
-                    </div>
-
                     <div className="button-group">
                         <button type="submit" disabled={loading}>
-                            {loading ? "Processing..." : "Withdraw"}
+                            {loading ? "Loading..." : "Get Account"}
                         </button>
                         <button type="button" onClick={() => navigate("/")}>
                             Back to Home
                         </button>
                     </div>
                 </form>
+
+                {account && (
+                    <div className="account-details">
+                        <h2>Account Information</h2>
+                        <p><strong>Customer Name:</strong> {account.customerName}</p>
+                        <p><strong>Account Number:</strong> {account.accountNumber}</p>
+                        <p><strong>Balance:</strong> ${account.balance}</p>
+                        <p><strong>Credit Score:</strong> {account.creditScore}</p>
+                        <p><strong>Created At:</strong> {new Date(account.createdAt).toLocaleDateString()}</p>
+                        <p><strong>Updated At:</strong> {new Date(account.updatedAt).toLocaleDateString()}</p>
+                    </div>
+                )}
             </div>
         </div>
     );
