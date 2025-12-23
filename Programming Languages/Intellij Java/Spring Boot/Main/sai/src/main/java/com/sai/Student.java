@@ -1,4 +1,4 @@
-package com.java.sai;
+package com.sai;
 import lombok.Data;
 
 @Data
