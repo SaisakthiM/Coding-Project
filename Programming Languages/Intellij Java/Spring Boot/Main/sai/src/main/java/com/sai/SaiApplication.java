@@ -1,11 +1,10 @@
-package com.java.sai;
-import com.java.sai.config.Config;  // ✅ correct import
-
-
+package com.sai;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.sai.sai.config.Config;
 
 @SpringBootApplication
 public class SaiApplication {

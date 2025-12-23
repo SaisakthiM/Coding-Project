@@ -1,4 +1,4 @@
-package com.java.sai;
+package com.sai;
 
 public interface Writer {
     public void write();

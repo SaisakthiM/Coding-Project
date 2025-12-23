@@ -598,7 +598,7 @@
   "typescript.disableAutomaticTypeAcquisition": true,
   "npm.autoDetect": "off",
   "java.autobuild.enabled": false,
-  "files.autoSave": "off",
+  "files.autoSave": "afterDelay",
   "editor.formatOnSave": false,
   "java.jdt.ls.vmargs": "-XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1G -Xms256m"
 }

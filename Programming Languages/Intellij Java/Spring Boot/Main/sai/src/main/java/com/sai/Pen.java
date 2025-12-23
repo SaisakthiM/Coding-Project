@@ -1,4 +1,4 @@
-package com.java.sai;
+package com.sai;
 
 public class Pen implements Writer{
     @Override

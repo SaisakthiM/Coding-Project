@@ -896,3 +896,46 @@ public class Student {
 }
 
  */
+
+/* 
+Before we continue to like spring boot we have to know a bit of what is collections and how it is used in java actually now for a better learning of even the spring boot
+Collection (Interface)
+├── List (Interface)
+│   ├── ArrayList (Class)
+│   ├── Vector (Class)
+│   │   └── Stack (Class)
+│   └── LinkedList (Class)
+├── Set (Interface)
+│   ├── HashSet (Class)
+│   ├── LinkedHashSet (Class)
+│   └── SortedSet (Interface)
+│       └── TreeSet (Class)
+└── Queue (Interface)
+    ├── PriorityQueue (Class)
+    └── Deque (Interface)
+        └── ArrayDeque (Class)
+
+Map (Interface)
+├── AbstractMap (Class)
+│   ├── EnumMap (Class)
+│   └── HashMap (Class)
+└── SortedMap (Interface)
+    └── NavigableMap (Interface)
+        └── TreeMap (Class)
+
+this is the collection list 
+so we primarily use the List, Set and Queue mostly
+in Maps we very often use HashMap and that's industry standard
+
+
+
+
+
+
+
+
+
+
+
+
+*/

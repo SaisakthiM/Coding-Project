@@ -1,7 +1,19 @@
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
-        /* 1st task print hello and name in separate places */
-        System.out.println("Hello");
-        System.out.println("Saisakthi");
+        List<String> colors = new ArrayList<>();
+        colors.add("blue");
+        colors.add("red");
+        colors.add("green");
+        colors.add("main");
+        System.out.println(colors);
+
+        for (String color : colors) {
+            System.out.println(color);
+        }
+        
     }
 }

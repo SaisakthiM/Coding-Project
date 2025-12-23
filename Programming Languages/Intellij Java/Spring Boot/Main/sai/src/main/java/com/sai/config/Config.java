@@ -1,12 +1,11 @@
-package com.java.sai.config;
-import com.java.sai.Pen;
-import com.java.sai.Pencil;
-import com.java.sai.Student;
-import com.java.sai.Writer;
-
+package com.sai.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 
+import com.sai.Pen;
+import com.sai.Pencil;
+import com.sai.Student;
+import com.sai.Writer;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
