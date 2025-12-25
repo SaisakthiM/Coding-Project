@@ -8,19 +8,19 @@
     "net9.0": []
   },
   "packageFolders": {
-    "C:\\Users\\saika\\.nuget\\packages\\": {}
+    "/home/saisakthi/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Coding Project\\Clion\\C#\\Main\\Projects\\Project 1\\Project 1.csproj",
+      "projectUniqueName": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
       "projectName": "Project 1",
-      "projectPath": "C:\\Coding Project\\Clion\\C#\\Main\\Projects\\Project 1\\Project 1.csproj",
-      "packagesPath": "C:\\Users\\saika\\.nuget\\packages\\",
-      "outputPath": "C:\\Coding Project\\Clion\\C#\\Main\\Projects\\Project 1\\obj\\",
+      "projectPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
+      "packagesPath": "/home/saisakthi/.nuget/packages/",
+      "outputPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\saika\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/saisakthi/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -44,7 +44,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net9.0": {
@@ -60,6 +60,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[9.0.11, 9.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[9.0.11, 9.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[9.0.11, 9.0.11]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -68,7 +82,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.205/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
