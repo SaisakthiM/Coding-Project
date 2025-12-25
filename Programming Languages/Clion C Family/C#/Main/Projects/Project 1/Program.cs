@@ -1,12 +1,23 @@
 using System;
 using System.Linq;
-
-string Name(string name)
+using System.Reflection.Metadata;
+namespace MyFirstProgram
 {
-    return $"Hello, {name}!";
+
+class Program
+    {
+        static void Main(String[] args)
+        {
+            String name;
+            name = Console.ReadLine();
+            Console.WriteLine(name);
+        }
+    }
+
 }
 
-string k = Name("Hi");
+
+
 
 
 
