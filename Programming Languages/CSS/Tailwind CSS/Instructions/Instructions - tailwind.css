@@ -13,22 +13,35 @@ Styling with Utility classes
 You style things with Tailwind by combining many 
 single-purpose presentational classes (utility classes) directly in your markup
 
+Ok now let's start with what are the features and how can we actually use tailwind easily 
 
+ok now there are nuances which are specific to tailwind here are some
+Targeting mobile screens : this is a good feature in tailwind as you can just use sm: 
+which is means just small screen 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+and the width and height we use in css, it's just w and h
+that's it
 
 
 */
+
+/*
+Breakpoints : 
+In tailwind we can use a special feature which is breakpoints
+this makes our UI much more flexible to pixel changes and helps deploy our UI to other devices with various pixels
+| Prefix | Minimum Width | Description                    |
+| ------ | ------------- | ------------------------------ |
+| `sm:`  | 640px         | Small screens (phones)         |
+| `md:`  | 768px         | Medium screens (tablets)       |
+| `lg:`  | 1024px        | Large screens (laptops)        |
+| `xl:`  | 1280px        | Extra-large screens (desktops) |
+| `2xl:` | 1536px        | Very large screens             |
+
+this is a important one and more easy one
+
+you can also set custom breakpoints like this 
+
+"min-[your_needed_min_pixels]: bg-color-red max-[same_here]: bg-color-blue'
+
+*/
+

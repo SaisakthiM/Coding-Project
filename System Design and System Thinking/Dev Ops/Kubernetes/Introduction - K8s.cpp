@@ -250,9 +250,17 @@ we can create a deployment which is a abstraction over pod
 controlling when and where the pod should be created
 so we can create a deployment for now
 
-so for this sample, we can create a nginx deployment 
+why not we create pod directly and give full access to us
+there is a reason for that 
 
+pods have a lifetime which is actually limited
+so when it's lifetime ends it actually dies
+when we manage this manually you can't go create a pod when pod dies at 2AM
+that's where deployment comes in
+it manages the creation and destruction of the pods
+you just need to configure the pod specification and it will manage it
 
+ 
 
 
 
