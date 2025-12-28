@@ -1,26 +1,31 @@
-# auto-commit.ps1
+$ErrorActionPreference = "Stop"
 
 $today = Get-Date -Format "yyyy-MM-dd"
 $commitMessage = "Changes made on Date : $today"
 
-# Navigate to the repo folder
 Set-Location "C:\Coding Project"
 
-# --- STEP 1: Pull first to sync remote -> local ---
-try {
-    git pull --rebase origin Coding-Project
-} catch {
-    Write-Host "Pull failed. Resolve conflicts manually before continuing."
+# Detect current branch
+$branch = git branch --show-current
+
+if (-not $branch) {
+    Write-Host "Not on a branch (detached HEAD)"
     exit 1
 }
 
-# --- STEP 2: Stage changes (tracked + untracked) ---
+# Pull latest changes
+git pull --rebase origin $branch
+
+# Stage changes
 git add -A
 
-# --- STEP 3: Commit only if there are staged changes ---
-if (git diff --cached --name-only) {
-    git commit -m "$commitMessage"
+# Commit only if there are staged changes
+$changes = git diff --cached --name-only
+if ($changes) {
+    git commit -m $commitMessage
+} else {
+    Write-Host "No changes to commit"
 }
 
-# --- STEP 4: Push updates to remote ---
-git push origin Coding-Project
+# Push changes
+git push origin $branch

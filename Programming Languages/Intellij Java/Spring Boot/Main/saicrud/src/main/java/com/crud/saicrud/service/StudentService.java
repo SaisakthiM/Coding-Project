@@ -19,4 +19,33 @@ public class StudentService {
     public List<Student> students_list() {
         return students;
     }
+    public void createService(Student student) {
+        students.add(student);
+    }
+    public void updateService(Student student, int rno) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getId() == rno) {
+                students.set(i, student); // replace
+                break;
+            }
+        }   
+    }
+    public void deleteService(int rno) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getId() == rno) {
+                students.remove(students.get(i)); // remove
+                break;
+            }
+        } 
+    } 
+
+    public Student getStudentService(int rno) {
+        for (Student student : students) {
+            if (student.getId() == rno) {
+                return student;
+            }
+        }
+        return null;
+    }
+
 }
