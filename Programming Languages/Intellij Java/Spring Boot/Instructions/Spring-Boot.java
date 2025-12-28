@@ -895,7 +895,155 @@ public class Student {
     private String technology;
 }
 
+so the response to this call will be like 
+
+HTTP/1.1 200 
+Content-Type: application/json
+Date: Sun, 28 Dec 2025 02:00:29 GMT
+Connection: close
+Content-Length: 81
+
+[{"id":1,"name":"sai","technology":"AI"},{"id":2,"name":"sai","technology":"Ai"}]
+the top ones are headers of the response it contains details like the protocol, version status code 
+content type and date and connection status
+(why connection status is given explicitely closed there is a reason, some connections also use the web socket which has a long time connection)
+
+then the body 
+see, the object is actually converted into JSON how
+it is because of the module called the jackson 
+this module works behind the scenes actually for converting the objects into a json
+
+
+now here is the get put delete and post methods and services and how it works actually 
+
+package com.crud.saicrud.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.crud.saicrud.model.Student;
+
+@Service
+public class StudentService {
+    List<Student> students = new ArrayList<>(
+        Arrays.asList(
+            new Student(1, "sai", "AI"),
+            new Student(2,"sai", "Ai")
+        )
+    );
+    public List<Student> students_list() {
+        return students;
+    }
+    public void createService(Student student) {
+        students.add(student);
+    }
+    public void updateService(Student student, int rno) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getId() == rno) {
+                students.set(i, student); // replace
+                break;
+            }
+        }   
+    }
+    public void deleteService(int rno) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).getId() == rno) {
+                students.remove(students.get(i)); // remove
+                break;
+            }
+        } 
+    } 
+
+    public Student getStudentService(int rno) {
+        for (Student student : students) {
+            if (student.getId() == rno) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+}
+
+this is the service actually which handles the business logic 
+and here is the controller layer
+package com.crud.saicrud.controller;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.crud.saicrud.model.Student;
+import com.crud.saicrud.service.StudentService;
+
+@RestController
+@RequestMapping("/student")
+public class StudentController {
+    @Autowired
+    StudentService service;
+
+    @GetMapping("/")
+    public List<Student> getStudents() {
+        return service.students_list();
+    }
+
+    @GetMapping("{rno}")
+    public Student getStudentbyRno(@PathVariable("rno") int rno){
+        return service.getStudentService(rno);
+    }
+
+    @PostMapping("post/")
+    public void createStudent(@RequestBody Student student) {
+        service.createService(student);
+    }   
+    @PutMapping("put/{rno}")
+    public void updateStudent(@RequestBody Student student, @PathVariable("rno") int rno) {
+        service.updateService(student, rno);
+    }
+    @DeleteMapping("delete/{rno}")
+    public void deleteStudent(@PathVariable("rno") int rno) {
+        service.deleteService(rno);
+    }
+
+}
+
+this is the controller layer here you have to know some things actually 
+the path variable : that's a important guy 
+it parses or interpolates the variable (or query parameter actually many say ) it's job is to 
+actually 
+
  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 
 Before we continue to like spring boot we have to know a bit of what is collections and how it is used in java actually now for a better learning of even the spring boot
