@@ -552,8 +552,9 @@
     "pnpm-lock.yaml"
   ],
   "cSpell.words": [
-    "Saisakthi",
-    "Saika"
+    "JDBC",
+    "Saika",
+    "Saisakthi"
   ],
   // OPTIMIZED: Increased spell check delay to reduce CPU usage
   "cSpell.spellCheckDelayMs": 300,

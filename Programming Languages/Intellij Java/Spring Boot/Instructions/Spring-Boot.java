@@ -1022,7 +1022,20 @@ public class StudentController {
 this is the controller layer here you have to know some things actually 
 the path variable : that's a important guy 
 it parses or interpolates the variable (or query parameter actually many say ) it's job is to 
-actually 
+actually get the variable and interpolate so the controller knows that's a valid path 
+then request body, here you can actually give out a json file actually as a body and it parses it and extracts the data
+
+
+as we now implemented the CRUD operations here
+let's also implement the database connection 
+
+so before this we actually use the database we have to know about the JDBC (Java Database Connectivity) actually 
+it is the way of connecting and quering through a database actually
+
+but it is tedious and have many steps like setting up connection and setting up query like that
+now the spring data JPA makes it easier
+
+what jpa actually uses is ORM 
 
  */
 
