@@ -20,7 +20,9 @@ function Basic() {
         alt="Modern building architecture"
       />
     </div>
-    <div class="p-8">
+
++
+     <div class="p-8 ">
       <div class="text-sm font-semibold tracking-wide text-indigo-500 uppercase">Company retreats</div>
             <a href="#" class="mt-1 block text-lg leading-tight font-medium text-black hover:underline">
               Incredible accommodation for your team
@@ -37,6 +39,13 @@ function Basic() {
         <br></br>
         <h1 className="flex justify-center sm:text-left w-0.5 h-0.5">smart phone</h1>
       </div>
+      <br></br>
+      <br></br>
+      <div className="flex flex-wrap-reverse">
+      <div className="flex justify-center h-">01</div>
+      <div>02</div>
+      <div>03</div>
+    </div>
     </div>
     )
 }
