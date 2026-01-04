@@ -3,6 +3,7 @@ package com.saihibernate.saihibernate.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,5 +42,17 @@ public class StudentController {
     public Student getStudentbyRno(@PathVariable int rno) {
         return service.getDetailsbyRno(rno);
     }
-    @DeleteMapping()
+    @DeleteMapping("/student")
+    public String deleteAllstud() {
+        service.deleteall();
+        return "Deleted all students";
+    }
+    @GetMapping("/student/technology/{tech}")
+    public List<Student> getStudByTech(@PathVariable("tech") String tech) {
+      return service.getByTech(tech);
+    }
+    @GetMapping("/student/filter")
+    public List<Student> getStudBytechandgend(@Param("gender") String gender, @Param("technology") String technology){
+      return service.getByTechandGender();
+  }
 }
