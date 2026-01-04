@@ -1,6 +1,7 @@
 package com.saihibernate.saihibernate.service;
 
 import java.util.List;
+import java.util.ListResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,6 @@ public class StudentService {
     public void postDetail(Student student) {
         repo.save(student);
     }
-    
     public void putDetail(Student student) {
         repo.save(student);
     }
@@ -32,5 +32,14 @@ public class StudentService {
     public Student getDetailsbyRno(int rno) {
         return repo.getReferenceById(rno);
     }
+    public void deleteall() {
+        repo.deleteAll();
+    }
+    public List<Student> getByTech(String technology){
+      return repo.findByTechnology(technology);
+    }
+    public List<Student> getByTechandGend() {
+    
+  }
     
 }

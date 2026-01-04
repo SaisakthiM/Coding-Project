@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Student {
     @Id
-    private int rno;
+    private Integer rno;
     private String name;
     private String gender;
     private String technology;
