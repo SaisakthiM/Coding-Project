@@ -22,17 +22,17 @@ public class StudentController {
     public List<Student> getStudent(){
         return service.getAllStudents();
     }
-    @PostMapping("/student_post/")
+    @PostMapping("/student")
     public String postStudent(@RequestBody Student student) {
         service.postDetail(student);
         return "Posted";
     }
-    @PutMapping("/student_put/")
+    @PutMapping("/student/{rno}")
     public Student putStudent(@RequestBody Student student) {
         service.putDetail(student);
         return student;
     }
-    @DeleteMapping("/student_delete/{rno}")
+    @DeleteMapping("/student/{rno}")
     public String deleteStudent(@PathVariable int rno) {
         service.deleteStudent(rno);
         return "Deleted";
@@ -41,4 +41,5 @@ public class StudentController {
     public Student getStudentbyRno(@PathVariable int rno) {
         return service.getDetailsbyRno(rno);
     }
+    @DeleteMapping()
 }
