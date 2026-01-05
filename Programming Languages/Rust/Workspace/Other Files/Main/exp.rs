@@ -1,7 +1,5 @@
 fn main(){
-    print!("Hello World!");
-    print!("Hi");
-    println!();
-    println!("Hello World!");
-    println!("Hi");
-}
+   let x: i64 = 100;
+    let y: i64 = 100;
+    print!("{}", x+y);
+
