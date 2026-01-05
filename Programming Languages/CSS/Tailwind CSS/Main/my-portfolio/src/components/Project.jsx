@@ -7,16 +7,18 @@ export default function Projects() {
       <hr className="pb-5"></hr>
       <div className="grid grid-cols-[1fr_auto_1fr] h-screen">
 
-  <div className="p-10">Left</div>
+    <div className="p-10">
+      <h1>min</h1>
+          
+    </div>
 
-  {/* Separator */}
-  <div className="w-px bg-white/40"></div>
+    {/* Separator */}
+    <div className="w-px bg-white/40"></div>
 
-  <div className="p-10">Right</div>
+    <div className="p-10">Right</div>
+    </div>
 
-</div>
 
-
-      </div>
-      )
+  </div>
+  )
 }
