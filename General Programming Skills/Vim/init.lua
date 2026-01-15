@@ -188,7 +188,7 @@ require("lazy").setup({
         "╚════██║██╔══██║██║╚██╗ ██╔╝██║██║╚██╔╝██║",
         "███████║██║  ██║██║ ╚████╔╝ ██║██║ ╚═╝ ██║",
         "╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝╚═╝     ╚═╝",
-        "⚡ Saivim — Full IDE Experience",
+        "           ⚡ Saivim — Kangawa",
       }
       
       dashboard.section.buttons.val = {
@@ -235,142 +235,301 @@ require("lazy").setup({
   },
 
   -- LSP + Mason
-  {
-    "williamboman/mason.nvim",
-    build = ":MasonUpdate",
-    config = true
-  },
-  
-  {
-    "williamboman/mason-lspconfig.nvim",
-    config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "lua_ls",
-          "ts_ls",
-          "pyright",
-          "rust_analyzer",
-          "gopls",
-          "clangd",
-          "html",
-          "cssls",
-          "jsonls",
-          "ruff",  -- Python linter/formatter
-        },
-        automatic_installation = true,
-      })
-    end,
-  },
-  
-  {
-    "neovim/nvim-lspconfig",
-    config = function()
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      
-      -- Lua
-      vim.lsp.config("lua_ls", {
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            diagnostics = { globals = { "vim" } }
-          }
-        }
-      })
-      
-      -- TypeScript/JavaScript
-      vim.lsp.config("ts_ls", { capabilities = capabilities })
-      
-      -- Python
-      vim.lsp.config("pyright", {
-        capabilities = capabilities,
-        settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = "basic",
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-            }
-          }
-        }
-      })
-      
-      -- Rust
-      vim.lsp.config("rust_analyzer", { capabilities = capabilities })
-      
-      -- Go
-      vim.lsp.config("gopls", { capabilities = capabilities })
-      
-      -- C/C++
-      vim.lsp.config("clangd", { capabilities = capabilities })
-      
-      -- HTML
-      vim.lsp.config("html", { capabilities = capabilities })
-      
-      -- CSS
-      vim.lsp.config("cssls", { capabilities = capabilities })
-      
-      -- JSON
-      vim.lsp.config("jsonls", { capabilities = capabilities })
-      
-      -- Enable LSP servers
-      vim.lsp.enable({ "lua_ls", "ts_ls", "pyright", "rust_analyzer", "gopls", "clangd", "html", "cssls", "jsonls" })
-    end,
-  },
+  -- Mason
+{
+  "williamboman/mason.nvim",
+  build = ":MasonUpdate",
+  config = true,
+},
 
-  -- Formatting
-  {
-    "stevearc/conform.nvim",
-    event = { "BufWritePre" },
-    cmd = { "ConformInfo" },
-    config = function()
-      require("conform").setup({
-        formatters_by_ft = {
-          lua = { "stylua" },
-          python = { "black", "isort" },
-          javascript = { "prettier" },
-          typescript = { "prettier" },
-          javascriptreact = { "prettier" },
-          typescriptreact = { "prettier" },
-          json = { "prettier" },
-          html = { "prettier" },
-          css = { "prettier" },
-          markdown = { "prettier" },
-          rust = { "rustfmt" },
-          go = { "gofmt" },
+-- Mason LSPConfig
+{
+  "williamboman/mason-lspconfig.nvim",
+  config = function()
+    require("mason-lspconfig").setup({
+      ensure_installed = {
+        -- Core
+        "lua_ls",
+        "ts_ls",
+        "pyright",
+        "rust_analyzer",
+        "gopls",
+        "clangd",
+        "html",
+        "cssls",
+        "jsonls",
+        "yamlls",
+        "dockerls",
+        "bashls",
+        "marksman",
+
+        -- Extra popular languages
+        "jdtls",                 -- Java
+        "intelephense",          -- PHP
+        "kotlin_language_server",-- Kotlin
+        "omnisharp",             -- C#
+        "sqlls",                 -- SQL
+        "graphql",               -- GraphQL
+        "taplo",                 -- TOML
+        "vimls",                 -- Vimscript
+        "cmake",                 -- CMake
+      },
+      automatic_installation = true,
+    })
+  end,
+},
+{
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  config = function()
+    require("mason-tool-installer").setup({
+      ensure_installed = {
+        -- Linters / Formatters
+        "eslint_d",
+        "stylelint",
+        "markdownlint",
+        "yamllint",
+        "jsonlint",
+        "hadolint",
+        "golangci-lint",
+        "phpcs",
+        "checkstyle",
+        "sqlfluff",
+      },
+      auto_update = true,
+      run_on_start = true,
+    })
+  end,
+},
+
+{
+  "windwp/nvim-ts-autotag",
+  dependencies = { "nvim-treesitter/nvim-treesitter" },
+  config = function()
+    require("nvim-ts-autotag").setup()
+  end,
+},
+
+
+-- LSPConfig
+{
+  "neovim/nvim-lspconfig",
+  config = function()
+    local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+    -- Lua
+    vim.lsp.config("lua_ls", {
+      capabilities = capabilities,
+      settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+    })
+
+    -- TypeScript / JavaScript
+    vim.lsp.config("vtsls", {
+	capabilities = capabilities,
+	  filetypes = {
+	    "javascript",
+	    "javascriptreact",
+	    "typescript",
+	    "typescriptreact",
+	  },
+    })
+
+    -- Python
+    vim.lsp.config("pyright", {
+      capabilities = capabilities,
+      settings = {
+        python = {
+          analysis = {
+            typeCheckingMode = "basic",
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+          },
         },
-        format_on_save = {
-          timeout_ms = 500,
-          lsp_fallback = true,
-        },
-      })
-    end,
-  },
+      },
+    })
+
+    -- Rust
+    vim.lsp.config("rust_analyzer", { capabilities = capabilities })
+
+    -- Go
+    vim.lsp.config("gopls", { capabilities = capabilities })
+
+    -- C / C++
+    vim.lsp.config("clangd", { capabilities = capabilities })
+
+    -- Java
+    vim.lsp.config("jdtls", {
+      capabilities = capabilities,
+      root_dir = vim.fs.root(0, { "gradlew", "mvnw", ".git" }),
+    })
+
+    -- PHP
+    vim.lsp.config("intelephense", { capabilities = capabilities })
+
+    -- Ruby
+    vim.lsp.config("solargraph", { capabilities = capabilities })
+
+    -- Swift
+    vim.lsp.config("swift", { capabilities = capabilities })
+
+    -- Kotlin
+    vim.lsp.config("kotlin_language_server", { capabilities = capabilities })
+
+    -- C#
+    vim.lsp.config("omnisharp", { capabilities = capabilities })
+
+    -- HTML
+    vim.lsp.config("html", {
+      capabilities = capabilities,
+      filetypes = { "html", "javascriptreact", "typescriptreact" },
+    })
+
+    -- CSS
+    vim.lsp.config("cssls", {
+      capabilities = capabilities,
+      filetypes = { "css", "scss", "less", "javascriptreact", "typescriptreact" },
+    })
+
+    -- Tailwind CSS
+    vim.lsp.config("tailwindcss", {
+      capabilities = capabilities,
+      filetypes = {
+        "html", "css", "javascript", "typescript",
+        "javascriptreact", "typescriptreact", "vue", "svelte"
+      },
+      root_dir = vim.fs.root(0, {
+        "tailwind.config.js",
+        "tailwind.config.ts",
+        "postcss.config.js",
+        "package.json",
+        ".git",
+      }),
+    })
+
+    -- JSON
+    vim.lsp.config("jsonls", { capabilities = capabilities })
+
+    -- YAML
+    vim.lsp.config("yamlls", { capabilities = capabilities })
+
+    -- Docker
+    vim.lsp.config("dockerls", { capabilities = capabilities })
+
+    -- Bash
+    vim.lsp.config("bashls", { capabilities = capabilities })
+
+    -- Markdown
+    vim.lsp.config("marksman", { capabilities = capabilities })
+
+    -- SQL
+    vim.lsp.config("sqlls", { capabilities = capabilities })
+
+    -- GraphQL
+    vim.lsp.config("graphql", { capabilities = capabilities })
+
+    -- Vue
+    vim.lsp.config("volar", { capabilities = capabilities })
+
+    -- Svelte
+    vim.lsp.config("svelte", { capabilities = capabilities })
+
+    -- Astro
+    vim.lsp.config("astro", { capabilities = capabilities })
+
+    -- Prisma
+    vim.lsp.config("prismals", { capabilities = capabilities })
+
+    -- TOML
+    vim.lsp.config("taplo", { capabilities = capabilities })
+
+    -- Vimscript
+    vim.lsp.config("vimls", { capabilities = capabilities })
+
+    -- CMake
+    vim.lsp.config("cmake", { capabilities = capabilities })
+
+    -- Enable all servers
+    vim.lsp.enable({
+      "lua_ls", "vtsls", "pyright", "ruff", "rust_analyzer", "gopls",
+      "clangd", "jdtls", "intelephense", "solargraph", "swift",
+      "kotlin_language_server", "omnisharp", "html", "cssls", "tailwindcss",
+      "jsonls", "yamlls", "dockerls", "bashls", "marksman", "sqlls",
+      "graphql", "volar", "svelte", "astro", "prismals", "taplo",
+      "vimls", "cmake"
+    })
+  end,
+},
 
   -- Linting
-  {
-    "mfussenegger/nvim-lint",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local lint = require("lint")
-      
-      -- Only enable linters that are actually installed
-      lint.linters_by_ft = {
-        python = { "ruff" },  -- ruff is faster and comes with many Python tools
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-      }
-      
-      -- Auto-lint on save and when entering insert mode
-      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-        callback = function()
-          -- Only lint if linter is available
-          pcall(function()
-            require("lint").try_lint()
-          end)
-        end,
-      })
-    end,
-  },
+{
+  "mfussenegger/nvim-lint",
+  event = { "BufReadPre", "BufNewFile" },
+  config = function()
+    local lint = require("lint")
+
+    -- Map filetypes to linters
+    lint.linters_by_ft = {
+      -- Web
+      javascript = { "eslint_d" },
+      typescript = { "eslint_d" },
+      javascriptreact = { "eslint_d" },
+      typescriptreact = { "eslint_d" },
+      vue = { "eslint_d" },
+      svelte = { "eslint_d" },
+
+      -- Python
+      python = { "ruff" },
+
+      -- CSS
+      css = { "stylelint" },
+      scss = { "stylelint" },
+      less = { "stylelint" },
+
+      -- Markdown / prose
+      markdown = { "markdownlint" },
+
+      -- YAML / JSON
+      yaml = { "yamllint" },
+      json = { "jsonlint" },
+
+      -- Docker
+      dockerfile = { "hadolint" },
+
+      -- Shell
+      sh = { "shellcheck" },
+
+      -- C / C++
+      c = { "clangtidy" },
+      cpp = { "clangtidy" },
+
+      -- Go
+      go = { "golangci_lint" },
+
+      -- Rust
+      rust = { "clippy" },
+
+      -- PHP
+      php = { "phpcs" },
+
+      -- Ruby
+      ruby = { "rubocop" },
+
+      -- Java
+      java = { "checkstyle" },
+
+      -- SQL
+      sql = { "sqlfluff" },
+    }
+
+    -- Auto-lint on save, read, and insert leave
+    vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+      callback = function()
+        pcall(function()
+          require("lint").try_lint()
+        end)
+      end,
+    })
+  end,
+},
 
   -- Completion
   { "hrsh7th/nvim-cmp" },
@@ -553,10 +712,10 @@ require("lazy").setup({
   -- File Explorer (Neo-tree - Better alternative)
 {
   "nvim-neo-tree/neo-tree.nvim",
-  branch = "v3.x", -- stable branch
+  branch = "v3.x",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-tree/nvim-web-devicons", -- optional, for file icons
+    "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
   },
   config = function()
@@ -565,18 +724,113 @@ require("lazy").setup({
       popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
+      
+      -- Window settings
+      window = {
+        position = "left",
+        width = 35,
+        mapping_options = {
+          noremap = true,
+          nowait = true,
+        },
+      },
+      
+      -- Filesystem settings
       filesystem = {
         filtered_items = {
-          visible = true, -- show hidden files
+          visible = true,
           hide_dotfiles = false,
           hide_gitignored = false,
         },
-        follow_current_file = { enabled = true },
+        follow_current_file = { 
+          enabled = true,
+          leave_dirs_open = false,
+        },
         use_libuv_file_watcher = true,
+        group_empty_dirs = false,
+      },
+      
+      -- Appearance
+      default_component_configs = {
+        container = {
+          enable_character_fade = true,
+        },
+        indent = {
+          indent_size = 2,
+          padding = 1,
+          with_markers = true,
+          indent_marker = "│",
+          last_indent_marker = "└",
+          highlight = "NeoTreeIndentMarker",
+        },
+        icon = {
+          folder_closed = "",
+          folder_open = "",
+          folder_empty = "",
+          default = "",
+          highlight = "NeoTreeFileIcon",
+        },
+        modified = {
+          symbol = "[+]",
+          highlight = "NeoTreeModified",
+        },
+        name = {
+          trailing_slash = false,
+          use_git_status_colors = true,
+          highlight = "NeoTreeFileName",
+        },
+        git_status = {
+          symbols = {
+            added     = "✚",
+            modified  = "",
+            deleted   = "✖",
+            renamed   = "󰁕",
+            untracked = "",
+            ignored   = "",
+            unstaged  = "󰄱",
+            staged    = "",
+            conflict  = "",
+          },
+        },
       },
     })
-    -- Toggle Neo-tree with G
+    
+    -- Keymapping
     vim.keymap.set("n", "T", ":Neotree toggle<CR>", { noremap = true, silent = true })
+    
+    -- FORCE TRANSPARENT Neo-tree
+    vim.api.nvim_create_autocmd({"VimEnter", "ColorScheme"}, {
+      callback = function()
+        -- Force transparent background for Neo-tree
+        vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE", fg = "#c5c9c5" })
+        vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE", fg = "#c5c9c5" })
+        vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE", fg = "NONE" })
+        vim.api.nvim_set_hl(0, "NeoTreeBorder", { bg = "NONE", fg = "#625e5a" })
+        vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { bg = "NONE", fg = "#625e5a" })
+        
+        -- Kanagawa Dragon colors for text
+        vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = "#8ba4b0" })
+        vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { fg = "#c4b28a" })
+        vim.api.nvim_set_hl(0, "NeoTreeRootName", { fg = "#c4746e", bold = true })
+        vim.api.nvim_set_hl(0, "NeoTreeFileName", { fg = "#c5c9c5" })
+        vim.api.nvim_set_hl(0, "NeoTreeFileIcon", { fg = "#a292a3" })
+        vim.api.nvim_set_hl(0, "NeoTreeFileNameOpened", { fg = "#8a9a7b", bold = true })
+        
+        -- Git colors
+        vim.api.nvim_set_hl(0, "NeoTreeGitAdded", { fg = "#8a9a7b" })
+        vim.api.nvim_set_hl(0, "NeoTreeGitDeleted", { fg = "#c4746e" })
+        vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = "#c4b28a" })
+        vim.api.nvim_set_hl(0, "NeoTreeGitConflict", { fg = "#E46876" })
+        vim.api.nvim_set_hl(0, "NeoTreeGitUntracked", { fg = "#8ea4a2" })
+        vim.api.nvim_set_hl(0, "NeoTreeGitIgnored", { fg = "#a6a69c" })
+        
+        -- Other
+        vim.api.nvim_set_hl(0, "NeoTreeIndentMarker", { fg = "#625e5a" })
+        vim.api.nvim_set_hl(0, "NeoTreeSymbolicLinkTarget", { fg = "#8ea4a2" })
+        vim.api.nvim_set_hl(0, "NeoTreeModified", { fg = "#c4b28a" })
+        vim.api.nvim_set_hl(0, "NeoTreeDimText", { fg = "#a6a69c" })
+      end,
+    })
   end,
 },
 
@@ -770,6 +1024,10 @@ map("n", "<leader>b", "<cmd>Telescope buffers<CR>", { noremap = true, silent = t
 map("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true, desc = "Live grep" })
 map("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { noremap = true, silent = true, desc = "Help tags" })
 
+-- Undo Redo
+vim.keymap.set("n", "<C-z>", "u", { noremap = true, silent = true })   -- Undo
+vim.keymap.set("n", "<C-y>", "<C-r>", { noremap = true, silent = true }) -- Redo
+
 -- Git status with proper error handling
 map("n", "<leader>G", function()
   -- Check if we're in a git repository
@@ -897,6 +1155,7 @@ map("n", "<A-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
 map("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 map("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
+
 -- ========================================
 -- Completion
 -- ========================================
@@ -1016,6 +1275,16 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
+-- Auto Save
+vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "InsertLeave" }, {
+  callback = function()
+    if vim.bo.modified then
+      vim.cmd("silent! write")
+    end
+  end,
+})
+
+
 -- Enable colorizer for specific file types
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = { "*.css", "*.scss", "*.html", "*.lua", "*.js", "*.ts", "*.jsx", "*.tsx" },
@@ -1023,3 +1292,46 @@ vim.api.nvim_create_autocmd("BufEnter", {
     vim.cmd("ColorizerAttachToBuffer")
   end,
 })
+
+-- Git Ignore
+
+-- General settings
+vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Load .gitignore into wildignore
+local function load_gitignore()
+  local gitignore = vim.fn.findfile(".gitignore", ".;")
+  if gitignore ~= "" then
+    for line in io.lines(gitignore) do
+      if line ~= "" and not line:match("^#") then
+        local pattern = line:gsub("^/", ""):gsub("%*", "*")
+        vim.opt.wildignore:append(pattern)
+      end
+    end
+  end
+end
+load_gitignore()
+
+-- Toggle Linting
+
+vim.g.lint_enabled = true
+vim.keymap.set("n", "<leader>lt", function()
+  vim.g.lint_enabled = not vim.g.lint_enabled
+  print("Linting " .. (vim.g.lint_enabled and "enabled" or "disabled"))
+end)
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
+  callback = function()
+    if vim.g.lint_enabled then
+      pcall(function()
+        require("lint").try_lint()
+      end)
+    end
+  end,
+})
+vim.keymap.set("n", "<S-Right>", ":tabnext<CR>", { silent = true }) vim.keymap.set("n", "<S-Left>", ":tabprevious<CR>", { silent = true })
+
+-- Create a new tab with the current buffer (duplicate into a tab)
+vim.keymap.set("n", "<C-t>", ":tab split<CR>", { silent = true })
+
