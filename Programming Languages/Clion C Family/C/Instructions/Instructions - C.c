@@ -1,23 +1,27 @@
 /*
 
-C - It is also a programming language, but it is not a scripting language. It is a compiled language.
-It is a general-purpose programming language. It is a mid-level language.
+What is C and history of C :
 
-it is compiled using gcc compiler 
+You might have heard that C is the mother of all languages and it is the best in that still 
+now why it is called like that 
 
-ok here is a sample program and see how it runs
-#include <stdio.h>
+C was founded in 1978 and it is more popular than ever since now. 
+that's the reason why C is still used in like 
+1) Kernels 
+2) Games 
+3) Compilers for many languages like Python and JS
 
-int main(){
-    printf("Hello World\n");
-    return 0;
-}
+and many more actually.
 
-the stdio.h you see, it is a header file
-think of it as a import module we use in python and the only key difference is
-when we say a importing module, we are just importing another python file which can be execueted bu itself
-but a header file is just a interface and cannot be executed
+so now let's see what is C 
 
-First before we jump into learning c, we have to learn a
+C is s General Purpose Programming languages
+Developed for UNIX operating system a predecessor for 
+B Programming language 
+
+It is also a low level language which allows user to manipulate the 
+CPU memory and disk directly 
+that's why it is used in the low level works like Compilers andother low level ones 
+
 
 */
