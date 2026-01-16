@@ -38,8 +38,7 @@ public class StudentService {
     public List<Student> getByTech(String technology){
       return repo.findByTechnology(technology);
     }
-    public List<Student> getByTechandGend() {
-    
-  }
-    
+    public List<Student> getByTechandGend(String gender, String technology) {
+    return repo.findByTechnologyandgender(gender, technology);
+  }   
 }
