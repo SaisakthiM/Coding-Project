@@ -51,8 +51,8 @@ public class StudentController {
     public List<Student> getStudByTech(@PathVariable("tech") String tech) {
       return service.getByTech(tech);
     }
-    @GetMapping("/student/filter")
-    public List<Student> getStudBytechandgend(@Param("gender") String gender, @Param("technology") String technology){
-      return service.getByTechandGender();
+    @GetMapping("/student/technology/{tech}/gender/{gender}")
+    public List<Student> getByetechandgend(@PathVariable("tech") String tech, @PathVariable("gender") String gender) {
+      return service.getByTechandGend(gender, tech);
+    }
   }
-}
