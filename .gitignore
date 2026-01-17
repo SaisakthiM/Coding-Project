@@ -69,7 +69,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnp/
 .pnp.js
-package-lock.json
+# package-lock.json
 
 
 # -------------------------------
@@ -124,4 +124,4 @@ Configurations and Scripts/Android CMD Tools/platforms/android-34/data/res/
 Pycharm/Python Framework/Django/Main/main_static/admin/js/vendor/
 
 # Script files
-General Programming Skills/Git/
+OGeneral Programming Skills/Git/
