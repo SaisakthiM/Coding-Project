@@ -7,5 +7,9 @@ name = "Project1"
 version = "0.1.0"
 
 [[package]]
+name = "main"
+version = "0.1.0"
+
+[[package]]
 name = "main_cargo"
 version = "0.1.0"
