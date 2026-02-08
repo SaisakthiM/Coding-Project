@@ -1,4 +1,6 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-int main() { printf("%lu", sizeof(long)); }
+int main() { 
+  printf("%lu", sizeof(long));
+}
