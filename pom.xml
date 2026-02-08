@@ -26,7 +26,7 @@
         <module>Programming Languages/Intellij Java/Spring Boot/Main/saisakthi</module>
         <module>Programming Languages/Intellij Java/Spring Boot/Main/saispring</module>
         <module>Programming Languages/Intellij Java/Spring Boot/Main/saihibernate</module>
-
+        <module>Programming Languages/Intellij Java/Instructions/Project/my-app</module>
         <!-- Bank Manager backend -->
         <module>Projects/Unfinished Projects/Working On/Bank Manager/backend/bank_management</module>
 
