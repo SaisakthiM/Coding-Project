@@ -4,7 +4,7 @@ package com.sai.id;
  * Hello world!
  *
  */
-public class App implements Main, Car<Integer> {
+public class App implements Main, Car<Integer>, Bike {
   public int main() {
     return 5;
   }
@@ -13,13 +13,13 @@ public class App implements Main, Car<Integer> {
     return 6;
   }
 
-  public void Model() {
-    System.out.print("This is Ford");
+  public String Model() {
+    return "hi";
   }
 
   public void main(String[] args) {
     System.out.print(Integer.toString(main()) + "\n");
     System.out.print(Integer.toString(car()) + "\n");
-    Model();
+    System.out.print(true);
   }
 }

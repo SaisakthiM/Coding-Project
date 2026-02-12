@@ -1,4 +1,4 @@
 interface class Exp {
-  public void name() 
+  public void name(return ""); 
     
 }

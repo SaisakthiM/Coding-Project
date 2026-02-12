@@ -1,9 +1,7 @@
 package com.sai.id;
 
 public interface Car<T> {
-  public void Model();
+  default String Model() { return "";};
 
   public T car();
-
-
 }
