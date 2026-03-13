@@ -1,5 +1,7 @@
 package com.sai.id;
 
+import javax.management.timer.Timer;
+
 /**
  * Hello world!
  *
@@ -31,5 +33,7 @@ public class App extends Ford implements Main, Car<String>, Bike {
     } finally {
       int x = 10;
     }
+    var timer = new Timer(1000,event -> System.out.println("The time is " + new Date())); 
+
   }
 }
