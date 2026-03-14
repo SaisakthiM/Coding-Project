@@ -601,5 +601,6 @@
   "java.autobuild.enabled": false,
   "files.autoSave": "afterDelay",
   "editor.formatOnSave": false,
-  "java.jdt.ls.vmargs": "-XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1G -Xms256m"
+  "java.jdt.ls.vmargs": "-XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1G -Xms256m",
+  "basedpyright.disableLanguageServices": true
 }
