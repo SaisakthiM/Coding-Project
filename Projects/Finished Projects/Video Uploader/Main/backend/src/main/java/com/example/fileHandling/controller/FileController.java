@@ -1,10 +1,12 @@
 package com.example.fileHandling.controller;
 
+import com.example.fileHandling.service.OmvSftpService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,21 +24,32 @@ import org.springframework.web.multipart.MultipartFile;
 @CrossOrigin(origins = "http://localhost:5173", maxAge = 3600)
 public class FileController {
 
-  @RequestMapping(value = "/upload", method = RequestMethod.POST)
-  public String uplaodFile(@RequestParam("fileToUpload") MultipartFile file) {
-    String fileUploadStatus = "";
-    String filePath = System.getProperty("user.dir") + "/Uploads" + File.separator + file.getOriginalFilename();
-    try {
-      FileOutputStream fout = new FileOutputStream(filePath);
-      fout.write(file.getBytes());
-      fout.close();
-      fileUploadStatus = "File Uploaded Successfully";
-    } catch (Exception e) {
-      e.printStackTrace();
-      fileUploadStatus = "Error in uploading file: " + e;
+  @Autowired
+  private OmvSftpService omvSftpService;  // inject the service
+
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public String uploadFile(@RequestParam("fileToUpload") MultipartFile file) {
+        String fileUploadStatus = "";
+        String filePath = System.getProperty("user.dir") + "/Uploads" + File.separator + file.getOriginalFilename();
+
+        try {
+            // 1. Save locally (your existing code)
+            FileOutputStream fout = new FileOutputStream(filePath);
+            fout.write(file.getBytes());
+            fout.close();
+            fileUploadStatus = "File Uploaded Locally Successfully. ";
+
+            // 2. Forward to OMV
+            omvSftpService.uploadToOmv(filePath, file.getOriginalFilename());
+            fileUploadStatus += "File also backed up to OMV Successfully.";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fileUploadStatus = "Error: " + e.getMessage();
+        }
+
+        return fileUploadStatus;
     }
-    return fileUploadStatus;
-  }
 
   @RequestMapping(value = "/getFiles", method = RequestMethod.GET)
   public String[] getFiles() {
