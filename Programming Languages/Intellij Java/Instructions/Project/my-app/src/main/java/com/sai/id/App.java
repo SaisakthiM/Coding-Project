@@ -32,8 +32,7 @@ public class App extends Ford implements Main, Car<String>, Bike {
       System.out.print("\n ok it did not work");
     } finally {
       int x = 10;
+      System.out.println(x);
     }
-    var timer = new Timer(1000,event -> System.out.println("The time is " + new Date())); 
-
   }
 }
