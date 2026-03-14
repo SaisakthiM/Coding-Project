@@ -240,6 +240,11 @@ Keep these rules in mind as we work through the examples that illustrate them:
     2) There can only be one owner at a time.
     3_ When the owner goes out of scope, the value will be dropped
 
+actual definition : 
+ownership is a set of rules that rust follows to manage memory 
+high level language have garbage collector 
+low level does not collect at all and expects user to do that 
+but this is different 
 
 
 
