@@ -1,5 +1,5 @@
 [workspace]
-members = [
+members = ["Main Files/Cargo/main",
     "Main Files/Cargo/main_cargo",
     "Project1",
 ]

@@ -34,7 +34,6 @@ RUN pip install graphene-django
 COPY . .
 
 # Copy .env file explicitly (if not already included in COPY . .)
-COPY .env ./
 
 # Copy wait-for-db.sh and make it executable
 COPY wait-for-db.sh /wait-for-db.sh
@@ -61,7 +60,6 @@ RUN pip install graphene-django
 COPY . .
 
 # Copy .env file explicitly (if not already included in COPY . .)
-COPY .env ./
 
 # Copy wait-for-db.sh and make it executable
 COPY wait-for-db.sh /wait-for-db.sh

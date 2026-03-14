@@ -11,16 +11,46 @@
       "**/.git/**": true,
       "**/dist/**": true,
       "**/build/**": true,
-      "**/venv/**": true
+      "**/venv/**": true,
+      "**/General Programming Skills/Git/next.js/**": true
     },
 
     // 🔍 Smart search exclusions
     "search.exclude": {
-      "**/node_modules/**": true,
       "**/.git/**": true,
       "**/dist/**": true,
       "**/build/**": true,
-      "**/venv/**": true
-    }
+      "**/venv/**": true,
+      "**/General Programming Skills/Git/next.js/**": true
+    },
+
+    // 👁 Hide from Explorer (prevents accidental access)
+    "files.exclude": {
+      "**/General Programming Skills/Git/next.js/**": true
+    },
+
+    // 🧠 HARD block for Tailwind language server
+    "tailwindCSS.files.exclude": [
+      "**/General Programming Skills/Git/next.js/**",
+      "**/examples/**",
+      "**/test/**"
+    ]
+  },
+
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact",
+    "javascriptreact": "javascriptreact",
+    "typescriptreact": "typescriptreact"
+  },
+
+  "tailwindCSS.emmetCompletions": true,
+
+  "files.associations": {
+    "*.css": "tailwindcss"
   }
 }

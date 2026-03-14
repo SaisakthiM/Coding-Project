@@ -8,7 +8,6 @@
   "settings": {
     "workbench.colorCustomizations": {},
     "workbench.colorTheme": "Night Owl X One Dark",
-    "workbench.preferredDarkColorTheme": "Visual Studio Dark - C++",
     "files.associations": {
       "array": "cpp",
       "atomic": "cpp",
@@ -112,7 +111,7 @@
 
     // ✅ Performance Optimizations Begin Here
     "files.exclude": {
-      "**/node_modules": true,
+      // "**/node_modules": true,
       "**/build": true,
       "**/dist": true,
       "**/.git": true
@@ -132,5 +131,21 @@
     "typescript.tsserver.experimental.enableProjectDiagnostics": false,
     "javascript.suggest.autoImports": false
     // ✅ Performance Optimizations End
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact",
+    "javascriptreact": "javascriptreact",
+    "typescriptreact": "typescriptreact"
+  },
+
+  "tailwindCSS.emmetCompletions": true,
+
+  "files.associations": {
+    "*.css": "tailwindcss"
   }
 }
