@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank
+    username: bankmanagement
+    password: bankmanagement@2008
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update  # Creates/updates tables automatically
+    show-sql: true      # Shows SQL queries in console (helpful for learning)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true  # Formats SQL output for readability
+  
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+    
+  application:
+    name: bank-management
+
+server:
+  port: 8080
