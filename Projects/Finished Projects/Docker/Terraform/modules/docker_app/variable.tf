@@ -9,9 +9,25 @@ variable "env" {
   default = []
 }
 
+variable "command" {
+  type    = list(string)
+  default = []
+}
+
 variable "volumes" {
+  description = "Bind mounts (host path → container path)"
   type = list(object({
     host_path      = string
+    container_path = string
+    read_only      = bool
+  }))
+  default = []
+}
+
+variable "named_volumes" {
+  description = "Named Docker volumes (volume name → container path)"
+  type = list(object({
+    volume_name    = string
     container_path = string
     read_only      = bool
   }))

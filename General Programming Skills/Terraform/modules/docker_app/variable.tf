@@ -4,6 +4,16 @@ variable "internal_port" { type = number }
 variable "external_port" { type = number }
 variable "network" { type = string }
 
+variable "env" {
+  type    = list(string)
+  default = []
+}
+
+variable "command" {
+  type    = list(string)
+  default = []
+}
+
 variable "volumes" {
   type = list(object({
     host_path      = string
@@ -13,3 +23,11 @@ variable "volumes" {
   default = []
 }
 
+variable "named_volumes" {
+  type = list(object({
+    volume_name    = string
+    container_path = string
+    read_only      = bool
+  }))
+  default = []
+}

@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -16,3 +16,4 @@ EXPOSE 3000
 
 # Run dev server with host 0.0.0.0 to allow external connections
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+

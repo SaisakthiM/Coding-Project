@@ -12,7 +12,7 @@ import ModifyNote from "./notes/ModifyNote.jsx";
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/notes/">
         <Routes>
           <Route
             path="/"

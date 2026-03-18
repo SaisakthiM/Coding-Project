@@ -160,3 +160,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+FORCE_SCRIPT_NAME = '/notes'
+LOGIN_URL = '/notes/accounts/login/'
+

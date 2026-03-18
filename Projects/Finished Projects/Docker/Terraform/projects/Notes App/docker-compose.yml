@@ -1,56 +1,5 @@
 services:
 
-  # Backend (Django)
-  backend:
-    build: ./backend
-    container_name: backend_app
-    command: >
-      sh -c "python manage.py migrate &&
-           python manage.py collectstatic --noinput &&
-           gunicorn notes_app.wsgi:application --bind 0.0.0.0:8000"
-    volumes:
-      - static_volume:/static
-      - media_volume:/media
-    environment:
-      - DATABASE_NAME=notes_app
-      - DATABASE_USER=saisakthi
-      - DATABASE_PASSWORD=sai2008
-      - DATABASE_HOST=postgres
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-
-  # Frontend - Dev (Vite)
-  frontend_dev:
-    build:
-      context: ./frontend/notes_app_frontend
-      dockerfile: Dockerfile.dev
-    container_name: frontend_dev
-    command: npm run dev
-    volumes:
-      - ./frontend/notes_app_frontend:/app
-    ports:
-      - "5173:5173"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - backend
-
-  # Frontend - Production (build + Nginx)
-  frontend_prod:
-    build:
-      context: ./frontend/notes_app_frontend
-      dockerfile: Dockerfile.prod # Use multi-stage Dockerfile
-    container_name: frontend_app
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    environment:
-      - NODE_ENV=production
-
-  # Postgres
   postgres:
     image: postgres:16
     container_name: notes_postgres
@@ -60,10 +9,39 @@ services:
       POSTGRES_PASSWORD: sai2008
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: notes_backend
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn notes_app.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/static
+      - media_volume:/media
+    environment:
+      DATABASE_NAME: notes_app
+      DATABASE_USER: saisakthi
+      DATABASE_PASSWORD: sai2008
+      DATABASE_HOST: postgres
+    depends_on:
+      - postgres
     ports:
-      - "5432:5432"
+      - "8000:8000"
+
+  frontend_build:
+    build:
+      context: ./frontend/notes_app_frontend
+      dockerfile: Dockerfile.dev
+    container_name: notes_frontend_build
+    volumes:
+      - notes-build:/dist
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
   static_volume:
   media_volume:
+  notes-build:

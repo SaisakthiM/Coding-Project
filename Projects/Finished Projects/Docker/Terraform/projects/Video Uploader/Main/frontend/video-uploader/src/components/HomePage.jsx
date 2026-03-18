@@ -1,4 +1,5 @@
 import "./home.css"
+import { Link } from 'react-router-dom'
 export default function HomePage() {
   return (
     <div className="wrapper">
@@ -6,9 +7,9 @@ export default function HomePage() {
         <h1 className="header">File Uploader</h1>
         <h2>Here you can, </h2>
         <ol>
-          <li><a href="/upload">Upload a File</a></li>
-          <li><a href="/download">Download or retrieve a File</a></li>
-          <li><a href="/remove">Remove a File</a></li>
+          <li><Link to="/upload">Upload a File</Link></li>
+          <li><Link to="/download">Download or retrieve a File</Link></li>
+          <li><Link to="/remove">Remove a File</Link></li>
         </ol>
         <h2>These files uploaded are stored in a server and in local for redudency</h2>
       </div>

@@ -2,12 +2,12 @@ services:
 
   # -------- Django Backend --------
   django:
-    build: ./backend
+    build: ./apps/backend
     container_name: django
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/social_media:/app/social_media
+      - ./apps/backend/social_media:/app/social_media
     environment:
       DATABASE_URL: postgres://postgres:saisakthi2008@postgres:5432/socialmediaapp
       MEDIA_STORAGE_URL: http://minio:9000
@@ -19,7 +19,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       RUNNING_IN_DOCKER: 1
-      DEBUG: "False"  # Disable debug mode in Docker
+      DEBUG: "False"
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,17 +52,17 @@ services:
       timeout: 5s
       retries: 5
 
-  # -------- Frontend Dev (Vite/HMR) --------
+  # -------- Frontend Dev --------
   frontend-dev:
     build:
-      context: ./frontend
+      context: ./apps/frontend
       dockerfile: Dockerfile
       target: dev
     container_name: frontend-dev
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
+      - ./apps/frontend:/app
       - /app/node_modules
     depends_on:
       - django
@@ -72,10 +72,11 @@ services:
     environment:
       - VITE_DEV_SERVER_HOST=0.0.0.0
       - VITE_API_URL=/api
-  # -------- Frontend Production (Nginx) --------
+
+  # -------- Frontend Production --------
   frontend-prod:
     build:
-      context: ./frontend
+      context: ./apps/frontend
       dockerfile: Dockerfile
       target: production
     container_name: frontend-prod
@@ -94,7 +95,8 @@ services:
       - frontend-net
       - backend-net
     restart: unless-stopped
-  # -------- Cassandra DB --------
+
+  # -------- Cassandra --------
   cassandra:
     image: cassandra:4
     container_name: cassandra
@@ -111,14 +113,14 @@ services:
 
   # -------- Java Microservice --------
   microservice-java:
-    build: ./microservice-java
+    build: ./apps/microservice-java
     container_name: microservice-java
     ports:
       - "8081:8080"
     environment:
-      SPRING_CASSANDRA_CONTACT-POINTS: cassandra
+      SPRING_CASSANDRA_CONTACT_POINTS: cassandra
       SPRING_CASSANDRA_PORT: 9042
-      SPRING_CASSANDRA_LOCAL-DATACENTER: datacenter1
+      SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
     depends_on:
       cassandra:
         condition: service_healthy
@@ -127,8 +129,8 @@ services:
     networks:
       - backend-net
     volumes:
-      - ./microservice-java/.m2:/root/.m2
-      - ./microservice-java/target:/app/target
+      - ./apps/microservice-java/.m2:/root/.m2
+      - ./apps/microservice-java/target:/app/target
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 10s
@@ -150,7 +152,7 @@ services:
 
   # -------- Go Microservice --------
   microservice-go:
-    build: ./microservice-go
+    build: ./apps/microservice-go
     container_name: microservice-go
     depends_on:
       redis:
@@ -190,10 +192,10 @@ services:
     networks:
       - backend-net
 
-  # -------- Media Storage (MinIO) --------
+  # -------- MinIO --------
   minio:
     build:
-      context: ./minio
+      context: ./storage/minio
       dockerfile: Dockerfile
     container_name: minio
     environment:
@@ -220,7 +222,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./platform/observability/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
       - backend-net
@@ -228,7 +230,6 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     profiles:
-      - prod
       - observability
 
   # -------- Grafana --------
@@ -248,7 +249,6 @@ services:
       - prometheus
       - loki
     profiles:
-      - prod
       - observability
 
   # -------- Loki --------
@@ -258,14 +258,13 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./observability/loki-config.yml:/etc/loki/local-config.yml
+      - ./platform/observability/loki-config.yml:/etc/loki/local-config.yml
       - loki_data:/loki
     networks:
       - backend-net
     command: -config.file=/etc/loki/local-config.yml
     user: root
     profiles:
-      - prod
       - observability
 
   # -------- Promtail --------
@@ -276,14 +275,13 @@ services:
       - /var/log:/var/log
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./observability/promtail-config.yml:/etc/promtail/config.yml
+      - ./platform/observability/promtail-config.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
     networks:
       - backend-net
     profiles:
-      - prod
       - observability
 
   # -------- Tempo --------
@@ -296,7 +294,7 @@ services:
       - "4317:4317"
       - "4318:4318"
     volumes:
-      - ./observability/tempo-config.yml:/etc/tempo/tempo.yaml
+      - ./platform/observability/tempo-config.yml:/etc/tempo/tempo.yaml
       - tempo_data:/tmp/tempo
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     networks:
@@ -304,7 +302,6 @@ services:
     depends_on:
       - minio
     profiles:
-      - prod
       - observability
 
 volumes:

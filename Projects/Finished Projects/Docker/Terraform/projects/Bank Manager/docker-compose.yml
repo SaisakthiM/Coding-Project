@@ -1,4 +1,5 @@
 services:
+
   db:
     image: postgres:16-alpine
     container_name: bank_postgres
@@ -6,59 +7,39 @@ services:
       POSTGRES_USER: bankmanagement
       POSTGRES_PASSWORD: bankmanagement@2008
       POSTGRES_DB: bank
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bankmanagement -d bank"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - pgdata:/var/lib/postgresql/data
     networks:
       - bank-network
 
   backend:
     build:
       context: "./backend/bank_management"
-      dockerfile: Dockerfile
     container_name: bank_backend
     depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8080:8080"
+      - db
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bank
       SPRING_DATASOURCE_USERNAME: bankmanagement
       SPRING_DATASOURCE_PASSWORD: bankmanagement@2008
+    ports:
+      - "8080:8080"
     networks:
       - bank-network
-    restart: unless-stopped
 
-  frontend:
+  frontend_build:
     build:
       context: "./frontend"
       dockerfile: Dockerfile
-    container_name: bank_frontend
-    depends_on:
-      - backend
-    ports:
-      - "3000:3000"
+    container_name: bank_frontend_build
     volumes:
-      - ./frontend:/app          # Mount source code for HMR
-      - /app/node_modules        # Prevent overwriting node_modules
-    environment:
-      VITE_API_URL: http://localhost:8080
+      - bank-build:/dist
     networks:
       - bank-network
-    stdin_open: true             # Keep container running
-    tty: true                    # Allocate pseudo-TTY
-    restart: unless-stopped
 
 volumes:
   pgdata:
+  bank-build:
 
 networks:
   bank-network:
-    driver: bridge

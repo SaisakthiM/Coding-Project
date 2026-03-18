@@ -5,13 +5,13 @@ import "./home.css"
 export function Comments({ data }) {
   const dat = use(data)
   const links = [];
-  dat.data.forEach((item, index) => (links[index] = `http://localhost:8080/download/${item}`))
+  dat.data.forEach((item, index) => (links[index] = `/video/api/download/${item}`))
   return (
     <ol>
       {dat.data.map((item, index) => (
         <li key={index}>
           <a
-            href={`http://localhost:8080/download/${item}`}
+            href={`/video/api/download/${item}`}
             download={item}
           >
             {item}
