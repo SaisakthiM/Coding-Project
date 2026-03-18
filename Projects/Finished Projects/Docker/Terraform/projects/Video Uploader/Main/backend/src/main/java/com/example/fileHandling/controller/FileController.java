@@ -21,48 +21,58 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class FileController {
 
   @Autowired
-  private OmvSftpService omvSftpService;  // inject the service
+  private OmvSftpService omvSftpService;
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String uploadFile(@RequestParam("fileToUpload") MultipartFile file) {
-        String fileUploadStatus = "";
-        String filePath = System.getProperty("user.dir") + "/Uploads" + File.separator + file.getOriginalFilename();
+  private String getUploadsPath() {
+    String env = System.getenv("UPLOADS_DIR");
+    return (env != null && !env.isEmpty()) ? env : System.getProperty("user.dir") + "/Uploads";
+  }
 
+  @RequestMapping(value = "/upload", method = RequestMethod.POST)
+  public String uploadFile(@RequestParam("fileToUpload") MultipartFile file) {
+    String filePath = getUploadsPath() + File.separator + file.getOriginalFilename();
+
+    try {
+      new File(getUploadsPath()).mkdirs();
+      FileOutputStream fout = new FileOutputStream(filePath);
+      fout.write(file.getBytes());
+      fout.close();
+
+      // Upload to OMV in background — don't block the response
+      String finalFilePath = filePath;
+      String originalFilename = file.getOriginalFilename();
+      new Thread(() -> {
         try {
-            // 1. Save locally (your existing code)
-            FileOutputStream fout = new FileOutputStream(filePath);
-            fout.write(file.getBytes());
-            fout.close();
-            fileUploadStatus = "File Uploaded Locally Successfully. ";
-
-            // 2. Forward to OMV
-            omvSftpService.uploadToOmv(filePath, file.getOriginalFilename());
-            fileUploadStatus += "File also backed up to OMV Successfully.";
-
+          omvSftpService.uploadToOmv(finalFilePath, originalFilename);
+          System.out.println("OMV backup successful: " + originalFilename);
         } catch (Exception e) {
-            e.printStackTrace();
-            fileUploadStatus = "Error: " + e.getMessage();
+          System.out.println("OMV backup failed (non-critical): " + e.getMessage());
         }
+      }).start();
 
-        return fileUploadStatus;
+      return "File Uploaded Successfully!";
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return "Error: " + e.getMessage();
     }
+  }
 
   @RequestMapping(value = "/getFiles", method = RequestMethod.GET)
   public String[] getFiles() {
-    String folderPath = System.getProperty("user.dir") + "/Uploads";
-    File directory = new File(folderPath);
+    File directory = new File(getUploadsPath());
+    if (!directory.exists()) directory.mkdirs();
     String[] filenames = directory.list();
-    return filenames;
+    return filenames != null ? filenames : new String[]{};
   }
 
   @RequestMapping(value = "/download/{path:.+}", method = RequestMethod.GET)
   public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("path") String filename)
       throws FileNotFoundException {
-    String fileUploadpath = System.getProperty("user.dir") + "/Uploads";
     String[] filenames = this.getFiles();
     boolean contains = Arrays.asList(filenames).contains(filename);
 
@@ -70,13 +80,8 @@ public class FileController {
       return new ResponseEntity("File Not Found", HttpStatus.NOT_FOUND);
     }
 
-    String filePath = fileUploadpath + File.separator + filename;
+    String filePath = getUploadsPath() + File.separator + filename;
     File file = new File(filePath);
-
-    System.out.println("Downloading file from: " + filePath);
-    System.out.println("File exists: " + file.exists());
-    System.out.println("File size: " + file.length());
-    System.out.println("Filename being sent: " + filename);
 
     InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 

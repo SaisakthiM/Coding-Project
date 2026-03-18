@@ -1,20 +1,17 @@
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "docker_container" "app" {
   name    = var.name
   image   = var.image
   restart = "always"
 
-  ports {
-    internal = var.internal_port
-    external = var.external_port
+  env     = var.env
+  command = length(var.command) > 0 ? var.command : null
+
+  dynamic "ports" {
+    for_each = var.external_port != 0 ? [1] : []
+    content {
+      internal = var.internal_port
+      external = var.external_port
+    }
   }
 
   networks_advanced {
@@ -27,6 +24,16 @@ resource "docker_container" "app" {
       source    = mounts.value.host_path
       target    = mounts.value.container_path
       type      = "bind"
+      read_only = mounts.value.read_only
+    }
+  }
+
+  dynamic "mounts" {
+    for_each = var.named_volumes
+    content {
+      source    = mounts.value.volume_name
+      target    = mounts.value.container_path
+      type      = "volume"
       read_only = mounts.value.read_only
     }
   }

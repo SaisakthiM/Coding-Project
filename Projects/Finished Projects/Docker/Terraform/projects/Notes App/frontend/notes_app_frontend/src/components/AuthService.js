@@ -8,7 +8,7 @@ export default class AuthService {
     }
 
     async register() {
-        const url = "http://127.0.0.1:8000/api/user/register/";
+        const url = "/notes/api/user/register/";
         const params = {
             username: this.username,
             password: this.password,
@@ -19,7 +19,7 @@ export default class AuthService {
     }
 
     async login() {
-        const url = "http://127.0.0.1:8000/api/token/";
+        const url = "/notes/api/token/";
         const params = {
             username: this.username,
             password: this.password,

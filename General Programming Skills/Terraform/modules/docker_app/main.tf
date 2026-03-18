@@ -1,16 +1,11 @@
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "docker_container" "app" {
-  name  = var.name
-  image = var.image
+  name    = var.name
+  image   = var.image
   restart = "always"
+
+  env = var.env
+
+  command = length(var.command) > 0 ? var.command : null
 
   ports {
     internal = var.internal_port
@@ -21,7 +16,6 @@ resource "docker_container" "app" {
     name = var.network
   }
 
-  # Mount host directories/files using the existing 'volumes' variable
   dynamic "mounts" {
     for_each = var.volumes
     content {
@@ -31,6 +25,14 @@ resource "docker_container" "app" {
       read_only = mounts.value.read_only
     }
   }
+
+  dynamic "mounts" {
+    for_each = var.named_volumes
+    content {
+      source    = mounts.value.volume_name
+      target    = mounts.value.container_path
+      type      = "volume"
+      read_only = mounts.value.read_only
+    }
+  }
 }
-
-

@@ -1,13 +1,13 @@
 import axios from 'axios';
 
 // Base API URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = '/bank/api';
 
 const bankService = {
   // Create new account
   createAccount: async (customerName, accountNumber) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/accounts`, {
+      const response = await axios.post(`${API_BASE_URL}/accounts`, {
         customerName,
         accountNumber,
       });
@@ -20,7 +20,7 @@ const bankService = {
   // Get all accounts
   getAllAccounts: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/accounts`);
+      const response = await axios.get(`${API_BASE_URL}/accounts`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -30,7 +30,7 @@ const bankService = {
   // Get account by ID
   getAccountById: async (id) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/accounts/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/accounts/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -40,7 +40,7 @@ const bankService = {
   // Deposit money
   deposit: async (accountId, amount) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/accounts/${accountId}/deposit`, {
+      const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/deposit`, {
         amount,
       });
       return response.data;
@@ -52,7 +52,7 @@ const bankService = {
   // Withdraw money
   withdraw: async (accountId, amount) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/accounts/${accountId}/withdraw`, {
+      const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/withdraw`, {
         amount,
       });
       return response.data;

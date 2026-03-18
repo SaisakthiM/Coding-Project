@@ -1,0 +1,12 @@
+services:
+
+  quiz_build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz_build
+    volumes:
+      - quiz-build:/dist
+
+volumes:
+  quiz-build:
