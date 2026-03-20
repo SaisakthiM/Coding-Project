@@ -445,9 +445,6 @@
     "identifier": "custom"
   },
   "rubyLsp.customRubyCommand": "C:\\Ruby31-x64\\bin\\ruby.exe",
-  "rust-analyzer.linkedProjects": [
-    "C:/Coding Project/Rust/Workspace/Cargo.toml"
-  ],
   "rust-analyzer.diagnostics.enable": true,
   "terminal.integrated.enableMultiLinePasteWarning": "never",
   "terminal.integrated.fontFamily": "CaskaydiaCove Nerd Font, JetBrainsMono NF, Consolas, monospace",

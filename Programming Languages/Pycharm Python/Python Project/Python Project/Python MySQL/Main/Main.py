@@ -5,8 +5,8 @@ from SQL import MySQL
 class Test:
     def __init__(self):
         try:
-            cnx = mysql.connector.connect(user='root',password='saisakthi@2008',
-                                        host='127.0.0.1')
+            cnx = mysql.connector.connect(user='root',password='saisakthi2008',
+                                        host='localhost', database="Sai")
             self.cursor = cnx.cursor()
             print("Connection Was Successful")
         except mysql.connector.Error as err:
@@ -62,9 +62,9 @@ class Test:
 
 
 def SQL(): 
-    db = MySQL("localhost", "root", "saisakthi@2008")
+    db = MySQL("localhost", "root", "saisakthi2008")
     db.instructions()
-    db.set_database("test_db")
+    db.set_database("main_data")
     db.start_connection()
     db.start_cursor()
     db.database_connection()
@@ -73,7 +73,7 @@ def SQL():
 
 def test():
     # Initialize the MySQL class
-    db = MySQL("localhost", "root", "saisakthi@2008")
+    db = MySQL("localhost", "root", "saisakthi2008")
 
     # Show instructions
     db.instructions()
@@ -116,6 +116,7 @@ def test():
     db.delete("Column", "price", table_name="products")
 
 test()
+SQL()
     
 
 

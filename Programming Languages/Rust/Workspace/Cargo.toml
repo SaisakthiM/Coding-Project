@@ -1,5 +1,5 @@
 [workspace]
 members = ["Main Files/Cargo/main",
-    "Main Files/Cargo/main_cargo", "Project Files/rust-proj",
+    "Main Files/Cargo/main_cargo", "Project Files/collections", "Project Files/exercise", "Project Files/rust-proj",
     "Project1",
 ]
