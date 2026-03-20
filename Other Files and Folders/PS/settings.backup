@@ -466,9 +466,6 @@
     },
     "rubyLsp.customRubyCommand": "C:\\Ruby31-x64\\bin\\ruby.exe",
     
-    "rust-analyzer.linkedProjects": [
-        "C:/Coding Project/Rust/Workspace/Cargo.toml"
-    ],
     "terminal.integrated.enableMultiLinePasteWarning": "auto",
     "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
     "yaml.schemas": {
