@@ -1,9 +1,8 @@
 #![allow(unused)]
 #![allow(non_snake_case)]
 
-use rand;
-
-use std::io::{Read, Write, stdin, stdout};
+use std::{ascii::escape_default, cmp::Ordering, io::{Read, Write, stdin, stdout}};
+use rand::prelude::*;
 fn add_2() {
     let mut x : String = String::from("");
     let mut y : String = String::from("");
@@ -80,13 +79,45 @@ fn is_prime(val: u64) -> bool{
     return true;
 }
 
+
+
 fn get_input() {
     let mut input = String::from("");
     println!("Enter a number : ");
     stdin().read_line(&mut input).expect("Error cannot read the line");
+    let fin: i32 = input.trim().parse().expect("Cannot parse into int");
+    let mut rng = rand::rng();
+    let val = rng.random_range(1..=10);
+
+    let cmpare = || {
+        match fin.cmp(&val) {
+            Ordering::Less => "less",
+            Ordering::Greater => "more",
+            Ordering::Equal => "win",
+        };
+    };
+
+    if val == fin {
+        println!("Your prediction was right, the number is : {}", fin);
+    }
     
+    else {
+        let mut input: String = String::from("");
+        println!("Do you want to see the Number (Yes/No) : ");
+        stdin().read_line(&mut input).expect("Error cannot read the line");
+        match input.as_str() {
+            "Yes" => println!("Your prediction was Wrong, the number is : {}, Your Guess is : {}", val, input),
+            "No" => {
+                print!("Your Guess was : {:?}", cmpare());
+            }
+            _ => println!("Wrong Option")
+        }
+        
+    }
+    
+
 }
 
 fn main() {
-    
+    get_input();
 }
