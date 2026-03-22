@@ -1,12 +1,7 @@
-async function fetchData() {
-  let data;
-  try {
-    data = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-    console.log("Data received:", data);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-  return data;
-}
+console.log("A");
 
-fetchData().then(result => console.log("Final:", result));
+setTimeout(() => console.log("B"), 0);
+
+Promise.resolve().then(() => console.log("C"));
+
+console.log("D");
