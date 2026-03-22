@@ -31,23 +31,13 @@ while IFS= read -r pom_file; do
 
     # If path contains spaces, create a symlink and use that instead
     if [[ "$rel_path" == *" "* ]]; then
-        # Build a safe link name: take last 2 path segments, replace spaces with -
-        safe_name=$(echo "$rel_path" | awk -F'/' '{
-            n=NF;
-            if (NF>=2) print $(n-1)"/"$n;
-            else print $n
-        }' | tr ' ' '-' | tr '/' '-')
+        # Use the FULL relative path as the link name (spaces→hyphens, slashes→hyphens)
+        # This guarantees uniqueness across all projects
+        safe_name=$(echo "$rel_path" | tr ' ' '-' | tr '/' '-')
 
-        # Ensure uniqueness by appending a counter if needed
         link_path="$LINKS_DIR/$safe_name"
-        counter=1
-        while [ -e "$link_path" ]; do
-            link_path="$LINKS_DIR/${safe_name}-${counter}"
-            ((counter++))
-        done
-
         ln -sf "$pom_dir" "$link_path"
-        rel_path=".vscode/java-links/$(basename "$link_path")"
+        rel_path=".vscode/java-links/$safe_name"
         echo "  🔗 Symlinked (spaces): $rel_path"
     else
         echo "  ✅ Found: $rel_path"
