@@ -3,12 +3,17 @@
 # ─── Config ───────────────────────────────────────────────────────────────────
 AGGREGATOR_POM="/home/saisakthi/Coding-Project/pom.xml"
 ROOT_DIR="/home/saisakthi/Coding-Project"
+LINKS_DIR="$ROOT_DIR/.vscode/java-links"
 # ──────────────────────────────────────────────────────────────────────────────
 
 echo "🔍 Scanning for pom.xml files under: $ROOT_DIR"
 
-# Collect all pom.xml paths, excluding the aggregator itself and any target/ dirs
+# Clean and recreate symlinks directory
+rm -rf "$LINKS_DIR"
+mkdir -p "$LINKS_DIR"
+
 MODULE_PATHS=()
+
 while IFS= read -r pom_file; do
     pom_dir=$(dirname "$pom_file")
 
@@ -17,13 +22,43 @@ while IFS= read -r pom_file; do
         continue
     fi
 
-    # Get path relative to aggregator
+    # Skip symlink targets (inside .vscode/java-links) to avoid duplicates
+    if [[ "$pom_dir" == "$LINKS_DIR"* ]]; then
+        continue
+    fi
+
     rel_path="${pom_dir#$ROOT_DIR/}"
+
+    # If path contains spaces, create a symlink and use that instead
+    if [[ "$rel_path" == *" "* ]]; then
+        # Build a safe link name: take last 2 path segments, replace spaces with -
+        safe_name=$(echo "$rel_path" | awk -F'/' '{
+            n=NF;
+            if (NF>=2) print $(n-1)"/"$n;
+            else print $n
+        }' | tr ' ' '-' | tr '/' '-')
+
+        # Ensure uniqueness by appending a counter if needed
+        link_path="$LINKS_DIR/$safe_name"
+        counter=1
+        while [ -e "$link_path" ]; do
+            link_path="$LINKS_DIR/${safe_name}-${counter}"
+            ((counter++))
+        done
+
+        ln -sf "$pom_dir" "$link_path"
+        rel_path=".vscode/java-links/$(basename "$link_path")"
+        echo "  🔗 Symlinked (spaces): $rel_path"
+    else
+        echo "  ✅ Found: $rel_path"
+    fi
+
     MODULE_PATHS+=("$rel_path")
-    echo "  ✅ Found: $rel_path"
+
 done < <(find "$ROOT_DIR" \
     -not -path "*/target/*" \
     -not -path "*/.git/*" \
+    -not -path "*/.vscode/java-links/*" \
     -name "pom.xml" \
     | sort)
 
@@ -38,7 +73,6 @@ done
 MODULES_XML+="    </modules>"
 
 # ─── Replace the existing <modules>...</modules> block in the aggregator ──────
-# Uses Python for reliable multi-line XML replacement
 python3 - "$AGGREGATOR_POM" "$MODULES_XML" <<'EOF'
 import sys, re
 
@@ -48,7 +82,6 @@ new_modules_block = sys.argv[2]
 with open(pom_path, 'r') as f:
     content = f.read()
 
-# Replace everything between <modules> and </modules> (inclusive)
 updated = re.sub(
     r'[ \t]*<modules>.*?</modules>',
     new_modules_block,
@@ -64,4 +97,4 @@ EOF
 
 echo ""
 echo "🎉 Done! Reload VS Code with:"
-echo "   Ctrl+Shift+P → Java: Reload Projects"
+echo "   Ctrl+Shift+P → Java: Clean Java Language Server Workspace → Restart and delete"
