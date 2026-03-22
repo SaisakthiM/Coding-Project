@@ -18,22 +18,22 @@
     <description>Aggregator POM for VS Code Java language server indexing</description>
 
     <modules>
-        <module>Programming Languages/Intellij Java/Instructions/Project/my-app</module>
-        <module>Programming Languages/Intellij Java/Instructions/Project/new-proj/demo</module>
-        <module>Programming Languages/Intellij Java/Instructions/Project/new-proj/sai</module>
-        <module>Programming Languages/Intellij Java/Instructions/Project/sai</module>
-        <module>Programming Languages/Intellij Java/Projects/Task Manager/task-manager</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/saiapi</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/saicrud</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/saihibernate</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/sai</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/saisakthi</module>
-        <module>Programming Languages/Intellij Java/Spring Boot/Main/saispring</module>
-        <module>Projects/Finished Projects/Docker/Terraform/projects/Bank Manager/backend/bank_management</module>
-        <module>Projects/Finished Projects/Docker/Terraform/projects/Social Media App/apps/microservice-java</module>
-        <module>Projects/Finished Projects/Docker/Terraform/projects/Video Uploader/Main/backend</module>
-        <module>Projects/Unfinished Projects/Working On/AI Chatbot/backend/chatbot</module>
-        <module>Projects/Unfinished Projects/Working On/Video Uploader/Main/backend</module>
+        <module>.vscode/java-links/Project-my-app</module>
+        <module>.vscode/java-links/new-proj-demo</module>
+        <module>.vscode/java-links/new-proj-sai</module>
+        <module>.vscode/java-links/Project-sai</module>
+        <module>.vscode/java-links/Task-Manager-task-manager</module>
+        <module>.vscode/java-links/Main-saiapi</module>
+        <module>.vscode/java-links/Main-saicrud</module>
+        <module>.vscode/java-links/Main-saihibernate</module>
+        <module>.vscode/java-links/Main-sai</module>
+        <module>.vscode/java-links/Main-saisakthi</module>
+        <module>.vscode/java-links/Main-saispring</module>
+        <module>.vscode/java-links/backend-bank_management</module>
+        <module>.vscode/java-links/apps-microservice-java</module>
+        <module>.vscode/java-links/Main-backend</module>
+        <module>.vscode/java-links/backend-chatbot</module>
+        <module>.vscode/java-links/Main-backend-1</module>
     </modules>
 
 </project>
