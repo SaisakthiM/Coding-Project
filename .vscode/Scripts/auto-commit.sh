@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-# Navigate to project directory
 cd "$HOME/Coding-Project" || {
   echo "Directory not found"
   exit 1
 }
 
-# Detect current branch
 BRANCH=$(git branch --show-current)
 
 if [[ -z "$BRANCH" ]]; then
@@ -18,18 +16,23 @@ fi
 today=$(date +"%Y-%m-%d")
 commitMessage="Changes made on Date : $today"
 
-# Pull latest changes
-git pull --rebase origin "$BRANCH"
-
 # Stage all changes
 git add -A
 
-# Commit only if there are staged changes
+# Commit FIRST before pulling (avoids stash/pop conflicts)
 if ! git diff --cached --quiet; then
+  echo "✅ Committing local changes..."
   git commit -m "$commitMessage"
 else
-  echo "No changes to commit"
+  echo "ℹ️  No changes to commit"
 fi
 
-# Push changes
+# Now pull safely — working tree is clean
+echo "⬇️  Pulling latest from origin/$BRANCH..."
+git pull --rebase origin "$BRANCH"
+
+# Push
+echo "⬆️  Pushing to origin/$BRANCH..."
 git push origin "$BRANCH"
+
+echo "🎉 Done!"
