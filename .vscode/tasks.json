@@ -57,7 +57,6 @@
             },
             "runOptions": {},
             "problemMatcher": [],
-            // Remind yourself to reload after this task
         },
         {
             "label": "Run All Startup Tasks",
