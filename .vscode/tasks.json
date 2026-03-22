@@ -44,7 +44,21 @@
 
             "problemMatcher": []
         },
-
+        {
+            "label": "Update Maven Modules",
+            "type": "shell",
+            "linux": {
+                "command": "/bin/bash",
+                "args": ["${workspaceFolder}/.vscode/Scripts/update_modules.sh"]
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "runOptions": {},
+            "problemMatcher": [],
+            // Remind yourself to reload after this task
+        },
         {
             "label": "Run All Startup Tasks",
             "dependsOn": [
