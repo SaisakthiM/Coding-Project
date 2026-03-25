@@ -28,7 +28,7 @@ spec:
             - containerPort: 9004
           env:
             - name: MINIO_ROOT_USER
-              value: minio
+              value: minio+
             - name: MINIO_ROOT_PASSWORD
               value: minio123
           volumeMounts:
