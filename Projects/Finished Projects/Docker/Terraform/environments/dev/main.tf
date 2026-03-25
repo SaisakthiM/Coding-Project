@@ -777,75 +777,6 @@ resource "kubectl_manifest" "microservice_java_deployment" {
                   value: datacenter1
   YAML
 }
-
-resource "kubectl_manifest" "minio_service" {
-  depends_on = [null_resource.kind_cluster]
-  yaml_body  = <<-YAML
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: minio
-    spec:
-      selector:
-        app: minio
-      ports:
-        - name: api
-          protocol: TCP
-          port: 9000
-          targetPort: 9000
-        - name: console
-          protocol: TCP
-          port: 9004
-          targetPort: 9004
-      type: ClusterIP
-  YAML
-}
-
-resource "kubectl_manifest" "minio_deployment" {
-  depends_on = [null_resource.kind_load_images]
-  yaml_body  = <<-YAML
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: minio
-      labels:
-        app: minio
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: minio
-      template:
-        metadata:
-          labels:
-            app: minio
-        spec:
-          containers:
-            - name: minio
-              image: socialmediaapp-minio:latest
-              imagePullPolicy: Never
-              args:
-                - server
-                - /data
-                - --console-address
-                - ":9004"
-              ports:
-                - containerPort: 9000
-                - containerPort: 9004
-              env:
-                - name: MINIO_ROOT_USER
-                  value: minio
-                - name: MINIO_ROOT_PASSWORD
-                  value: minio123
-              volumeMounts:
-                - name: minio-data
-                  mountPath: /data
-          volumes:
-            - name: minio-data
-              emptyDir: {}
-  YAML
-}
-
 resource "kubectl_manifest" "ingress_api" {
   depends_on = [helm_release.ingress_nginx]
   yaml_body  = <<-YAML
@@ -873,6 +804,33 @@ resource "kubectl_manifest" "ingress_api" {
   YAML
 }
 
+resource "kubectl_manifest" "ingress_minio" {
+  depends_on = [helm_release.ingress_nginx]
+  yaml_body  = <<-YAML
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: social-media-minio-ingress
+      namespace: default
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    spec:
+      ingressClassName: nginx
+      rules:
+        - http:
+            paths:
+              - path: /social/minio(/|$)(.*)
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: minio
+                    port:
+                      number: 9000
+  YAML
+}
+
 resource "kubectl_manifest" "ingress_frontend" {
   depends_on = [helm_release.ingress_nginx]
   yaml_body  = <<-YAML
@@ -896,12 +854,5 @@ resource "kubectl_manifest" "ingress_frontend" {
                     name: frontend-prod
                     port:
                       number: 80
-              - path: /social/minio(/|$)(.*)
-                pathType: ImplementationSpecific
-                backend:
-                  service:
-                    name: minio
-                    port:
-                      number: 9000
   YAML
 }
