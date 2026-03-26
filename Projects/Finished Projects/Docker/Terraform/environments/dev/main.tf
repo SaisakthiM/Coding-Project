@@ -26,7 +26,6 @@ provider "docker" {
 provider "kubectl" {
   config_path    = "~/.kube/config"
   config_context = "kind-social-media"
-  
 }
 
 provider "helm" {
@@ -388,7 +387,7 @@ resource "docker_image" "social_minio" {
   }
 }
 
-# ─── KIND CLUSTER (null_resource — Terraform can't manage kind natively) ───
+# ─── KIND CLUSTER ─────────────────────────────────────────────
 resource "null_resource" "kind_cluster" {
   triggers = {
     kind_config = filesha256("${path.module}/../../projects/Social Media App/infrastructure/kind/kind-config.yaml")
@@ -408,7 +407,7 @@ resource "null_resource" "kind_cluster" {
   }
 }
 
-# ─── LOAD IMAGES INTO KIND (null_resource — kind load has no provider) ─────
+# ─── LOAD IMAGES INTO KIND ────────────────────────────────────
 resource "null_resource" "kind_load_images" {
   depends_on = [
     null_resource.kind_cluster,
@@ -438,7 +437,7 @@ resource "null_resource" "kind_load_images" {
   }
 }
 
-# ─── CONNECT GATEWAY TO KIND NETWORK (null_resource — docker network has no provider) ───
+# ─── CONNECT GATEWAY TO KIND NETWORK ─────────────────────────
 resource "null_resource" "gateway_kind_network" {
   depends_on = [
     null_resource.kind_cluster,
@@ -459,7 +458,7 @@ resource "null_resource" "gateway_kind_network" {
   }
 }
 
-# ─── INGRESS-NGINX (helm — clean lifecycle, upgradeable) ──────
+# ─── INGRESS-NGINX ────────────────────────────────────────────
 resource "helm_release" "ingress_nginx" {
   depends_on       = [null_resource.kind_cluster]
   name             = "ingress-nginx"
@@ -488,7 +487,7 @@ resource "helm_release" "ingress_nginx" {
   }
 }
 
-# ─── KUBERNETES RESOURCES (kubectl_manifest — tracked in tf state) ──────────
+# ─── KUBERNETES RESOURCES ─────────────────────────────────────
 
 resource "kubectl_manifest" "postgres_secret" {
   depends_on = [null_resource.kind_cluster]
@@ -777,6 +776,75 @@ resource "kubectl_manifest" "microservice_java_deployment" {
                   value: datacenter1
   YAML
 }
+
+resource "kubectl_manifest" "minio_service" {
+  depends_on = [null_resource.kind_cluster]
+  yaml_body  = <<-YAML
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: minio
+    spec:
+      selector:
+        app: minio
+      ports:
+        - name: api
+          protocol: TCP
+          port: 9000
+          targetPort: 9000
+        - name: console
+          protocol: TCP
+          port: 9004
+          targetPort: 9004
+      type: ClusterIP
+  YAML
+}
+
+resource "kubectl_manifest" "minio_deployment" {
+  depends_on = [null_resource.kind_load_images]
+  yaml_body  = <<-YAML
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: minio
+      labels:
+        app: minio
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: minio
+      template:
+        metadata:
+          labels:
+            app: minio
+        spec:
+          containers:
+            - name: minio
+              image: socialmediaapp-minio:latest
+              imagePullPolicy: Never
+              args:
+                - server
+                - /data
+                - --console-address
+                - ":9004"
+              ports:
+                - containerPort: 9000
+                - containerPort: 9004
+              env:
+                - name: MINIO_ROOT_USER
+                  value: minio
+                - name: MINIO_ROOT_PASSWORD
+                  value: minio123
+              volumeMounts:
+                - name: minio-data
+                  mountPath: /data
+          volumes:
+            - name: minio-data
+              emptyDir: {}
+  YAML
+}
+
 resource "kubectl_manifest" "ingress_api" {
   depends_on = [helm_release.ingress_nginx]
   yaml_body  = <<-YAML
