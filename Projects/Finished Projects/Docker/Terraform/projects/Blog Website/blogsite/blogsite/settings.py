@@ -134,6 +134,3 @@ STORAGES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-FORCE_SCRIPT_NAME = '/blog'
-LOGIN_URL = '/blog/accounts/login/'
