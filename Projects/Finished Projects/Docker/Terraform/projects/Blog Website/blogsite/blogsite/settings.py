@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_9$gh=u4#z*o9!f!+i#43(2ma$of1pt)!_fbl^w(@6z31yqn5y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -125,6 +125,9 @@ STATICFILES_DIRS = [BASE_DIR / 'blog' / 'static']
 
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -134,3 +137,6 @@ STORAGES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = '/blog/'
+LOGOUT_REDIRECT_URL = '/blog/'
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
