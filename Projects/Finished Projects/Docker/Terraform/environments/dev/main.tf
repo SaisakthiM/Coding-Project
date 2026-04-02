@@ -486,6 +486,143 @@ resource "helm_release" "ingress_nginx" {
     value = "30080"
   }
 }
+/*
+# ─── CASSANDRA ────────────────────────────────────────────────
+resource "helm_release" "cassandra" {
+  depends_on = [null_resource.kind_cluster]
+  name       = "cassandra"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "cassandra"
+  namespace  = "default"
+  wait       = true
+  timeout    = 300
+  
+  set {
+    name  = "replicaCount"
+    value = "1"  # Keep it 1 for local dev, saves resources
+  }
+  set {
+    name  = "resources.requests.memory"
+    value = "512Mi"
+  }
+  set {
+    name  = "resources.requests.cpu"
+    value = "250m"
+  }
+}
+
+# ─── REDIS ────────────────────────────────────────────────────
+resource "helm_release" "redis" {
+  depends_on = [null_resource.kind_cluster, helm_release.cassandra]
+  name       = "redis"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "redis"
+  namespace  = "default"
+  wait       = true
+  timeout    = 120
+
+  set {
+    name  = "auth.password"
+    value = "redis-password"
+  }
+  set {
+    name  = "architecture"
+    value = "standalone"  # Saves resources vs replication
+  }
+}
+
+resource "helm_release" "kube_prometheus_stack" {
+  depends_on = [null_resource.kind_cluster, helm_release.redis]
+  name       = "kube-prometheus-stack"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 600 # This chart can take a while to deploy
+
+  set {
+    name  = "prometheus.prometheusSpec.additionalScrapeConfigs"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/prometheus.yml")
+    type  = "string"
+  }
+  set {
+    name  = "grafana.adminPassword"
+    value = "admin" # Consider using a Kubernetes secret for production
+  }
+  set {
+    name  = "grafana.ingress.enabled"
+    value = "true"
+  }
+  set {
+    name  = "grafana.ingress.ingressClassName"
+    value = "nginx"
+  }
+  set {
+    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
+    value = "/"
+  }
+  set {
+    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/ssl-redirect"
+    value = "false"
+  }
+  set {
+    name  = "grafana.ingress.hosts[0]"
+    value = "grafana.local" # You might need to add this to your /etc/hosts
+  }
+}
+
+resource "helm_release" "loki" {
+  depends_on = [helm_release.kube_prometheus_stack]
+  name       = "loki"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "loki"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 300
+
+  set {
+    name  = "loki.config"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/loki-config.yml")
+    type  = "string"
+  }
+}
+
+resource "helm_release" "tempo" {
+  depends_on = [helm_release.loki, kubectl_manifest.minio_service]
+  name       = "tempo"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "tempo"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 300
+
+  set {
+    name  = "tempo.config"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/tempo-config.yml")
+    type  = "string"
+  }
+}
+
+resource "helm_release" "promtail" {
+  depends_on = [helm_release.loki]
+  name       = "promtail"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "promtail"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 180
+
+  set {
+    name  = "config.snippets.scrapeConfigs"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/promtail-config.yml")
+    type  = "string"
+  }
+}
+*/
 
 # ─── KUBERNETES RESOURCES ─────────────────────────────────────
 
