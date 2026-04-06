@@ -1,0 +1,14 @@
+.wrapper {
+    display: flex;
+    height: 50vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.container h1 {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.list_api {
+    
+}
