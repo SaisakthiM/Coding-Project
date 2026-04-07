@@ -112,7 +112,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_URL = "/media/"
+MEDIA_URL = "/social/minio/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -162,7 +162,7 @@ STORAGES = {
             "secret_key":        "minio123",
             "bucket_name":       "media",
             "endpoint_url":      "http://minio:9000",
-            "custom_domain":     "localhost/social/minio/media",
+            "custom_domain":     None,
             "url_protocol":      "http:",
             "querystring_auth":  False,
             "file_overwrite":    False,
