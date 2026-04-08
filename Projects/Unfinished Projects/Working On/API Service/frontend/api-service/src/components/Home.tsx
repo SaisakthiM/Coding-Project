@@ -18,8 +18,8 @@ export function Home() {
                     <br></br>
                     <div className="list_api">
                     <ol>
-                        <li><Link to="/api/weather">Weather API</Link></li>
-                        <li><Link to="/api/geo">Geolocation API</Link></li>
+                        <li><Link to="/weather">Weather API</Link></li>
+                        <li><Link to="/geo">Geolocation API</Link></li>
                     </ol>
                 </div>
             </div>
