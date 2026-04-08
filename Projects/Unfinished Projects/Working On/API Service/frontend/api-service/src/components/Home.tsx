@@ -1,4 +1,3 @@
-import "/home/saisakthi/Coding-Project/Projects/Unfinished Projects/Working On/API Service/frontend/api-service/src/css/Home.css"
 import { Link } from "react-router-dom"
 
 
@@ -21,6 +20,9 @@ export function Home() {
                         <li><Link to="/weather">Weather API</Link></li>
                         <li><Link to="/geo">Geolocation API</Link></li>
                     </ol>
+                    <div className="result">
+                        
+                    </div>
                 </div>
             </div>
             
