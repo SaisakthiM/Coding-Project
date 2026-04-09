@@ -7,7 +7,7 @@ var axios = require('axios')
 
 router.get("/", (req,res) => {
   console.log(req.query)
-  res.send("hi")
+  res.send("Server")
 })
 router.get('/api/weather/', function(req, res, next) {
   res.send("Hello")
