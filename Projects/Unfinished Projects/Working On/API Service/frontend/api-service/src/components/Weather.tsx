@@ -1,4 +1,15 @@
+import { useEffect, useState } from "react"
+import axios from "axios"
+
+
 export function Weather() {
+    useEffect(() => {
+        const res = axios.get("http:localhost:8000/");
+        return res.data
+    })
+    const [Lat, setLat] = useState("");
+    const [Lon, setLon] = useState("");
+    const [Loc, setLoc] = useState("");
     return (
         <div className="wrapper">
             <div className="container">
@@ -9,19 +20,18 @@ export function Weather() {
                 <br></br>
                 <form>
                     <label>Location : </label>
-                    <input type="text" pattern="[A-Za-z]"></input>
+                    <input type="text" pattern="[A-Za-z]" value={Loc} onChange={(e) => {setLoc(e.target.value)}} ></input>
                     <br></br>
                     <br></br>
-                    <label>Latitude : </label>
-                    <input type="text" pattern="[A-Za-z]"></input>
+                    <label>Latitide : </label>
+                    <input type="text" pattern="[A-Za-z]" value={Lat} onChange={(e) => {setLat(e.target.value)}} ></input>
                     <br></br>
                     <br></br>
                     <label>Longitude : </label>
-                    <input type="text" pattern="[A-Za-z]"></input>
+                    <input type="text" pattern="[A-Za-z]" value={Lon} onChange={(e) => {setLon(e.target.value)}} ></input>
                     <br></br>
                     <br></br>
                     <input type="submit" id="sub_button"></input>
-
                 </form>
             </div>
         </div>
