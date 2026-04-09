@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 
-export function Weather() {
-    const [Lat, setLat] = useState("");
-    const [Lon, setLon] = useState("");
-    const [Loc, setLoc] = useState("");
+export function GeoCod() {
+    const [City, setCity] = useState("");
+    const [State, setState] = useState("");
+    const [Country, setCountry] = useState("");
     const [serverOnline, setServerOnline] = useState<boolean | null>(null);
     const [response, setResponse] = useState("")
 
     const send = async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/weather/?pd=${Loc}&lat=${Lat}&lon=${Lon}`)
+            const res = await axios.get(`http://localhost:8000/api/geo/cod/?city=${City}&state_code=${State}&country_code=${Country}`)
             setResponse(res.data)
         }
         catch (e) {
@@ -40,27 +40,27 @@ export function Weather() {
             <>
                 <div className="wrapper">
                     <div className="container">
-                        <h1>Weather API</h1>
+                        <h1>Geocoding API</h1>
                         <br />
-                        <p>In this API, you have to fill the location and details of the area you are searching for</p>
+                        <p>In this API, you have to fill the city name, state and country code. </p>
+                        <p>then you will get the latitude and longitude code</p>
                         <p>Here are the details need to fill</p>
                         <br />
                         <form>
-                            <label>Timezone : </label>
-                            <input type="number" value={Loc} onChange={(e) => setLoc(e.target.value)} />
+                            <label>City Name : </label>
+                            <input type="text" value={City} onChange={(e) => setCity(e.target.value)} />
                             <br /><br />
-                            <label>Latitude : </label>
-                            <input type="number" value={Lat} onChange={(e) => setLat(e.target.value)} />
+                            <label>State Code : </label>
+                            <input type="number" value={State} onChange={(e) => setState(e.target.value)} />
                             <br /><br />
-                            <label>Longitude : </label>
-                            <input type="number" value={Lon} onChange={(e) => setLon(e.target.value)} />
+                            <label>Country Code : </label>
+                            <input type="number" value={Country} onChange={(e) => setCountry(e.target.value)} />
                             <br /><br />
                             <input type="submit" id="sub_button" onClick={send} value="Submit"/>
                         </form>
                         <br></br>
                     <div className="response">
-                        <p>Current Weather : {response}</p>
-                        
+                        <p>Latitude and Longitude : {response}</p>
                     </div>
                     </div>
                     
