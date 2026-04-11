@@ -1,35 +1,45 @@
 import { Link } from "react-router-dom"
-
+import "./Home.css"
 
 export function Home() {
     return (
-        <div className="wrapper">
-            <div className="container">
-                    <br></br>
-                    <br></br>
-                    <br></br>
+        <div className="home-wrapper">
+            <div className="home-container">
+                <div className="hero">
+                    <span className="badge">v1.0</span>
                     <h1>API Service</h1>
-                    <br></br>
-                    <br></br>
-                    <p>This service enables for fetching multiple API calls at the time</p>
-                    <p>Here are the list we currently have in our service</p>
-                    <br></br>
-                    <p>Note: Weather API needs code in Latitude and longitude so use </p>
-                    <p>Geocoding API to first convert your location into coordinates</p>
-                    <br></br>
-                    <br></br>
-                    <div className="list_api">
-                    <ol>
-                        <li><Link to="/geo/cod">Geocoding API</Link></li>
-                        <li><Link to="/weather">Weather API</Link></li>
-                        <li><Link to="/geo/loc">Geolocation API</Link></li>
-                    </ol>
-                    <div className="result">
-                        
-                    </div>
+                    <p className="subtitle">
+                        A unified interface for fetching weather and location data.
+                        Use Geocoding to convert a city into coordinates, then pass
+                        them into the Weather API.
+                    </p>
+                </div>
+
+                <div className="note-card">
+                    <span className="note-icon">💡</span>
+                    <p>Weather API requires latitude & longitude. Use the <strong>Geocoding API</strong> first to get coordinates from a city name.</p>
+                </div>
+
+                <div className="api-grid">
+                    <Link to="/geo/cod" className="api-card">
+                        <div className="api-card-icon">🌐</div>
+                        <div className="api-card-content">
+                            <h2>Geocoding API</h2>
+                            <p>Convert a city name, state, and country code into latitude and longitude coordinates.</p>
+                        </div>
+                        <span className="api-card-arrow">→</span>
+                    </Link>
+
+                    <Link to="/weather" className="api-card">
+                        <div className="api-card-icon">🌤️</div>
+                        <div className="api-card-content">
+                            <h2>Weather API</h2>
+                            <p>Fetch real-time weather data for any location using its coordinates.</p>
+                        </div>
+                        <span className="api-card-arrow">→</span>
+                    </Link>
                 </div>
             </div>
-            
         </div>
     )
 }
