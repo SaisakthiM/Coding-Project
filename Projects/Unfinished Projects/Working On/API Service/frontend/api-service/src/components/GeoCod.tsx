@@ -1,20 +1,49 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
+import "./Weather.css"
+
+type GeoResult = {
+    lat: number;
+    lon: number;
+    name: string;
+    country: string;
+    state?: string;
+}
 
 export function GeoCod() {
     const [City, setCity] = useState("");
     const [State, setState] = useState("");
     const [Country, setCountry] = useState("");
     const [serverOnline, setServerOnline] = useState<boolean | null>(null);
-    const [response, setResponse] = useState("")
+    const [result, setResult] = useState<GeoResult | null>(null);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const send = async () => {
+        setLoading(true);
+        setError("");
+        setResult(null);
         try {
             const res = await axios.get(`http://localhost:8000/api/geo/cod/?city=${City}&state_code=${State}&country_code=${Country}`)
-            setResponse(res.data)
-        }
-        catch (e) {
-            console.log(e)
+
+            if (!res.data || res.data.length === 0) {
+                setError("Location not found. Check your inputs.");
+                return;
+            }
+
+            const loc = res.data[0];
+            setResult({
+                lat: loc.lat,
+                lon: loc.lon,
+                name: loc.name,
+                country: loc.country,
+                state: loc.state,
+            });
+        } catch (e) {
+            console.log(e);
+            setError("Request failed.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -30,47 +59,80 @@ export function GeoCod() {
         check();
     }, []);
 
-    // Still waiting for server response
-    if (serverOnline === null) {
-        return <div>Checking server...</div>;
-    }
+    if (serverOnline === null) return <div className="status-msg">Checking server...</div>;
 
     if (serverOnline) {
         return (
-            <>
-                <div className="wrapper">
-                    <div className="container">
-                        <h1>Geocoding API</h1>
-                        <br />
-                        <p>In this API, you have to fill the city name, state and country code. </p>
-                        <p>then you will get the latitude and longitude code</p>
-                        <p>Here are the details need to fill</p>
-                        <br />
-                        <form>
-                            <label>City Name : </label>
-                            <input type="text" value={City} onChange={(e) => setCity(e.target.value)} />
-                            <br /><br />
-                            <label>State Code : </label>
-                            <input type="number" value={State} onChange={(e) => setState(e.target.value)} />
-                            <br /><br />
-                            <label>Country Code : </label>
-                            <input type="number" value={Country} onChange={(e) => setCountry(e.target.value)} />
-                            <br /><br />
-                            <input type="submit" id="sub_button" onClick={send} value="Submit"/>
-                        </form>
-                        <br></br>
-                    <div className="response">
-                        <p>Latitude and Longitude : {response}</p>
+            <div className="wrapper">
+                <div className="container">
+                    <h1>Geocoding API</h1>
+                    <p>Enter a city name and its state/country codes to get the latitude and longitude.</p>
+
+                    <form>
+                        <div className="field">
+                            <label>City Name</label>
+                            <input
+                                type="text"
+                                value={City}
+                                placeholder="e.g. Chennai"
+                                onChange={(e) => setCity(e.target.value)}
+                            />
+                        </div>
+                        <div className="field">
+                            <label>State Code</label>
+                            <input
+                                type="text"
+                                value={State}
+                                placeholder="e.g. TN (optional)"
+                                onChange={(e) => setState(e.target.value)}
+                            />
+                        </div>
+                        <div className="field">
+                            <label>Country Code</label>
+                            <input
+                                type="text"
+                                value={Country}
+                                placeholder="e.g. IN"
+                                onChange={(e) => setCountry(e.target.value)}
+                            />
+                        </div>
+                        <input type="button" id="sub_button" onClick={send} value={loading ? "Loading..." : "Submit"} />
+                    </form>
+
+                    <div className={`response-card ${result ? "active" : ""}`}>
+                        {!result && !error && (
+                            <p className="response-placeholder">Results will appear here...</p>
+                        )}
+                        {error && <p className="response-error">{error}</p>}
+                        {result && (
+                            <>
+                                <div className="response-header">
+                                    <span className="response-location">📍 {result.name}{result.state ? `, ${result.state}` : ""}</span>
+                                    <span className="response-desc">{result.country}</span>
+                                </div>
+                                <div className="response-stats">
+                                    <div className="stat">
+                                        <span className="stat-icon">🧭</span>
+                                        <span className="stat-value">{result.lat.toFixed(4)}</span>
+                                        <span className="stat-label">Latitude</span>
+                                    </div>
+                                    <div className="stat-divider" />
+                                    <div className="stat">
+                                        <span className="stat-icon">🗺️</span>
+                                        <span className="stat-value">{result.lon.toFixed(4)}</span>
+                                        <span className="stat-label">Longitude</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
-                    </div>
-                    
                 </div>
-            </>
+            </div>
         );
     }
 
     return (
-        <div>
+        <div className="error-page">
             <h2>400</h2>
             <p>Server Not Found</p>
         </div>

@@ -1,20 +1,44 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
+import "./Weather.css"
+
+type WeatherResult = {
+    name: string;
+    description: string;
+    temp: number;
+    feels_like: number;
+    humidity: number;
+    wind: number;
+}
 
 export function Weather() {
     const [Lat, setLat] = useState("");
     const [Lon, setLon] = useState("");
-    const [Loc, setLoc] = useState("");
     const [serverOnline, setServerOnline] = useState<boolean | null>(null);
-    const [response, setResponse] = useState("")
+    const [result, setResult] = useState<WeatherResult | null>(null);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const send = async () => {
+        setLoading(true);
+        setError("");
+        setResult(null);
         try {
-            const res = await axios.get(`http://localhost:8000/api/weather/?pd=${Loc}&lat=${Lat}&lon=${Lon}`)
-            setResponse(res.data)
-        }
-        catch (e) {
+            const res = await axios.get(`http://localhost:8000/api/weather/?lat=${Lat}&lon=${Lon}`)
+            const { name, main, weather, wind } = res.data;
+            setResult({
+                name,
+                description: weather[0].description,
+                temp: main.temp,
+                feels_like: main.feels_like,
+                humidity: main.humidity,
+                wind: wind.speed,
+            });
+        } catch (e) {
             console.log(e)
+            setError("Request failed. Check your coordinates.")
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -30,47 +54,83 @@ export function Weather() {
         check();
     }, []);
 
-    // Still waiting for server response
-    if (serverOnline === null) {
-        return <div>Checking server...</div>;
-    }
+    if (serverOnline === null) return <div className="status-msg">Checking server...</div>;
 
     if (serverOnline) {
         return (
-            <>
-                <div className="wrapper">
-                    <div className="container">
-                        <h1>Weather API</h1>
-                        <br />
-                        <p>In this API, you have to fill the location and details of the area you are searching for</p>
-                        <p>Here are the details need to fill</p>
-                        <br />
-                        <form>
-                            <label>Timezone : </label>
-                            <input type="number" value={Loc} onChange={(e) => setLoc(e.target.value)} />
-                            <br /><br />
-                            <label>Latitude : </label>
-                            <input type="number" value={Lat} onChange={(e) => setLat(e.target.value)} />
-                            <br /><br />
-                            <label>Longitude : </label>
-                            <input type="number" value={Lon} onChange={(e) => setLon(e.target.value)} />
-                            <br /><br />
-                            <input type="submit" id="sub_button" onClick={send} value="Submit"/>
-                        </form>
-                        <br></br>
-                    <div className="response">
-                        <p>Current Weather : {response}</p>
-                        
+            <div className="wrapper">
+                <div className="container">
+                    <h1>Weather API</h1>
+                    <p>Enter the coordinates of the area you want to check the weather for.</p>
+
+                    <form>
+                        <div className="field">
+                            <label>Latitude</label>
+                            <input
+                                type="number"
+                                value={Lat}
+                                placeholder="e.g. 13.0836"
+                                onChange={(e) => setLat(e.target.value)}
+                            />
+                        </div>
+                        <div className="field">
+                            <label>Longitude</label>
+                            <input
+                                type="number"
+                                value={Lon}
+                                placeholder="e.g. 80.2705"
+                                onChange={(e) => setLon(e.target.value)}
+                            />
+                        </div>
+                        <input type="button" id="sub_button" onClick={send} value={loading ? "Loading..." : "Submit"} />
+                    </form>
+
+                    <div className={`response-card ${result ? "active" : ""}`}>
+                        {!result && !error && (
+                            <p className="response-placeholder">Results will appear here...</p>
+                        )}
+                        {error && <p className="response-error">{error}</p>}
+                        {result && (
+                            <>
+                                <div className="response-header">
+                                    <span className="response-location">📍 {result.name}</span>
+                                    <span className="response-desc">{result.description}</span>
+                                </div>
+                                <div className="response-stats">
+                                    <div className="stat">
+                                        <span className="stat-icon">🌡️</span>
+                                        <span className="stat-value">{result.temp}°C</span>
+                                        <span className="stat-label">Temp</span>
+                                    </div>
+                                    <div className="stat-divider" />
+                                    <div className="stat">
+                                        <span className="stat-icon">🤔</span>
+                                        <span className="stat-value">{result.feels_like}°C</span>
+                                        <span className="stat-label">Feels Like</span>
+                                    </div>
+                                    <div className="stat-divider" />
+                                    <div className="stat">
+                                        <span className="stat-icon">💧</span>
+                                        <span className="stat-value">{result.humidity}%</span>
+                                        <span className="stat-label">Humidity</span>
+                                    </div>
+                                    <div className="stat-divider" />
+                                    <div className="stat">
+                                        <span className="stat-icon">💨</span>
+                                        <span className="stat-value">{result.wind} m/s</span>
+                                        <span className="stat-label">Wind</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
-                    </div>
-                    
                 </div>
-            </>
+            </div>
         );
     }
 
     return (
-        <div>
+        <div className="error-page">
             <h2>400</h2>
             <p>Server Not Found</p>
         </div>
