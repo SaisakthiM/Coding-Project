@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var axios = require('axios')
 const { loadEnvFile } = require('node:process');
-loadEnvFile('/home/saisakthi/Coding-Project/Projects/Unfinished Projects/Working On/API Service/backend/bin/.env');
+loadEnvFile('../bin/.env');
 
 /* GET home page. */
 
