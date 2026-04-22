@@ -18,7 +18,6 @@ router.get('/api/weather/', async function(req, res, next) {
   res.json(val.data);
 });
 
-// Fix: add trailing slash to match frontend
 router.get('/api/geo/cod/', async function(req, res, next) {
   const { city, state_code, country_code } = req.query;
   const val = await axios.get(
