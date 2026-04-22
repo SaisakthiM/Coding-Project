@@ -1,0 +1,11 @@
+django
+python-dotenv
+requests
+google-genai
+minio
+django-cors-headers
+pymysql
+uuid
+sentence_transformers
+scikit-learn
+djangorestframework
