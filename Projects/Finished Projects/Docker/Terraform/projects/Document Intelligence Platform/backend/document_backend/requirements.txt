@@ -5,8 +5,11 @@ google-genai
 minio
 django-cors-headers
 pymysql
-uuid
-sentence_transformers
+numpy
 scikit-learn
 djangorestframework
-gunicorn 
+gunicorn
+mysqlclient
+sentence-transformers
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch

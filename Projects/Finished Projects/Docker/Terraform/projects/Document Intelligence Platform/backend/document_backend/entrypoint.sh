@@ -2,8 +2,7 @@
 
 echo "⏳ Waiting for DB to be ready..."
 
-# Wait until Django can reach the database
-until python manage.py showmigrations > /dev/null 2>&1; do
+until python -c "import socket; s=socket.create_connection(('db', 3306), timeout=3)" 2>/dev/null; do
   echo "  DB not ready yet, retrying in 3s..."
   sleep 3
 done
