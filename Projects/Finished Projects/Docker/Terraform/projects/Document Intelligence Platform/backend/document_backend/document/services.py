@@ -9,6 +9,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
+def get_embedding(text):
+    return model.encode(text)
+
 load_dotenv()
 
 PORT = os.getenv("PORT_AI", "11434")
@@ -28,8 +31,7 @@ client_minio = Minio(
     secure=MINIO_SECURE,
 )
 
-def get_embedding(text):
-    return model.encode(text)
+
 
 def summarize_ollama(prompt: str, model: str = "phi3"):
     payload = {
