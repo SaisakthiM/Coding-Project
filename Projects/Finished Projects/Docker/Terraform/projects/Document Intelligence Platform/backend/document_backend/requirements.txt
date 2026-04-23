@@ -9,3 +9,4 @@ uuid
 sentence_transformers
 scikit-learn
 djangorestframework
+gunicorn 
