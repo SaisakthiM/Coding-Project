@@ -3,7 +3,7 @@ import { getBooks } from "../scripts/Handler.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://doc-backend:8000/";
 
 async function askQuestion(bookId, question, history = []) {
     const response = await fetch(`${BASE_URL}/ask/`, {
