@@ -41,14 +41,18 @@ resource "docker_network" "gateway_net" {
 }
 
 # ─── VOLUMES ──────────────────────────────────────────────────
-resource "docker_volume" "notes_dist"   { name = "gateway_notes-dist" }
-resource "docker_volume" "bank_dist"    { name = "gateway_bank-dist" }
-resource "docker_volume" "quiz_dist"    { name = "gateway_quiz-dist" }
-resource "docker_volume" "video_dist"   { name = "gateway_video-dist" }
-resource "docker_volume" "notes_pgdata" { name = "gateway_notes-pgdata" }
-resource "docker_volume" "notes_static" { name = "gateway_notes-static" }
-resource "docker_volume" "notes_media"  { name = "gateway_notes-media" }
-resource "docker_volume" "bank_pgdata"  { name = "gateway_bank-pgdata" }
+resource "docker_volume" "notes_dist"    { name = "gateway_notes-dist" }
+resource "docker_volume" "bank_dist"     { name = "gateway_bank-dist" }
+resource "docker_volume" "quiz_dist"     { name = "gateway_quiz-dist" }
+resource "docker_volume" "video_dist"    { name = "gateway_video-dist" }
+resource "docker_volume" "api_dist"      { name = "gateway_api-dist" }       # NEW
+resource "docker_volume" "notes_pgdata"  { name = "gateway_notes-pgdata" }
+resource "docker_volume" "notes_static"  { name = "gateway_notes-static" }
+resource "docker_volume" "notes_media"   { name = "gateway_notes-media" }
+resource "docker_volume" "bank_pgdata"   { name = "gateway_bank-pgdata" }
+resource "docker_volume" "doc_mysql"     { name = "gateway_doc-mysql" }      # NEW
+resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }      # NEW
+resource "docker_volume" "doc_dist" { name = "gateway_doc-dist" }
 
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
@@ -132,6 +136,48 @@ resource "docker_image" "notes_backend" {
   }
 }
 
+# ── NEW: API Service ───────────────────────────────────────────
+resource "docker_image" "api_service_backend" {
+  name         = "api-service-backend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/API Service/backend")
+    dockerfile = "Dockerfile"
+  }
+}
+
+resource "docker_image" "api_service_frontend_build" {
+  name         = "api-service-frontend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/API Service/frontend/api-service")
+    dockerfile = "Dockerfile.prod"
+  }
+}
+
+# ── NEW: Document Intelligence Platform ───────────────────────
+resource "docker_image" "doc_backend" {
+  name         = "documentintelligenceplatform-backend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Document Intelligence Platform/backend/document_backend")
+    dockerfile = "Dockerfile"
+  }
+}
+
+resource "docker_image" "doc_frontend_build" {
+  name         = "documentintelligenceplatform-frontend:latest"
+  keep_locally = true
+  
+
+
+  build {
+    context    = abspath("${path.module}/../../projects/Document Intelligence Platform/frontend/document_frontend")
+    dockerfile = "Dockerfile.prod"
+    
+  }
+}
+
 # ─── GATEWAY ──────────────────────────────────────────────────
 module "gateway" {
   source        = "../../modules/docker_app"
@@ -153,7 +199,8 @@ module "gateway" {
     { volume_name = docker_volume.notes_dist.name, container_path = "/apps/notes", read_only = true },
     { volume_name = docker_volume.bank_dist.name,  container_path = "/apps/bank",  read_only = true },
     { volume_name = docker_volume.quiz_dist.name,  container_path = "/apps/quiz",  read_only = true },
-    { volume_name = docker_volume.video_dist.name, container_path = "/apps/video", read_only = true }
+    { volume_name = docker_volume.video_dist.name, container_path = "/apps/video", read_only = true },
+    { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api",   read_only = true },  # NEW
   ]
 }
 
@@ -298,6 +345,115 @@ module "blog_website" {
   network       = docker_network.gateway_net.name
 }
 
+# ─── API SERVICE ──────────────────────────────────────────────
+module "api_service_backend" {
+  source        = "../../modules/docker_app"
+  name          = "api-service-backend"
+  image         = docker_image.api_service_backend.name
+  internal_port = 3000
+  external_port = 0
+  network       = docker_network.gateway_net.name
+  env = [
+    "API_KEY_WEATHER=a9dba91e24c88d7a4cdd395211df339a"
+  ]
+}
+
+resource "docker_container" "api_service_frontend_build" {
+  name  = "api-service-frontend-build"
+  image = docker_image.api_service_frontend_build.name
+  must_run = false    # ← add this
+  restart  = "no"
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.api_dist.name
+    target = "/dist"
+    type   = "volume"
+  }
+}
+
+# ─── DOCUMENT INTELLIGENCE PLATFORM ──────────────────────────
+
+resource "docker_container" "doc_mysql" {
+  name    = "doc-mysql"
+  image   = "mysql:8.0"
+  restart = "always"
+  env = [
+    "MYSQL_ROOT_PASSWORD=saisakthi2008",
+    "MYSQL_DATABASE=book_db"
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.doc_mysql.name
+    target = "/var/lib/mysql"
+    type   = "volume"
+  }
+
+  healthcheck {
+    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psaisakthi2008"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "30s"
+  }
+}
+
+resource "docker_container" "doc_minio" {
+  name    = "doc-minio"
+  image   = "quay.io/minio/minio:latest"
+  restart = "always"
+  command = ["server", "/data", "--console-address", ":9001"]
+  env = [
+    "MINIO_ROOT_USER=admin",
+    "MINIO_ROOT_PASSWORD=password123"
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.doc_minio.name
+    target = "/data"
+    type   = "volume"
+  }
+}
+
+module "doc_backend" {
+  source        = "../../modules/docker_app"
+  name          = "doc-backend"
+  image         = docker_image.doc_backend.name
+  internal_port = 8000
+  external_port = 0
+  network       = docker_network.gateway_net.name
+  env = [
+    "DB_HOST=doc-mysql",
+    "DB_PORT=3306",
+    "DB_NAME=book_db",
+    "DB_USER=root",
+    "DB_PASSWORD=saisakthi2008",
+    "MINIO_ENDPOINT=doc-minio:9000",
+    "MINIO_ACCESS_KEY=admin",
+    "MINIO_SECRET_KEY=password123",
+    "MINIO_BUCKET=documents",
+    "MINIO_SECURE=False",
+    "GEMINI_API_KEY=AIzaSyDgDMtJN5DrFfBfwym2x7Ea_sjqzOvSSLc",
+    "OLLAMA_HOST=host.docker.internal",
+    "PORT_AI=11434",
+    "DJANGO_SECRET_KEY=your-secret-key-change-in-production",
+    "DEBUG=False",
+    "ALLOWED_HOSTS=localhost,127.0.0.1,gateway,doc-backend"
+  ]
+}
+
+resource "docker_container" "doc_frontend_build" {
+  name  = "doc-frontend-build"
+  image = docker_image.doc_frontend_build.name
+  must_run = false    # ← add this
+  restart  = "no"   
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.doc_dist.name
+    target = "/output"
+    type   = "volume"
+  }
+}
+
 # ═══════════════════════════════════════════════════════════════
 # SOCIAL MEDIA APP — Kubernetes / kind
 # ═══════════════════════════════════════════════════════════════
@@ -306,7 +462,6 @@ locals {
   social_base = abspath("${path.module}/../../projects/Social Media App")
 }
 
-# ─── BUILD SOCIAL MEDIA IMAGES ────────────────────────────────
 resource "docker_image" "social_django" {
   name         = "socialmediaapp-django:latest"
   keep_locally = true
@@ -387,7 +542,6 @@ resource "docker_image" "social_minio" {
   }
 }
 
-# ─── KIND CLUSTER ─────────────────────────────────────────────
 resource "null_resource" "kind_cluster" {
   triggers = {
     kind_config = filesha256("${path.module}/../../projects/Social Media App/infrastructure/kind/kind-config.yaml")
@@ -407,7 +561,6 @@ resource "null_resource" "kind_cluster" {
   }
 }
 
-# ─── LOAD IMAGES INTO KIND ────────────────────────────────────
 resource "null_resource" "kind_load_images" {
   depends_on = [
     null_resource.kind_cluster,
@@ -437,7 +590,6 @@ resource "null_resource" "kind_load_images" {
   }
 }
 
-# ─── CONNECT GATEWAY TO KIND NETWORK ─────────────────────────
 resource "null_resource" "gateway_kind_network" {
   depends_on = [
     null_resource.kind_cluster,
@@ -458,7 +610,6 @@ resource "null_resource" "gateway_kind_network" {
   }
 }
 
-# ─── INGRESS-NGINX ────────────────────────────────────────────
 resource "helm_release" "ingress_nginx" {
   depends_on       = [null_resource.kind_cluster]
   name             = "ingress-nginx"
@@ -486,146 +637,8 @@ resource "helm_release" "ingress_nginx" {
     value = "30080"
   }
 }
-/*
-# ─── CASSANDRA ────────────────────────────────────────────────
-resource "helm_release" "cassandra" {
-  depends_on = [null_resource.kind_cluster]
-  name       = "cassandra"
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "cassandra"
-  namespace  = "default"
-  wait       = true
-  timeout    = 300
-  
-  set {
-    name  = "replicaCount"
-    value = "1"  # Keep it 1 for local dev, saves resources
-  }
-  set {
-    name  = "resources.requests.memory"
-    value = "512Mi"
-  }
-  set {
-    name  = "resources.requests.cpu"
-    value = "250m"
-  }
-}
 
-# ─── REDIS ────────────────────────────────────────────────────
-resource "helm_release" "redis" {
-  depends_on = [null_resource.kind_cluster, helm_release.cassandra]
-  name       = "redis"
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "redis"
-  namespace  = "default"
-  wait       = true
-  timeout    = 120
-
-  set {
-    name  = "auth.password"
-    value = "redis-password"
-  }
-  set {
-    name  = "architecture"
-    value = "standalone"  # Saves resources vs replication
-  }
-}
-
-resource "helm_release" "kube_prometheus_stack" {
-  depends_on = [null_resource.kind_cluster, helm_release.redis]
-  name       = "kube-prometheus-stack"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
-  create_namespace = true
-  wait       = true
-  timeout    = 600 # This chart can take a while to deploy
-
-  set {
-    name  = "prometheus.prometheusSpec.additionalScrapeConfigs"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/prometheus.yml")
-    type  = "string"
-  }
-  set {
-    name  = "grafana.adminPassword"
-    value = "admin" # Consider using a Kubernetes secret for production
-  }
-  set {
-    name  = "grafana.ingress.enabled"
-    value = "true"
-  }
-  set {
-    name  = "grafana.ingress.ingressClassName"
-    value = "nginx"
-  }
-  set {
-    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
-    value = "/"
-  }
-  set {
-    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/ssl-redirect"
-    value = "false"
-  }
-  set {
-    name  = "grafana.ingress.hosts[0]"
-    value = "grafana.local" # You might need to add this to your /etc/hosts
-  }
-}
-
-resource "helm_release" "loki" {
-  depends_on = [helm_release.kube_prometheus_stack]
-  name       = "loki"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "loki"
-  namespace  = "monitoring"
-  create_namespace = true
-  wait       = true
-  timeout    = 300
-
-  set {
-    name  = "loki.config"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/loki-config.yml")
-    type  = "string"
-  }
-}
-
-resource "helm_release" "tempo" {
-  depends_on = [helm_release.loki, kubectl_manifest.minio_service]
-  name       = "tempo"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "tempo"
-  namespace  = "monitoring"
-  create_namespace = true
-  wait       = true
-  timeout    = 300
-
-  set {
-    name  = "tempo.config"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/tempo-config.yml")
-    type  = "string"
-  }
-}
-
-resource "helm_release" "promtail" {
-  depends_on = [helm_release.loki]
-  name       = "promtail"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "promtail"
-  namespace  = "monitoring"
-  create_namespace = true
-  wait       = true
-  timeout    = 180
-
-  set {
-    name  = "config.snippets.scrapeConfigs"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/promtail-config.yml")
-    type  = "string"
-  }
-}
-*/
-
-# ─── KUBERNETES RESOURCES ─────────────────────────────────────
-
+# ─── KUBERNETES RESOURCES (unchanged) ────────────────────────
 resource "kubectl_manifest" "postgres_secret" {
   depends_on = [null_resource.kind_cluster]
   yaml_body  = <<-YAML
@@ -1061,3 +1074,140 @@ resource "kubectl_manifest" "ingress_frontend" {
                       number: 80
   YAML
 }
+/*
+# ─── CASSANDRA ────────────────────────────────────────────────
+resource "helm_release" "cassandra" {
+  depends_on = [null_resource.kind_cluster]
+  name       = "cassandra"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "cassandra"
+  namespace  = "default"
+  wait       = true
+  timeout    = 300
+  
+  set {
+    name  = "replicaCount"
+    value = "1"  # Keep it 1 for local dev, saves resources
+  }
+  set {
+    name  = "resources.requests.memory"
+    value = "512Mi"
+  }
+  set {
+    name  = "resources.requests.cpu"
+    value = "250m"
+  }
+}
+
+# ─── REDIS ────────────────────────────────────────────────────
+resource "helm_release" "redis" {
+  depends_on = [null_resource.kind_cluster, helm_release.cassandra]
+  name       = "redis"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "redis"
+  namespace  = "default"
+  wait       = true
+  timeout    = 120
+
+  set {
+    name  = "auth.password"
+    value = "redis-password"
+  }
+  set {
+    name  = "architecture"
+    value = "standalone"  # Saves resources vs replication
+  }
+}
+
+resource "helm_release" "kube_prometheus_stack" {
+  depends_on = [null_resource.kind_cluster, helm_release.redis]
+  name       = "kube-prometheus-stack"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 600 # This chart can take a while to deploy
+
+  set {
+    name  = "prometheus.prometheusSpec.additionalScrapeConfigs"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/prometheus.yml")
+    type  = "string"
+  }
+  set {
+    name  = "grafana.adminPassword"
+    value = "admin" # Consider using a Kubernetes secret for production
+  }
+  set {
+    name  = "grafana.ingress.enabled"
+    value = "true"
+  }
+  set {
+    name  = "grafana.ingress.ingressClassName"
+    value = "nginx"
+  }
+  set {
+    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
+    value = "/"
+  }
+  set {
+    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/ssl-redirect"
+    value = "false"
+  }
+  set {
+    name  = "grafana.ingress.hosts[0]"
+    value = "grafana.local" # You might need to add this to your /etc/hosts
+  }
+}
+
+resource "helm_release" "loki" {
+  depends_on = [helm_release.kube_prometheus_stack]
+  name       = "loki"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "loki"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 300
+
+  set {
+    name  = "loki.config"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/loki-config.yml")
+    type  = "string"
+  }
+}
+
+resource "helm_release" "tempo" {
+  depends_on = [helm_release.loki, kubectl_manifest.minio_service]
+  name       = "tempo"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "tempo"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 300
+
+  set {
+    name  = "tempo.config"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/tempo-config.yml")
+    type  = "string"
+  }
+}
+
+resource "helm_release" "promtail" {
+  depends_on = [helm_release.loki]
+  name       = "promtail"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "promtail"
+  namespace  = "monitoring"
+  create_namespace = true
+  wait       = true
+  timeout    = 180
+
+  set {
+    name  = "config.snippets.scrapeConfigs"
+    value = file("${path.module}/../../projects/Social Media App/platform/observability/promtail-config.yml")
+    type  = "string"
+  }
+}
+*/

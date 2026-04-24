@@ -15,13 +15,15 @@ def get_embedding(text):
 load_dotenv()
 
 PORT = os.getenv("PORT_AI", "11434")
-OLLAMA_URL = f"http://localhost:{PORT}/api/generate"
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "host.docker.internal")  # ← reaches your Mac
+OLLAMA_URL = f"http://{OLLAMA_HOST}:{PORT}/api/generate"
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
 MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 MINIO_BUCKET = os.getenv("MINIO_BUCKET")
-MINIO_SECURE = os.getenv("MINIO_SECURE")
+MINIO_SECURE = os.getenv("MINIO_SECURE", "False").lower() == "true"  # ← proper bool
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 client_minio = Minio(
@@ -41,7 +43,7 @@ def summarize_ollama(prompt: str, model: str = "phi3"):
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=5)
         response.raise_for_status()
         data = response.json()
         return data.get("response")

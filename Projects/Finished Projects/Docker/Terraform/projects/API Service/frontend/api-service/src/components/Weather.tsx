@@ -24,7 +24,7 @@ export function Weather() {
         setError("");
         setResult(null);
         try {
-            const res = await axios.get(`http://localhost:8000/api/weather/?lat=${Lat}&lon=${Lon}`)
+            const res = await axios.get(`http://api-service-backend:3000/api/weather/?lat=${Lat}&lon=${Lon}`)
             const { name, main, weather, wind } = res.data;
             setResult({
                 name,
@@ -45,7 +45,7 @@ export function Weather() {
     useEffect(() => {
         const check = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/");
+                const res = await axios.get("http://api-service-backend:3000/");
                 setServerOnline(res.status === 200);
             } catch {
                 setServerOnline(false);
