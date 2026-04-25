@@ -62,7 +62,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'document_backend.urls'
 
-CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
