@@ -7,7 +7,7 @@ import { Library } from './components/Library'
 
 function App() {
     return (
-		<BrowserRouter>
+		<BrowserRouter basename="/document">
 			<Routes>
 				<Route path='/' element={<Home></Home>}></Route>
 				<Route path='/upload' element={<Upload></Upload>}></Route>

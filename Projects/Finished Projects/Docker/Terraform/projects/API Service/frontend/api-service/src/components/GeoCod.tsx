@@ -24,7 +24,7 @@ export function GeoCod() {
         setError("");
         setResult(null);
         try {
-            const res = await axios.get(`http://api-service-backend:3000/api/geo/cod/?city=${City}&state_code=${State}&country_code=${Country}`)
+            const res = await axios.get(`/api-service/api/api/geo/cod/?city=${City}&state_code=${State}&country_code=${Country}`)
 
             if (!res.data || res.data.length === 0) {
                 setError("Location not found. Check your inputs.");
@@ -50,7 +50,7 @@ export function GeoCod() {
     useEffect(() => {
         const check = async () => {
             try {
-                const res = await axios.get("http://api-service-backend:3000/");
+                const res = await axios.get("/api-service/api/");
                 setServerOnline(res.status === 200);
             } catch {
                 setServerOnline(false);

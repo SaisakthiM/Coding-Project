@@ -1,4 +1,5 @@
-const BASE_URL = "http://doc-backend:8000/";
+// All API calls go through the nginx gateway, not directly to the container
+const BASE_URL = "/document/api";
 
 async function request(path, options = {}) {
     const response = await fetch(`${BASE_URL}${path}`, {
@@ -31,7 +32,7 @@ export async function createBook({ title, author, rating, description, file }) {
 
     const response = await fetch(`${BASE_URL}/books/`, {
         method: "POST",
-        body: form,  
+        body: form,
     });
 
     const data = await response.json();
@@ -44,13 +45,13 @@ export async function getBook(id) {
     return request(`/books/${id}/`);
 }
 
-// DELETE /books/:id/  (add to your views if needed)
+// DELETE /books/:id/
 export async function deleteBook(id) {
     return request(`/books/${id}/`, { method: "DELETE" });
 }
 
 // POST /books/:id/summarize/
-export async function summarizeBook(id, model = "ollama") {
+export async function summarizeBook(id, model = "gemini") {
     return request(`/books/${id}/summarize/`, {
         method: "POST",
         body: JSON.stringify({ model }),
@@ -61,4 +62,3 @@ export async function summarizeBook(id, model = "ollama") {
 export async function getRecommendations(id) {
     return request(`/books/${id}/recommendations/`);
 }
-

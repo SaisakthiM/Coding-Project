@@ -54,6 +54,8 @@ resource "docker_volume" "doc_mysql"     { name = "gateway_doc-mysql" }      # N
 resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }      # NEW
 resource "docker_volume" "doc_dist" { name = "gateway_doc-dist" }
 
+
+
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
   name         = "bankmanager-backend:latest"
@@ -196,11 +198,12 @@ module "gateway" {
   ]
 
   named_volumes = [
-    { volume_name = docker_volume.notes_dist.name, container_path = "/apps/notes", read_only = true },
-    { volume_name = docker_volume.bank_dist.name,  container_path = "/apps/bank",  read_only = true },
-    { volume_name = docker_volume.quiz_dist.name,  container_path = "/apps/quiz",  read_only = true },
-    { volume_name = docker_volume.video_dist.name, container_path = "/apps/video", read_only = true },
-    { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api",   read_only = true },  # NEW
+    { volume_name = docker_volume.notes_dist.name, container_path = "/apps/notes",       read_only = true },
+    { volume_name = docker_volume.bank_dist.name,  container_path = "/apps/bank",        read_only = true },
+    { volume_name = docker_volume.quiz_dist.name,  container_path = "/apps/quiz",        read_only = true },
+    { volume_name = docker_volume.video_dist.name, container_path = "/apps/video",       read_only = true },
+    { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api-service", read_only = true },  # ← fix path
+    { volume_name = docker_volume.doc_dist.name,   container_path = "/apps/document",    read_only = true },  # ← add this
   ]
 }
 
@@ -350,7 +353,7 @@ module "api_service_backend" {
   source        = "../../modules/docker_app"
   name          = "api-service-backend"
   image         = docker_image.api_service_backend.name
-  internal_port = 3000
+  internal_port = 8000
   external_port = 0
   network       = docker_network.gateway_net.name
   env = [

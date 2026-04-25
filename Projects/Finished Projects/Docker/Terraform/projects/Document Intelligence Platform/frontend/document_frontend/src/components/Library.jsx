@@ -3,7 +3,7 @@ import { getBooks, summarizeBook } from "../scripts/Handler.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const BASE_URL = "http://doc-backend:8000/";
+const BASE_URL = "/document/api";
 
 async function fetchRecommendations(bookId) {
     const response = await fetch(`${BASE_URL}/books/${bookId}/recommendations/`);
@@ -77,7 +77,6 @@ function BookCard({ book, onRecommend, onSummarize }) {
                     >
                         Recommend
                     </button>
-
                     <button
                         className="form-submit lib-btn-recommend"
                         onClick={() => onSummarize(book)}
@@ -113,28 +112,18 @@ function RecommendModal({ book, onClose }) {
                     <button className="chat-context-reset" onClick={onClose}>✕</button>
                 </div>
                 <div className="modal-body">
-                    {loading && (
-                        <p className="sidebar-empty">Finding similar books…</p>
-                    )}
-                    {error && (
-                        <div className="form-banner form-banner--error">{error}</div>
-                    )}
+                    {loading && <p className="sidebar-empty">Finding similar books…</p>}
+                    {error && <div className="form-banner form-banner--error">{error}</div>}
                     {!loading && !error && recs.length === 0 && (
                         <p className="sidebar-empty">No recommendations found.</p>
                     )}
                     {!loading && !error && recs.map((rec) => (
                         <div key={rec.id} className="rec-item">
-                            <div className="rec-icon-wrap">
-                                <BookIcon />
-                            </div>
+                            <div className="rec-icon-wrap"><BookIcon /></div>
                             <div className="rec-info">
                                 <p className="lib-card-title">{rec.title}</p>
-                                {rec.author && (
-                                    <p className="book-item-author">{rec.author}</p>
-                                )}
-                                {rec.description && (
-                                    <p className="lib-card-desc">{rec.description}</p>
-                                )}
+                                {rec.author && <p className="book-item-author">{rec.author}</p>}
+                                {rec.description && <p className="lib-card-desc">{rec.description}</p>}
                             </div>
                         </div>
                     ))}
@@ -143,7 +132,6 @@ function RecommendModal({ book, onClose }) {
         </div>
     );
 }
-
 
 function SummaryModal({ book, onClose }) {
     const [summary, setSummary] = useState("");
@@ -156,7 +144,6 @@ function SummaryModal({ book, onClose }) {
             .catch((e) => setError(e.message))
             .finally(() => setLoading(false));
     }, [book.id]);
-    
 
     return (
         <div className="modal-backdrop" onClick={onClose}>
@@ -168,21 +155,12 @@ function SummaryModal({ book, onClose }) {
                     </div>
                     <button className="chat-context-reset" onClick={onClose}>✕</button>
                 </div>
-
                 <div className="modal-body">
-                    {loading && (
-                        <p className="sidebar-empty">Generating summary…</p>
-                    )}
-
-                    {error && (
-                        <div className="form-banner form-banner--error">{error}</div>
-                    )}
-
+                    {loading && <p className="sidebar-empty">Generating summary…</p>}
+                    {error && <div className="form-banner form-banner--error">{error}</div>}
                     {!loading && !error && (
                         <div className="chat-bubble-text">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {summary}
-                            </ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
                         </div>
                     )}
                 </div>
@@ -250,18 +228,11 @@ export function Library() {
             )}
 
             {selectedBook && (
-                <RecommendModal
-                    book={selectedBook}
-                    onClose={() => setSelectedBook(null)}
-                />
+                <RecommendModal book={selectedBook} onClose={() => setSelectedBook(null)} />
             )}
-
             {summaryBook && (
-                <SummaryModal
-                    book={summaryBook}
-                    onClose={() => setSummaryBook(null)}
-                />
+                <SummaryModal book={summaryBook} onClose={() => setSummaryBook(null)} />
             )}
-            </>
+        </>
     );
 }
