@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export function Home() {
     return (
         <>
@@ -13,22 +15,21 @@ export function Home() {
             </div>
 
             <div className="nav-links">
-                <a href="/upload" className="nav-card">
+                <Link to="/upload" className="nav-card">
                     <span className="nav-icon">↑</span>
                     <span className="nav-label">Upload</span>
                     <span className="nav-desc">Add a new document or book</span>
-                </a>
-                <a href="/library" className="nav-card">
+                </Link>
+                <Link to="/library" className="nav-card">
                     <span className="nav-icon">☰</span>
                     <span className="nav-label">Library</span>
                     <span className="nav-desc">View your uploaded files</span>
-                </a>
-                <a href="/ask" className="nav-card">
+                </Link>
+                <Link to="/ask" className="nav-card">
                     <span className="nav-icon">?</span>
                     <span className="nav-label">Ask</span>
                     <span className="nav-desc">Chat about your documents</span>
-                </a>
-                
+                </Link>
             </div>
         </>
     );

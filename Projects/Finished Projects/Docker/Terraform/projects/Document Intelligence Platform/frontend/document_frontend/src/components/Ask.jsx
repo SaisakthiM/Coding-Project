@@ -3,7 +3,7 @@ import { getBooks } from "../scripts/Handler.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const BASE_URL = "http://doc-backend:8000/";
+const BASE_URL = "/document/api";
 
 async function askQuestion(bookId, question, history = []) {
     const response = await fetch(`${BASE_URL}/ask/`, {
@@ -100,7 +100,6 @@ export function Ask() {
             </div>
 
             <div className="chat-layout">
-                {/* Sidebar — book picker */}
                 <aside className="book-sidebar">
                     <p className="sidebar-heading">Your Library</p>
                     {booksLoading ? (
@@ -126,7 +125,6 @@ export function Ask() {
                     )}
                 </aside>
 
-                {/* Chat panel */}
                 <div className="chat-panel">
                     {!selectedBook ? (
                         <div className="chat-empty">
@@ -135,7 +133,6 @@ export function Ask() {
                         </div>
                     ) : (
                         <>
-                            {/* Context bar */}
                             <div className="chat-context-bar">
                                 <div className="chat-context-info">
                                     <span className="chat-context-title">{selectedBook.title}</span>
@@ -148,7 +145,6 @@ export function Ask() {
                                 </button>
                             </div>
 
-                            {/* Messages */}
                             <div className="chat-messages">
                                 {messages.map((msg, i) => (
                                     <div
@@ -179,7 +175,6 @@ export function Ask() {
                                 <div ref={bottomRef} />
                             </div>
 
-                            {/* Input */}
                             <div className="chat-input-row">
                                 <textarea
                                     className="chat-input"
