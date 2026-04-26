@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content',  'image']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'w-full p-2 rounded bg-gray-700 text-white'}),
             'content': forms.Textarea(attrs={'class': 'w-full p-2 rounded bg-gray-700 text-white', 'rows': 6}),

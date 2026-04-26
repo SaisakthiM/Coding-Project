@@ -16,7 +16,14 @@ spec:
         - name: backend
           image: socialmediaapp-django:latest
           imagePullPolicy: Never
-
+      startupProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import socket; socket.create_connection(('postgres', 5432), timeout=1)"
+          failureThreshold: 30
+          periodSeconds: 5
           ports:
             - containerPort: 8000
 

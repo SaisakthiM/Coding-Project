@@ -137,6 +137,8 @@ STORAGES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/blog/login/'           # was '/blog/register/' — wrong
 LOGIN_REDIRECT_URL = '/blog/'
 LOGOUT_REDIRECT_URL = '/blog/'
+
 CSRF_TRUSTED_ORIGINS = ['http://localhost']
