@@ -53,6 +53,8 @@ resource "docker_volume" "bank_pgdata"   { name = "gateway_bank-pgdata" }
 resource "docker_volume" "doc_mysql"     { name = "gateway_doc-mysql" }      # NEW
 resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }      # NEW
 resource "docker_volume" "doc_dist" { name = "gateway_doc-dist" }
+resource "docker_volume" "blog_mysql" { name = "gateway_blog-mysql" }
+resource "docker_volume" "blog_minio" { name = "gateway_blog-minio" }
 
 
 
@@ -64,6 +66,13 @@ resource "docker_image" "bank_backend" {
     context    = abspath("${path.module}/../../projects/Bank Manager/backend/bank_management")
     dockerfile = "Dockerfile"
   }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Bank Manager/backend/bank_management", "**") :
+      filesha256("${path.module}/../../projects/Bank Manager/backend/bank_management/${f}")
+      if !can(regex("(\\.git|target|__pycache__|\\.pyc|node_modules)", f))
+    ]))
+  }
 }
 
 resource "docker_image" "bank_frontend_build" {
@@ -72,6 +81,13 @@ resource "docker_image" "bank_frontend_build" {
   build {
     context    = abspath("${path.module}/../../projects/Bank Manager/frontend")
     dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Bank Manager/frontend", "**") :
+      filesha256("${path.module}/../../projects/Bank Manager/frontend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
   }
 }
 
@@ -82,6 +98,13 @@ resource "docker_image" "blog_website" {
     context    = abspath("${path.module}/../../projects/Blog Website")
     dockerfile = "Dockerfile"
   }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Blog Website", "**") :
+      filesha256("${path.module}/../../projects/Blog Website/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc|staticfiles|media)", f))
+    ]))
+  }
 }
 
 resource "docker_image" "hospital_management" {
@@ -91,41 +114,12 @@ resource "docker_image" "hospital_management" {
     context    = abspath("${path.module}/../../projects/hospital_management")
     dockerfile = "Dockerfile"
   }
-}
-
-resource "docker_image" "quiz_frontend_build" {
-  name         = "quiz-frontend-build:latest"
-  keep_locally = true
-  build {
-    context    = abspath("${path.module}/../../projects/Quiz App/quiz-app")
-    dockerfile = "Dockerfile.prod"
-  }
-}
-
-resource "docker_image" "video_backend" {
-  name         = "video-uploader-backend:latest"
-  keep_locally = true
-  build {
-    context    = abspath("${path.module}/../../projects/Video Uploader/Main/backend")
-    dockerfile = "Dockerfile"
-  }
-}
-
-resource "docker_image" "video_frontend_build" {
-  name         = "video-frontend-build:latest"
-  keep_locally = true
-  build {
-    context    = abspath("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader")
-    dockerfile = "Dockerfile.prod"
-  }
-}
-
-resource "docker_image" "notes_frontend_build" {
-  name         = "notes-frontend-build:latest"
-  keep_locally = true
-  build {
-    context    = abspath("${path.module}/../../projects/Notes App/frontend/notes_app_frontend")
-    dockerfile = "Dockerfile.prod"
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/hospital_management", "**") :
+      filesha256("${path.module}/../../projects/hospital_management/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc|staticfiles|media)", f))
+    ]))
   }
 }
 
@@ -136,15 +130,76 @@ resource "docker_image" "notes_backend" {
     context    = abspath("${path.module}/../../projects/Notes App/backend")
     dockerfile = "Dockerfile"
   }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Notes App/backend", "**") :
+      filesha256("${path.module}/../../projects/Notes App/backend/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
+    ]))
+  }
 }
 
-# ── NEW: API Service ───────────────────────────────────────────
+resource "docker_image" "notes_frontend_build" {
+  name         = "notes-frontend-build:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Notes App/frontend/notes_app_frontend")
+    dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Notes App/frontend/notes_app_frontend", "**") :
+      filesha256("${path.module}/../../projects/Notes App/frontend/notes_app_frontend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "video_backend" {
+  name         = "video-uploader-backend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Video Uploader/Main/backend")
+    dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Video Uploader/Main/backend", "**") :
+      filesha256("${path.module}/../../projects/Video Uploader/Main/backend/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "video_frontend_build" {
+  name         = "video-frontend-build:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader")
+    dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader", "**") :
+      filesha256("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
 resource "docker_image" "api_service_backend" {
   name         = "api-service-backend:latest"
   keep_locally = true
   build {
     context    = abspath("${path.module}/../../projects/API Service/backend")
     dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/API Service/backend", "**") :
+      filesha256("${path.module}/../../projects/API Service/backend/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
+    ]))
   }
 }
 
@@ -155,9 +210,15 @@ resource "docker_image" "api_service_frontend_build" {
     context    = abspath("${path.module}/../../projects/API Service/frontend/api-service")
     dockerfile = "Dockerfile.prod"
   }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/API Service/frontend/api-service", "**") :
+      filesha256("${path.module}/../../projects/API Service/frontend/api-service/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
 }
 
-# ── NEW: Document Intelligence Platform ───────────────────────
 resource "docker_image" "doc_backend" {
   name         = "documentintelligenceplatform-backend:latest"
   keep_locally = true
@@ -165,18 +226,28 @@ resource "docker_image" "doc_backend" {
     context    = abspath("${path.module}/../../projects/Document Intelligence Platform/backend/document_backend")
     dockerfile = "Dockerfile"
   }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Document Intelligence Platform/backend/document_backend", "**") :
+      filesha256("${path.module}/../../projects/Document Intelligence Platform/backend/document_backend/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
+    ]))
+  }
 }
 
 resource "docker_image" "doc_frontend_build" {
   name         = "documentintelligenceplatform-frontend:latest"
   keep_locally = true
-  
-
-
   build {
     context    = abspath("${path.module}/../../projects/Document Intelligence Platform/frontend/document_frontend")
     dockerfile = "Dockerfile.prod"
-    
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Document Intelligence Platform/frontend/document_frontend", "**") :
+      filesha256("${path.module}/../../projects/Document Intelligence Platform/frontend/document_frontend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
   }
 }
 
@@ -346,6 +417,23 @@ module "blog_website" {
   internal_port = 8000
   external_port = 0
   network       = docker_network.gateway_net.name
+  depends_on    = [docker_container.blog_db, docker_container.blog_minio]
+  env = [
+    "DB_NAME=blog_db",
+    "DB_USER=root",
+    "DB_PASSWORD=saisakthi2008",
+    "DB_HOST=blog-db",
+    "DB_PORT=3306",
+    "MINIO_ACCESS_KEY=admin",
+    "MINIO_SECRET_KEY=password123",
+    "MINIO_BUCKET=blog-media",
+    "MINIO_ENDPOINT=http://blog-minio:9000",
+    "SECRET_KEY=your-secret-key-here",
+    "DEBUG=False",
+    "ALLOWED_HOSTS=localhost,127.0.0.1",
+    "MINIO_ENDPOINT=http://blog-minio:9000",          # internal — for Django uploads
+    "MINIO_PUBLIC_URL=http://localhost/blog/minio",   # public — for browser URLs
+  ]
 }
 
 # ─── API SERVICE ──────────────────────────────────────────────
@@ -777,6 +865,8 @@ resource "kubectl_manifest" "backend_deployment" {
                   value: "True"
                 - name: RUNNING_IN_DOCKER
                   value: "True"
+                - name: REDIS_PORT      
+                  value: "6379"
   YAML
 }
 

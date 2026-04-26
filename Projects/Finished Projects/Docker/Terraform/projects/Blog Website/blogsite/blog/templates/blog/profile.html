@@ -8,8 +8,8 @@
   <!-- Header with current avatar -->
   <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid #ddd8cc;">
     <div>
-      {% if request.user.profile.avatar %}
-        <img src="{{ request.user.profile.avatar.url }}"
+      {% if request.user.profile.avatar and request.user.profile.avatar.name %}
+        <img src="/blog/media/{{ request.user.profile.avatar.name }}"
              style="width:5rem;height:5rem;border-radius:50%;object-fit:cover;border:3px solid var(--accent);"
              alt="Your avatar">
       {% else %}
@@ -61,8 +61,8 @@
     <div style="display:flex;flex-direction:column;gap:1.5rem;">
       {% for post in user_posts %}
         <article class="card" style="padding:1.5rem;display:flex;gap:1.2rem;align-items:flex-start;">
-          {% if post.image %}
-            <img src="{{ post.image.url }}"
+          {% if post.image and post.image.name %}
+            <img src="/blog/media/{{ post.image.name }}"
                  style="width:6rem;height:6rem;object-fit:cover;border:1px solid #ddd8cc;flex-shrink:0;"
                  alt="{{ post.title }}">
           {% endif %}
