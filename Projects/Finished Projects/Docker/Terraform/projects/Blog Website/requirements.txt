@@ -2,3 +2,7 @@ django
 whitenoise
 gunicorn 
 pillow
+mysqlclient>=2.2.0
+django-storages[s3]>=1.14
+boto3>=1.34
+Pillow>=10.0.0

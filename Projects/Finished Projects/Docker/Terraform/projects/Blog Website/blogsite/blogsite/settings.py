@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -75,13 +75,48 @@ WSGI_APPLICATION = 'blogsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# ─── Database ─────────────────────────────────────────────────────
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'blog_db'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'saisakthi2008'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
 
+# ─── MinIO Storage ────────────────────────────────────────────────
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": os.environ.get('MINIO_ACCESS_KEY', 'admin'),
+            "secret_key": os.environ.get('MINIO_SECRET_KEY', 'password123'),
+            "bucket_name": os.environ.get('MINIO_BUCKET', 'blog-media'),
+            "endpoint_url": os.environ.get('MINIO_ENDPOINT', 'http://minio:9000'),
+            "custom_domain": None,
+            "file_overwrite": False,
+            # ↓ this makes .url() generate URLs via the public nginx path
+            "url_protocol": "http:",
+            "endpoint_url": os.environ.get('MINIO_ENDPOINT', 'http://minio:9000'),
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
+}
+
+# After STORAGES definition
+MINIO_PUBLIC_URL = os.environ.get('MINIO_PUBLIC_URL', 'http://localhost/blog/minio')
+
+# Override storage to use public URL for generated links
+STORAGES["default"]["OPTIONS"]["custom_domain"] = \
+    MINIO_PUBLIC_URL.replace('http://', '').replace('https://', '')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -117,21 +152,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/blog/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'          # keep this as-is
 STATIC_ROOT = BASE_DIR / 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'blog' / 'static']
 
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
