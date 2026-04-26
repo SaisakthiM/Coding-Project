@@ -4,7 +4,25 @@ from .models import Post, Comment, Profile
 from .forms import PostForm, CommentForm, RegisterForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, logout
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'blog/login.html', {'error': 'Invalid username or password'})
+    return render(request, 'blog/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 def home(request):
     posts = Post.objects.all().order_by('-created_at')
@@ -48,18 +66,19 @@ def register(request):
             return redirect('home')
     else:
         form = RegisterForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'blog/register.html', {'form': form}) 
 
 @login_required
 def profile(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
+    user_posts = Post.objects.filter(author=request.user).order_by('-created_at')
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
     else:
         form = ProfileForm(instance=profile)
-    return render(request, 'blog/profile.html', {'form': form})
+    return render(request, 'blog/profile.html', {'form': form, 'user_posts': user_posts})
 
 @login_required
 def create_post(request):
