@@ -55,6 +55,7 @@ resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }      # N
 resource "docker_volume" "doc_dist" { name = "gateway_doc-dist" }
 resource "docker_volume" "blog_mysql" { name = "gateway_blog-mysql" }
 resource "docker_volume" "blog_minio" { name = "gateway_blog-minio" }
+resource "docker_volume" "intro_dist" { name = "gateway_intro-dist" }
 
 
 
@@ -62,6 +63,7 @@ resource "docker_volume" "blog_minio" { name = "gateway_blog-minio" }
 resource "docker_image" "bank_backend" {
   name         = "bankmanager-backend:latest"
   keep_locally = true
+  
   build {
     context    = abspath("${path.module}/../../projects/Bank Manager/backend/bank_management")
     dockerfile = "Dockerfile"
@@ -70,7 +72,7 @@ resource "docker_image" "bank_backend" {
     dir_sha = sha256(join("", [
       for f in fileset("${path.module}/../../projects/Bank Manager/backend/bank_management", "**") :
       filesha256("${path.module}/../../projects/Bank Manager/backend/bank_management/${f}")
-      if !can(regex("(\\.git|target|__pycache__|\\.pyc|node_modules)", f))
+      if !can(regex("(\\.git|target|__pycache__|\\.pyc)", f))
     ]))
   }
 }
@@ -78,6 +80,7 @@ resource "docker_image" "bank_backend" {
 resource "docker_image" "bank_frontend_build" {
   name         = "bank-frontend-build:latest"
   keep_locally = true
+  
   build {
     context    = abspath("${path.module}/../../projects/Bank Manager/frontend")
     dockerfile = "Dockerfile.prod"
@@ -107,6 +110,70 @@ resource "docker_image" "blog_website" {
   }
 }
 
+
+# ─── BLOG MySQL ───────────────────────────────────────────────
+resource "docker_container" "blog_db" {
+  name    = "blog-db"
+  image   = "mysql:8.0"
+  restart = "always"
+  env = [
+    "MYSQL_ROOT_PASSWORD=saisakthi2008",
+    "MYSQL_DATABASE=blog_db"
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.blog_mysql.name
+    target = "/var/lib/mysql"
+    type   = "volume"
+  }
+  healthcheck {
+    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psaisakthi2008"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "30s"
+  }
+}
+
+# ─── BLOG MinIO ───────────────────────────────────────────────
+resource "docker_container" "blog_minio" {
+  name    = "blog-minio"
+  image   = "quay.io/minio/minio:latest"
+  restart = "always"
+  command = ["server", "/data", "--console-address", ":9091"]
+  env = [
+    "MINIO_ROOT_USER=admin",
+    "MINIO_ROOT_PASSWORD=password123"
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.blog_minio.name
+    target = "/data"
+    type   = "volume"
+  }
+  healthcheck {
+    test         = ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "20s"
+  }
+}
+
+# ─── BLOG MinIO bucket init ───────────────────────────────────
+resource "docker_container" "blog_minio_init" {
+  name     = "blog-minio-init"
+  image    = "quay.io/minio/mc:latest"
+  must_run = false
+  restart  = "no"
+  command  = [
+    "/bin/sh", "-c",
+    "mc alias set blogminio http://blog-minio:9000 admin password123 && mc mb --ignore-existing blogminio/blog-media && mc anonymous set download blogminio/blog-media && echo 'Bucket ready!'"
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  depends_on = [docker_container.blog_minio]
+}
+
 resource "docker_image" "hospital_management" {
   name         = "hospital_management:latest"
   keep_locally = true
@@ -123,33 +190,17 @@ resource "docker_image" "hospital_management" {
   }
 }
 
-resource "docker_image" "notes_backend" {
-  name         = "notesapp-backend:latest"
+resource "docker_image" "quiz_frontend_build" {
+  name         = "quiz-frontend-build:latest"
   keep_locally = true
   build {
-    context    = abspath("${path.module}/../../projects/Notes App/backend")
-    dockerfile = "Dockerfile"
-  }
-  triggers = {
-    dir_sha = sha256(join("", [
-      for f in fileset("${path.module}/../../projects/Notes App/backend", "**") :
-      filesha256("${path.module}/../../projects/Notes App/backend/${f}")
-      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
-    ]))
-  }
-}
-
-resource "docker_image" "notes_frontend_build" {
-  name         = "notes-frontend-build:latest"
-  keep_locally = true
-  build {
-    context    = abspath("${path.module}/../../projects/Notes App/frontend/notes_app_frontend")
+    context    = abspath("${path.module}/../../projects/Quiz App/quiz-app")
     dockerfile = "Dockerfile.prod"
   }
   triggers = {
     dir_sha = sha256(join("", [
-      for f in fileset("${path.module}/../../projects/Notes App/frontend/notes_app_frontend", "**") :
-      filesha256("${path.module}/../../projects/Notes App/frontend/notes_app_frontend/${f}")
+      for f in fileset("${path.module}/../../projects/Quiz App/quiz-app", "**") :
+      filesha256("${path.module}/../../projects/Quiz App/quiz-app/${f}")
       if !can(regex("(\\.git|node_modules|dist)", f))
     ]))
   }
@@ -183,6 +234,39 @@ resource "docker_image" "video_frontend_build" {
       for f in fileset("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader", "**") :
       filesha256("${path.module}/../../projects/Video Uploader/Main/frontend/video-uploader/${f}")
       if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "notes_frontend_build" {
+  name         = "notes-frontend-build:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Notes App/frontend/notes_app_frontend")
+    dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Notes App/frontend/notes_app_frontend", "**") :
+      filesha256("${path.module}/../../projects/Notes App/frontend/notes_app_frontend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "notes_backend" {
+  name         = "notesapp-backend:latest"
+  keep_locally = true
+  
+  build {
+    context    = abspath("${path.module}/../../projects/Notes App/backend")
+    dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Notes App/backend", "**") :
+      filesha256("${path.module}/../../projects/Notes App/backend/${f}")
+      if !can(regex("(\\.git|__pycache__|\\.pyc)", f))
     ]))
   }
 }
@@ -250,7 +334,6 @@ resource "docker_image" "doc_frontend_build" {
     ]))
   }
 }
-
 # ─── GATEWAY ──────────────────────────────────────────────────
 module "gateway" {
   source        = "../../modules/docker_app"
@@ -273,8 +356,9 @@ module "gateway" {
     { volume_name = docker_volume.bank_dist.name,  container_path = "/apps/bank",        read_only = true },
     { volume_name = docker_volume.quiz_dist.name,  container_path = "/apps/quiz",        read_only = true },
     { volume_name = docker_volume.video_dist.name, container_path = "/apps/video",       read_only = true },
-    { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api-service", read_only = true },  # ← fix path
-    { volume_name = docker_volume.doc_dist.name,   container_path = "/apps/document",    read_only = true },  # ← add this
+    { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api-service", read_only = true },
+    { volume_name = docker_volume.doc_dist.name,   container_path = "/apps/document",    read_only = true },
+    { volume_name = docker_volume.intro_dist.name, container_path = "/apps/intro",       read_only = true },
   ]
 }
 
@@ -283,6 +367,8 @@ resource "docker_container" "notes_postgres" {
   name    = "notes-postgres"
   image   = "postgres:16"
   restart = "always"
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   env = [
     "POSTGRES_DB=notes_app",
     "POSTGRES_USER=saisakthi",
@@ -314,6 +400,8 @@ module "notes_backend" {
 resource "docker_container" "notes_frontend_build" {
   name  = "notes-frontend-build"
   image = docker_image.notes_frontend_build.name
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.notes_dist.name
@@ -326,6 +414,8 @@ resource "docker_container" "notes_frontend_build" {
 resource "docker_container" "bank_postgres" {
   name    = "bank-postgres"
   image   = "postgres:16-alpine"
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   restart = "always"
   env = [
     "POSTGRES_USER=bankmanagement",
@@ -358,6 +448,8 @@ resource "docker_container" "bank_frontend_build" {
   name  = "bank-frontend-build"
   image = docker_image.bank_frontend_build.name
   networks_advanced { name = docker_network.gateway_net.name }
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   mounts {
     source = docker_volume.bank_dist.name
     target = "/dist"
@@ -369,6 +461,8 @@ resource "docker_container" "bank_frontend_build" {
 resource "docker_container" "quiz_frontend_build" {
   name  = "quiz-frontend-build"
   image = docker_image.quiz_frontend_build.name
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.quiz_dist.name
@@ -391,6 +485,8 @@ module "video_backend" {
 resource "docker_container" "video_frontend_build" {
   name  = "video-frontend-build"
   image = docker_image.video_frontend_build.name
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.video_dist.name
@@ -414,6 +510,7 @@ module "blog_website" {
   source        = "../../modules/docker_app"
   name          = "blog-website"
   image         = docker_image.blog_website.name
+  
   internal_port = 8000
   external_port = 0
   network       = docker_network.gateway_net.name
@@ -454,6 +551,7 @@ resource "docker_container" "api_service_frontend_build" {
   image = docker_image.api_service_frontend_build.name
   must_run = false    # ← add this
   restart  = "no"
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.api_dist.name
@@ -492,6 +590,8 @@ resource "docker_container" "doc_minio" {
   name    = "doc-minio"
   image   = "quay.io/minio/minio:latest"
   restart = "always"
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  must_run              = true
   command = ["server", "/data", "--console-address", ":9001"]
   env = [
     "MINIO_ROOT_USER=admin",
@@ -537,6 +637,7 @@ resource "docker_container" "doc_frontend_build" {
   image = docker_image.doc_frontend_build.name
   must_run = false    # ← add this
   restart  = "no"   
+  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.doc_dist.name
@@ -544,6 +645,25 @@ resource "docker_container" "doc_frontend_build" {
     type   = "volume"
   }
 }
+
+# ─── INTRO PAGE ───────────────────────────────────────────────
+resource "null_resource" "intro_page" {
+  depends_on = [module.gateway]
+
+  triggers = {
+    file_sha = filesha256("${path.module}/../../projects/intro/index.html")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      docker run --rm \
+        -v ${docker_volume.intro_dist.name}:/dest \
+        -v "${abspath("${path.module}/../../projects/intro")}:/src:ro" \
+        alpine sh -c "cp /src/index.html /dest/index.html"
+    EOT
+  }
+}
+
 
 # ═══════════════════════════════════════════════════════════════
 # SOCIAL MEDIA APP — Kubernetes / kind
@@ -632,6 +752,8 @@ resource "docker_image" "social_minio" {
     ]))
   }
 }
+
+
 
 resource "null_resource" "kind_cluster" {
   triggers = {
