@@ -2,10 +2,6 @@
 
 > A unified, production-style monorepo hosting **9 full-stack applications** behind a single Nginx API gateway — provisioned entirely with **Terraform**, deployed across **Docker** and **Kubernetes (kind)**.
 
-<!-- PROJECT BANNER IMAGE -->
-<!-- Replace the comment below with your banner screenshot -->
-![alt text](image.png)
-
 ---
 
 ## 📋 Table of Contents
@@ -13,28 +9,17 @@
 - [Overview](#-overview)
 - [Architecture](#-architecture)
 - [Projects](#-projects)
-  - [Notes App](#1-notes-app)
-  - [Bank Manager](#2-bank-manager)
-  - [Quiz App](#3-quiz-app)
-  - [Video Uploader](#4-video-uploader)
-  - [Blog Website](#5-blog-website)
-  - [Hospital Management](#6-hospital-management)
-  - [API Service](#7-api-service)
-  - [Document Intelligence Platform](#8-document-intelligence-platform)
-  - [Social Media App](#9-social-media-app)
 - [Technology Stack](#-technology-stack)
 - [Infrastructure & DevOps](#-infrastructure--devops)
 - [Getting Started](#-getting-started)
 - [Routing Map](#-routing-map)
-- [Observability & Debugging](#-observability--debugging)
 - [Project Structure](#-project-structure)
-- [Screenshots](#-screenshots)
 
 ---
 
 ## 🌐 Overview
 
-This repository is a **personal development cluster** — a collection of independently built, production-grade full-stack projects unified under a single Nginx gateway. Every app is containerized, infrastructure is managed as code with Terraform, and the entire cluster can be provisioned or destroyed with a single command.
+A **personal development cluster** — a collection of independently built, production-grade full-stack projects unified under a single Nginx gateway. Every app is containerized, infrastructure is managed as code with Terraform, and the entire cluster can be provisioned or torn down with a single command.
 
 | | |
 |---|---|
@@ -88,16 +73,26 @@ This repository is a **personal development cluster** — a collection of indepe
 
 All Docker containers share the `gateway-net` bridge network. The Social Media App runs inside a `kind` Kubernetes cluster, and the gateway container is connected to both networks so traffic flows seamlessly.
 
-
 ---
 
 ## 📦 Projects
 
+### 0. Intro Page
+
+![Intro Page](../Projects/images/image-intro.png)
+
+| Layer | Technology |
+|-------|-----------|
+| Type | Static HTML |
+| URL | `http://localhost/intro/` |
+
+The cluster landing page — an overview of all 9 apps with live links, architecture diagram, and tech stack. Provisioned automatically via Terraform using a `null_resource` that copies `intro/index.html` into the gateway volume.
+
+---
+
 ### 1. Notes App
 
-A full-stack note-taking application with a Django REST API and a React frontend.
-
-![alt text](image.png)
+![Notes App](../Projects/images/image-notes.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -106,18 +101,13 @@ A full-stack note-taking application with a Django REST API and a React frontend
 | Database | PostgreSQL 16 |
 | URL | `http://localhost/notes/` |
 
-**Features:**
-- Create, read, update, and delete notes
-- REST API served by Django REST Framework
-- Persistent data in PostgreSQL
+Create, read, update, and delete notes via a Django REST Framework API with persistent PostgreSQL storage.
 
 ---
 
 ### 2. Bank Manager
 
-A banking management system with a Java Spring Boot backend and a React frontend.
-
-![alt text](image-1.png)
+![Bank Manager](../Projects/images/image-bank.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -126,18 +116,13 @@ A banking management system with a Java Spring Boot backend and a React frontend
 | Database | PostgreSQL 16 Alpine |
 | URL | `http://localhost/bank/` |
 
-**Features:**
-- Account and transaction management
-- Spring Data JPA with PostgreSQL
-- REST API with Spring MVC
+Account and transaction management with Spring Data JPA and a REST API built on Spring MVC.
 
 ---
 
 ### 3. Quiz App
 
-A static frontend quiz game on general Computer Science topics — no backend required.
-
-![alt text](image-2.png)
+![Quiz App](../Projects/images/image-quiz.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -145,18 +130,13 @@ A static frontend quiz game on general Computer Science topics — no backend re
 | Backend | None (static) |
 | URL | `http://localhost/quiz/` |
 
-**Features:**
-- 5-question CS trivia quiz
-- Fully client-side — no database, no API calls
-- Nginx serves the compiled static bundle directly
+A fully client-side CS trivia quiz — no database, no API calls. Nginx serves the compiled static bundle directly.
 
 ---
 
 ### 4. Video Uploader
 
-A video upload and streaming application with a Node.js backend.
-
-![alt text](image-3.png)
+![Video Uploader](../Projects/images/image-video.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -165,18 +145,13 @@ A video upload and streaming application with a Node.js backend.
 | Storage | Local filesystem (`/app/Uploads`) |
 | URL | `http://localhost/video/` |
 
-**Features:**
-- Upload and manage video files
-- Files served via Node.js
-- Gateway supports up to 1 GB uploads (`client_max_body_size 1000M`)
+Upload and stream video files via Node.js. The gateway supports up to 1 GB uploads.
 
 ---
 
 ### 5. Blog Website
 
-A full-featured blog platform with user authentication and cloud media storage.
-
-![alt text](image-4.png)
+![Blog Website](../Projects/images/image-blog.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -185,19 +160,13 @@ A full-featured blog platform with user authentication and cloud media storage.
 | Media Storage | MinIO (S3-compatible) |
 | URL | `http://localhost/blog/` |
 
-**Features:**
-- User login/logout with Django authentication
-- Rich post creation with image uploads
-- Media stored in MinIO, served publicly via `http://localhost/blog/minio/`
-- Django admin panel at `/blog/admin/`
+Full-featured blog with Django authentication, rich post creation, image uploads to MinIO, and an admin panel at `/blog/admin/`.
 
 ---
 
 ### 6. Hospital Management
 
-A Django-based hospital management system using Django admin and template views.
-
-![alt text](image-5.png)
+![Hospital Management](../Projects/images/image-hospital.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -205,18 +174,13 @@ A Django-based hospital management system using Django admin and template views.
 | Database | SQLite |
 | URL | `http://localhost/hospital/` |
 
-**Features:**
-- Patient and appointment tracking
-- Django template-based views
-- Lightweight setup with SQLite — no separate DB container needed
+Patient and appointment tracking using Django admin and template-based views. Lightweight — no separate DB container needed.
 
 ---
 
 ### 7. API Service
 
-A Node.js/Express backend that aggregates data from external APIs, with a React frontend.
-
-![alt text](image-6.png)
+![API Service](../Projects/images/image-api.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -225,18 +189,13 @@ A Node.js/Express backend that aggregates data from external APIs, with a React 
 | External API | OpenWeatherMap |
 | URL | `http://localhost/api-service/` |
 
-**Features:**
-- Live weather data via OpenWeatherMap API
-- Express routes serving structured JSON
-- React frontend for interactive API exploration
+Live weather data via OpenWeatherMap, served through Express routes with a React frontend for interactive exploration.
 
 ---
 
 ### 8. Document Intelligence Platform
 
-An AI-powered document analysis platform where users can upload documents and query them using LLMs.
-
-![alt text](image-7.png)
+![Document Intelligence Platform](../Projects/images/image-document.png)
 
 | Layer | Technology |
 |-------|-----------|
@@ -247,48 +206,34 @@ An AI-powered document analysis platform where users can upload documents and qu
 | AI | Google Gemini API + Ollama (local LLM) |
 | URL | `http://localhost/document/` |
 
-**Features:**
-- Upload PDF and document files, stored in MinIO
-- AI-powered Q&A on document content via Gemini API
-- Local LLM inference via Ollama running on the host (`host.docker.internal`)
-- Extended gateway timeout (120s) for large inference requests
+Upload PDF documents stored in MinIO and run AI-powered Q&A against them via Gemini API or local Ollama inference. Gateway timeout is extended to 120s for large inference requests.
 
 ---
 
 ### 9. Social Media App
 
-The most complex project — a microservices-based social platform deployed on a local **Kubernetes** cluster via `kind`.
-
-![alt text](image-8.png)
+![Social Media App](../Projects/images/image-social.png)
 
 | Component | Technology |
 |-----------|-----------|
 | Frontend | React (served via Nginx) |
 | Backend API | Django (Python) |
-| Microservice — Go | Handles caching/real-time layer |
+| Microservice — Go | Caching / real-time layer (Redis) |
 | Microservice — Java | Spring Boot, domain-specific logic |
 | Database | PostgreSQL 15 (K8s StatefulSet) |
 | Cache | Redis 7 |
 | Object Storage | MinIO |
 | Orchestration | Kubernetes via `kind` |
-| Ingress | ingress-nginx (deployed via Helm) |
+| Ingress | ingress-nginx (Helm) |
 | URL | `http://localhost/social/` |
 
-**Features:**
-- Posts, feeds, and user interactions
-- Go microservice integrates with Redis for caching
-- Java microservice handles separate business domains
-- Media uploads stored in MinIO
-- Full Kubernetes deployment with Ingress-based routing
-- Gateway bridges to kind cluster via `docker network connect kind gateway`
+The most complex project — a microservices platform running on a local Kubernetes cluster. The gateway bridges to the `kind` network so `/social/` traffic proxies directly into the cluster's ingress controller.
 
-> Prometheus, Grafana, Loki, Tempo, and Promtail observability stack is scaffolded and ready to enable — currently commented out in `main.tf` to conserve local resources.
+> The Prometheus, Grafana, Loki, Tempo, and Promtail observability stack is scaffolded and ready to enable — currently commented out in `main.tf` to conserve local resources.
 
 ---
 
 ## 🛠️ Technology Stack
-
-### Languages
 
 | Language | Used In |
 |----------|---------|
@@ -298,41 +243,23 @@ The most complex project — a microservices-based social platform deployed on a
 | JavaScript / Node.js | API Service, Video Uploader |
 | TypeScript / JSX | All React + Vite frontends |
 
-### Frameworks & Libraries
-
-| Framework | Role |
-|-----------|------|
-| Django | REST APIs and template-based backends |
-| Spring Boot | Bank Manager and Social Java microservice |
-| React + Vite | All frontend SPAs |
-| Express.js | API Service backend |
-
-### Databases
-
 | Database | Used By |
 |----------|---------|
 | PostgreSQL 16 | Notes App, Bank Manager |
-| PostgreSQL 15 | Social Media App (Kubernetes StatefulSet) |
+| PostgreSQL 15 | Social Media App (K8s StatefulSet) |
 | MySQL 8.0 | Blog Website, Document Intelligence Platform |
 | SQLite | Hospital Management |
 | Redis 7 | Social Media App (caching layer) |
 
-### Infrastructure
-
 | Tool | Purpose |
 |------|---------|
 | Docker | Containerization of all services |
-| Terraform | Full cluster IaC — images, containers, volumes, K8s |
+| Terraform | Full cluster IaC — images, containers, volumes, K8s manifests |
 | Kubernetes (`kind`) | Local K8s cluster for Social Media App |
 | Helm | Deploys ingress-nginx into the kind cluster |
 | Nginx | API Gateway — single entry point for all apps |
 | MinIO | S3-compatible object storage (Blog, Document, Social) |
-
-### AI / ML
-
-| Tool | Purpose |
-|------|---------|
-| Google Gemini API | Document Q&A and intelligence |
+| Google Gemini API | Document Q&A |
 | Ollama | Self-hosted local LLM inference |
 
 ---
@@ -341,25 +268,18 @@ The most complex project — a microservices-based social platform deployed on a
 
 ### Terraform
 
-The entire cluster is managed as Infrastructure as Code. Terraform handles Docker image builds (with SHA-based triggers so images only rebuild when source changes), container lifecycle, Kubernetes manifests, and Helm releases.
+The entire cluster is managed as Infrastructure as Code. Terraform handles Docker image builds, container lifecycle, Kubernetes manifests, and Helm releases.
 
 ```bash
-# Initialize Terraform providers
-terraform init
-
-# Preview what will be created/changed/destroyed
-terraform plan
-
-# Provision the entire cluster (first run takes ~5–10 min for image builds)
-terraform apply
-
-# Tear everything down
-terraform destroy
+terraform init       # initialise providers
+terraform plan       # preview changes
+terraform apply      # provision everything (~5–10 min on first run)
+terraform destroy    # tear everything down
 ```
 
 ### Smart Rebuild Triggers
 
-Each Docker image resource uses a `dir_sha` trigger — a hash of all source files. Terraform only rebuilds an image if the source code actually changed:
+Each Docker image uses a `dir_sha` trigger — a hash of all source files. Images only rebuild when source code actually changes:
 
 ```hcl
 triggers = {
@@ -373,14 +293,10 @@ triggers = {
 
 ### kind + Gateway Network Bridge
 
-The gateway container is connected to both `gateway-net` and the `kind` Docker network, allowing Nginx to proxy `/social/` traffic directly into the kind cluster:
+The gateway container connects to both `gateway-net` and the `kind` Docker network, routing `/social/` traffic directly into the cluster:
 
 ```bash
-# Verify the bridge
-docker network inspect kind | grep gateway
-
-# Manual bridge (Terraform does this automatically)
-docker network connect kind gateway
+docker network connect kind gateway   # Terraform handles this automatically
 ```
 
 ---
@@ -400,21 +316,14 @@ docker network connect kind gateway
 ### Bring Up the Cluster
 
 ```bash
-# 1. Clone the repo
 git clone <your-repo-url>
-cd <repo>/infrastructure/gateway    # adjust to your Terraform root
+cd <repo>/infrastructure/gateway
 
-# 2. Initialize Terraform
 terraform init
-
-# 3. Review the plan
-terraform plan
-
-# 4. Provision everything
 terraform apply
 ```
 
-All 9 apps will be live at `http://localhost/<app>/` once provisioned.
+All apps will be live at `http://localhost/<app>/` once provisioned.
 
 ### Tear Down
 
@@ -426,24 +335,22 @@ terraform destroy
 
 ## 🗺️ Routing Map
 
-All traffic enters through Nginx on port `80` and is proxied to the appropriate backend.
-
-| URL | App | Backend Target |
-|-----|-----|---------------|
-| `http://localhost/` | Gateway status | JSON response (inline) |
+| URL | App | Backend |
+|-----|-----|---------|
+| `http://localhost/intro/` | Intro Page | Static |
 | `http://localhost/notes/` | Notes App | `notes-backend:8000` |
 | `http://localhost/notes/api/` | Notes REST API | `notes-backend:8000` → `/api/` |
 | `http://localhost/bank/` | Bank Manager | `bank-backend:8080` |
 | `http://localhost/bank/api/` | Bank REST API | `bank-backend:8080` → `/api/` |
-| `http://localhost/quiz/` | Quiz App | Static files |
+| `http://localhost/quiz/` | Quiz App | Static |
 | `http://localhost/video/` | Video Uploader | `video-uploader-backend:8080` |
 | `http://localhost/hospital/` | Hospital Management | `hospital-management:8000` |
 | `http://localhost/blog/` | Blog Website | `blog-website:8000` |
 | `http://localhost/blog/minio/` | Blog media files | `blog-minio:9000` |
 | `http://localhost/api-service/` | API Service | `api-service-backend:8000` |
 | `http://localhost/document/` | Document Platform | `doc-backend:8000` |
-| `http://localhost/social/` | Social Media App | `kind` cluster → ingress-nginx |
-| `http://localhost/social/api/` | Social REST API | `kind` → Django backend pod |
+| `http://localhost/social/` | Social Media App | `kind` → ingress-nginx |
+| `http://localhost/social/api/` | Social REST API | `kind` → Django pod |
 | `http://localhost/social/minio/` | Social media files | `kind` → MinIO pod |
 
 ### Gateway Health Check
@@ -455,182 +362,12 @@ curl http://localhost/
 
 ---
 
-## 🔍 Observability & Debugging
-
-### Docker — Container Status
-
-```bash
-# All running containers
-docker ps
-
-# All containers including stopped/exited ones
-docker ps -a
-
-# Resource usage (CPU, memory, network) live
-docker stats
-```
-
-### Docker — Application Logs
-
-```bash
-
-# Follow logs in real time
-docker logs -f <container-name-from-ps>
-
-# Show only the last 100 lines
-docker logs --tail 100 <container-name>
-
-# Show logs with timestamps
-docker logs -t <container-name>
-```
-
-### Docker — Shell Access & Inspection
-
-```bash
-# Open a shell inside any running container
-docker exec -it <container-name> bash     # Debian/Ubuntu-based
-docker exec -it <container-name> sh       # Alpine-based
-
-# Inspect container config, mounts, network settings
-docker inspect <container-name>
-
-# List all named volumes
-docker volume ls
-
-# Inspect a specific volume
-docker volume inspect gateway_notes-pgdata
-
-# Inspect the gateway network
-docker network inspect gateway-net
-```
-
-### Docker — Database Access
-
-```bash
-# Notes PostgreSQL
-docker exec -it notes-postgres psql -U saisakthi -d notes_app
-
-# Bank PostgreSQL
-docker exec -it bank-postgres psql -U bankmanagement -d bank
-
-# Blog MySQL
-docker exec -it blog-db mysql -u root -psaisakthi2008 blog_db
-
-# Document MySQL
-docker exec -it doc-mysql mysql -u root -psaisakthi2008 book_db
-```
-
-### Nginx — Routing Debug
-
-```bash
-# Test Nginx config for syntax errors
-docker exec gateway nginx -t
-
-# Reload Nginx config without downtime
-docker exec gateway nginx -s reload
-
-# Test a specific route manually
-curl -v http://localhost/notes/api/
-```
-
-### Kubernetes — Pod & Service Status
-
-```bash
-# All pods across all namespaces
-kubectl get pods -A
-
-# Pods in the default namespace (Social Media App)
-kubectl get pods
-
-# Full details on a specific pod (great for Pending or CrashLoopBackOff)
-kubectl describe pod <pod-name>
-
-# All services
-kubectl get services
-
-# All deployments
-kubectl get deployments
-
-# Ingress rules
-kubectl get ingress
-kubectl describe ingress social-media-api-ingress
-kubectl describe ingress social-media-frontend-ingress
-```
-
-### Kubernetes — Pod Logs
-
-```bash
-# Django backend
-kubectl logs deployment/deployment-name
-```
-
-### Kubernetes — Shell Access
-
-```bash
-# Shell into the Django backend pod
-kubectl exec -it deployment/backend -- bash
-
-# Shell into PostgreSQL
-kubectl exec -it statefulset/postgres -- psql -U admin -d socialdb
-
-# Shell into Redis CLI
-kubectl exec -it deployment/redis -- redis-cli
-
-# Shell into Go microservice
-kubectl exec -it deployment/microservice-go -- sh
-```
-
-### Kubernetes — kind Cluster Management
-
-```bash
-# List all kind clusters
-kind get clusters
-
-# View kind cluster nodes (these are Docker containers)
-kubectl get nodes
-docker ps | grep social-media
-
-# Load a locally built image into the kind cluster manually
-kind load docker-image socialmediaapp-django:latest --name social-media
-
-# Delete and recreate the cluster
-kind delete cluster --name social-media
-kind create cluster --config infrastructure/kind/kind-config.yaml
-```
-
-### Terraform — State & Drift
-
-```bash
-# Check if real infrastructure drifted from Terraform state
-terraform plan
-
-# Show current Terraform state
-terraform show
-
-# List all managed resources
-terraform state list
-
-# Force-refresh Terraform state from real infrastructure
-terraform refresh
-
-# Manually remove a resource from state (without destroying it)
-terraform state rm <resource.name>
-
-# Import an existing resource into Terraform state
-terraform import <resource.name> <resource-id>
-```
-
----
-
 ## 📁 Project Structure
 
 ```
 .
 ├── API Service/
 │   ├── backend/                    # Node.js + Express
-│   │   ├── app.js
-│   │   ├── routes/
-│   │   └── Dockerfile
 │   └── frontend/api-service/       # React + Vite
 │
 ├── Bank Manager/
@@ -639,8 +376,7 @@ terraform import <resource.name> <resource-id>
 │
 ├── Blog Website/
 │   ├── blogsite/                   # Django project
-│   ├── Dockerfile
-│   └── entrypoint.sh
+│   └── Dockerfile
 │
 ├── Document Intelligence Platform/
 │   ├── backend/document_backend/   # Django + Gemini + Ollama
@@ -648,9 +384,14 @@ terraform import <resource.name> <resource-id>
 │   └── storage/minio/
 │
 ├── gateway/
-│   └── nginx/default.conf          # Nginx gateway — all routing lives here
+│   └── nginx/default.conf          # All routing lives here
 │
 ├── hospital_management/            # Django + SQLite
+│
+├── intro/
+│   └── index.html                  # Cluster intro page (static)
+│
+├── images/                         # Project screenshots
 │
 ├── Notes App/
 │   ├── backend/                    # Django
@@ -665,10 +406,8 @@ terraform import <resource.name> <resource-id>
 │   │   ├── frontend/               # React
 │   │   ├── microservice-go/        # Go microservice
 │   │   └── microservice-java/      # Spring Boot microservice
-│   ├── infrastructure/
-│   │   └── kind/                   # kind cluster config YAML
-│   ├── platform/
-│   │   └── observability/          # Prometheus, Loki, Tempo, Promtail configs
+│   ├── infrastructure/kind/        # kind cluster config YAML
+│   ├── platform/observability/     # Prometheus, Loki, Tempo, Promtail configs
 │   └── storage/minio/
 │
 ├── Video Uploader/
@@ -682,14 +421,14 @@ terraform import <resource.name> <resource-id>
         └── nginx/default.conf
 ```
 
-
+---
 
 ## 📝 Notes
 
 - All credentials in this repo are for **local development only**. Do not use them in any public or production environment.
-- The `kind` cluster must already exist before running `terraform apply` if the Social Media resources exist in Terraform state. Terraform will create it if it doesn't exist.
-- Frontend containers marked `must_run = false` / `restart = no` are one-shot build containers — they copy compiled static assets into a named volume and exit cleanly. This is expected behaviour.
-- The full **observability stack** (Cassandra, Prometheus, Grafana, Loki, Tempo, Promtail) is scaffolded in `main.tf` but commented out because it is in development.
+- The `kind` cluster must already exist before running `terraform apply` if the Social Media resources exist in Terraform state. Terraform will create it automatically if it doesn't.
+- Frontend containers marked `must_run = false` / `restart = no` are one-shot build containers — they copy compiled static assets into a named volume and exit. This is expected behaviour.
+- The full observability stack (Prometheus, Grafana, Loki, Tempo, Promtail) is scaffolded in `main.tf` but commented out — ready to enable when needed.
 
 ---
 
