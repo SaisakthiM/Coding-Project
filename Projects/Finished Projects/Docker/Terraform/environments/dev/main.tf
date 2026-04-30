@@ -530,6 +530,8 @@ module "blog_website" {
     "ALLOWED_HOSTS=localhost,127.0.0.1",
     "MINIO_ENDPOINT=http://blog-minio:9000",          # internal — for Django uploads
     "MINIO_PUBLIC_URL=http://localhost/blog/minio",   # public — for browser URLs
+    "MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs`", 
+    "MYSQLCLIENT_CFLAGS=`pkg-config mysqlclient --cflags`"
   ]
 }
 
