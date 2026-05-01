@@ -162,17 +162,25 @@ resource "docker_container" "blog_minio" {
 
 # ─── BLOG MinIO bucket init ───────────────────────────────────
 resource "docker_container" "blog_minio_init" {
-  name     = "blog-minio-init"
-  image    = "quay.io/minio/mc:latest"
-  must_run = false
-  restart  = "no"
-  command  = [
-    "/bin/sh", "-c",
-    "mc alias set blogminio http://blog-minio:9000 admin password123 && mc mb --ignore-existing blogminio/blog-media && mc anonymous set download blogminio/blog-media && echo 'Bucket ready!'"
+  name       = "blog-minio-init"
+  image      = "quay.io/minio/mc:latest"
+  must_run   = false
+  restart    = "no"
+  entrypoint = ["/bin/sh", "-c"]
+  command = [
+    <<-EOT
+      until mc alias set blogminio http://blog-minio:9000 admin password123; do
+        echo "Waiting for MinIO..."; sleep 2;
+      done
+      mc mb --ignore-existing blogminio/blog-media
+      mc anonymous set download blogminio/blog-media
+      echo "Bucket setup complete!"
+    EOT
   ]
   networks_advanced { name = docker_network.gateway_net.name }
   depends_on = [docker_container.blog_minio]
 }
+
 
 resource "docker_image" "hospital_management" {
   name         = "hospital_management:latest"
@@ -525,9 +533,9 @@ module "blog_website" {
     "MINIO_SECRET_KEY=password123",
     "MINIO_BUCKET=blog-media",
     "MINIO_ENDPOINT=http://blog-minio:9000",
-    "SECRET_KEY=your-secret-key-here",
+    "SECRET_KEY=sai-key",
     "DEBUG=False",
-    "ALLOWED_HOSTS=localhost,127.0.0.1",
+    "ALLOWED_HOSTS=*",
     "MINIO_ENDPOINT=http://blog-minio:9000",          # internal — for Django uploads
     "MINIO_PUBLIC_URL=http://localhost/blog/minio",   # public — for browser URLs
     "MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs`", 
