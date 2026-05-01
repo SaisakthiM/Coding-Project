@@ -659,7 +659,7 @@ resource "docker_container" "doc_frontend_build" {
 # ─── INTRO PAGE ───────────────────────────────────────────────
 resource "null_resource" "intro_page" {
   depends_on = [module.gateway]
-
+  
   triggers = {
     file_sha = filesha256("${path.module}/../../projects/intro/index.html")
   }
