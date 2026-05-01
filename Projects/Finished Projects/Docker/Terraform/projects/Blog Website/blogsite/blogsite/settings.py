@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
-
+from minio import Minio
+from minio.error import S3Error
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -92,20 +93,29 @@ DATABASES = {
     }
 }
 
-# ─── MinIO Storage ────────────────────────────────────────────────
+# ─── MinIO Storage Configuration ───────────────────────────────────
+MINIO_BUCKET = os.environ.get('MINIO_BUCKET', 'blog-media')
+MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT', 'http://minio:9000')
+MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'admin')
+MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'password123')
+
+# For nginx proxy: generates URLs like http://localhost/blog/minio/blog-media/...
+# For direct MinIO: generates URLs like http://localhost:9090/blog-media/...
+MINIO_PUBLIC_URL = os.environ.get('MINIO_PUBLIC_URL', 'http://localhost/blog/minio')
+
+# ─── Storage Configuration ─────────────────────────────────────────
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         "OPTIONS": {
-            "access_key": os.environ.get('MINIO_ACCESS_KEY', 'admin'),
-            "secret_key": os.environ.get('MINIO_SECRET_KEY', 'password123'),
-            "bucket_name": os.environ.get('MINIO_BUCKET', 'blog-media'),
-            "endpoint_url": os.environ.get('MINIO_ENDPOINT', 'http://minio:9000'),
-            "custom_domain": None,
+            "access_key": MINIO_ACCESS_KEY,
+            "secret_key": MINIO_SECRET_KEY,
+            "bucket_name": MINIO_BUCKET,
+            "endpoint_url": MINIO_ENDPOINT,
             "file_overwrite": False,
-            # ↓ this makes .url() generate URLs via the public nginx path
             "url_protocol": "http:",
-            "endpoint_url": os.environ.get('MINIO_ENDPOINT', 'http://minio:9000'),
+            # ↓ CRITICAL: Include bucket name in custom_domain for correct URL generation
+            "custom_domain": f"{MINIO_PUBLIC_URL.replace('http://', '').replace('https://', '')}/{MINIO_BUCKET}",
         }
     },
     "staticfiles": {
@@ -113,12 +123,43 @@ STORAGES = {
     }
 }
 
-# After STORAGES definition
-MINIO_PUBLIC_URL = os.environ.get('MINIO_PUBLIC_URL', 'http://localhost/blog/minio')
+# ─── MinIO Bucket Initialization (Graceful) ───────────────────────
+def initialize_minio_bucket():
+    """
+    Initialize MinIO bucket if it doesn't already exist.
+    This is a fallback - minio-init service should create it first.
+    """
+    try:
+        minio_endpoint = MINIO_ENDPOINT.replace('http://', '').replace('https://', '')
+        
+        client = Minio(
+            minio_endpoint,
+            access_key=MINIO_ACCESS_KEY,
+            secret_key=MINIO_SECRET_KEY,
+            secure=False
+        )
+        
+        # Check if bucket exists
+        if not client.bucket_exists(MINIO_BUCKET):
+            client.make_bucket(MINIO_BUCKET)
+            print(f"✓ Created MinIO bucket: {MINIO_BUCKET}")
+        else:
+            print(f"✓ MinIO bucket already exists: {MINIO_BUCKET}")
+            
+    except S3Error as e:
+        if "BucketAlreadyOwnedByYou" in str(e):
+            print(f"✓ MinIO bucket already exists (BucketAlreadyOwnedByYou)")
+        else:
+            print(f"⚠ MinIO bucket initialization: {e}")
+    except Exception as e:
+        print(f"ℹ MinIO initialization deferred: {e}")
 
-# Override storage to use public URL for generated links
-STORAGES["default"]["OPTIONS"]["custom_domain"] = \
-    MINIO_PUBLIC_URL.replace('http://', '').replace('https://', '')
+# Initialize MinIO bucket
+try:
+    initialize_minio_bucket()
+except Exception as e:
+    print(f"ℹ MinIO initialization skipped: {e}")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -156,7 +197,7 @@ USE_TZ = True
 
 MEDIA_URL = '/blog/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-STATIC_URL = '/static/'          # keep this as-is
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'blog' / 'static']
 
@@ -167,7 +208,7 @@ TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = '/blog/login/'           # was '/blog/register/' — wrong
+LOGIN_URL = '/blog/login/'
 LOGIN_REDIRECT_URL = '/blog/'
 LOGOUT_REDIRECT_URL = '/blog/'
 

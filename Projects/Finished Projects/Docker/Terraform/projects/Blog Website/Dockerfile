@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN apt-get install python3-dev default-libmysqlclient-dev build-essential pkg-config
-
 RUN pip install -r requirements.txt --config MYSQLCLIENT_LDFLAGS='pkg-config mysqlclient --libs' --config MYSQLCLIENT_CFLAGS='pkg-config mysqlclient --cflags'
 
 COPY . .

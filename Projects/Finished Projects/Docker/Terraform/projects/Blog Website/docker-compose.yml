@@ -34,7 +34,7 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password123
     volumes:
-      - minio_data:/data
+      - minio_data:/dataaldready there"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
@@ -44,20 +44,23 @@ services:
     networks:
       - blog-network
 
-  # ─── MinIO bucket setup (runs once then exits) ────────────────────
+# ─── MinIO bucket setup (runs once then exits) ────────────────────
   minio-init:
     image: quay.io/minio/mc
     container_name: blog-minio-init
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set blogminio http://minio:9000 admin password123;
-      mc mb --ignore-existing blogminio/blog-media;
-      mc anonymous set download blogminio/blog-media;
-      echo 'Bucket ready!';
-      "
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until mc alias set blogminio http://minio:9000 admin password123; do
+          echo "Waiting for MinIO..."; sleep 2;
+        done
+        mc mb --ignore-existing blogminio/blog-media
+        mc anonymous set download blogminio/blog-media
+        mc anonymous set public blogminio/blog-media
+        echo "Bucket setup complete!"
     networks:
       - blog-network
 
@@ -66,7 +69,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: blog-backend
+    container_name: blog-website
     restart: always
     env_file:
       - .env
@@ -77,6 +80,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully  # ← IMPORTANT!
     networks:
       - blog-network
       - gateway-net  
@@ -94,4 +99,4 @@ networks:
     driver: bridge
   gateway-net:
     external: true       # ← join existing gateway network
-    name: gateway_net 
+    name: gateway-net 
