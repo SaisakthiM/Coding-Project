@@ -2,7 +2,7 @@
 
 This File has all the tests conducted to this terraform ecosystem and the fix for those issue 
 
-## Scans : 
+## Scans or Reconnaissance: 
 
 * Nmap Scan 
 
@@ -35,8 +35,45 @@ so we can conclude from this nmap scan that major ports are closed like mqsql or
 * gobuster enumerate dir scan
 
 ``` 
+gobuster dir -u http://localhost/ -w /usr/share/dirb/wordlists/common.txt -t 20 --exclude-length 137
+===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://localhost/
+[+] Method:                  GET
+[+] Threads:                 20
+[+] Wordlist:                /usr/share/dirb/wordlists/common.txt
+[+] Negative Status codes:   404
+[+] Exclude Length:          137
+[+] User Agent:              gobuster/3.8.2
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+blog                 (Status: 301) [Size: 169] [--> http://localhost/blog/]
+social               (Status: 301) [Size: 169] [--> http://localhost/social/]
+Progress: 4613 / 4613 (100.00%)
+===============================================================
+Finished
+===============================================================
 
 ```
+
+There are actually 9 links in there with 9 different project
+only 2 was found, this concludes the project is not that easily exposed without the clear list 
+
+* Script to scan all the ports
+
+As you know, this project aldready uses nginx so we have a clear mapping of all ports now it's time to test all those response with curl
+
+```bash
+
+
+
+```
+
+
 
 
 
