@@ -1216,7 +1216,8 @@ resource "kubectl_manifest" "minio_deployment" {
                   mountPath: /data
           volumes:
             - name: minio-data
-              emptyDir: {}
+              emptyDir:
+                sizeLimit: 2Gi 
   YAML
 }
 

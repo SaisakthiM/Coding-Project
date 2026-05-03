@@ -49,7 +49,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -122,9 +121,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
     'DEFAULT_THROTTLE_RATES': {
         'message_send':      '30/minute',
         'story_create':      '10/hour',
@@ -132,6 +128,8 @@ REST_FRAMEWORK = {
         'conversation':      '20/minute',
         'note_create':       '60/hour',
         'register':          '5/minute',
+        'login':             '10/minute',   # ← add this
+        'profile_update':    '10/hour',     # ← add this
     }
 }
 
