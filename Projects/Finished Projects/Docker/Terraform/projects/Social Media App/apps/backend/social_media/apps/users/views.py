@@ -1,17 +1,17 @@
 """
-Updated users/views.py — adds Kafka follow events + Go rate limiting.
-Drop this in to replace the existing one.
+users/views.py — DRF API views with proper rate limiting.
+Uses DRF throttle classes, NOT django-ratelimit (which is for Django views only).
 """
 import requests
 import logging
 from django.conf import settings
 from rest_framework import status, permissions
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from django_ratelimit.decorators import ratelimit
 
 from .models import Follow
 from .serializers import (
@@ -25,6 +25,23 @@ logger = logging.getLogger(__name__)
 GO_SERVICE = getattr(settings, 'GO_SERVICE_URL', 'http://microservice-go:8080')
 
 
+# ─── THROTTLE CLASSES ─────────────────────────────────────────
+
+class RegisterThrottle(AnonRateThrottle):
+    """5 registrations per minute per IP."""
+    scope = 'register'
+
+class LoginThrottle(AnonRateThrottle):
+    """10 login attempts per minute per IP."""
+    scope = 'login'
+
+class ProfileUpdateThrottle(UserRateThrottle):
+    """10 profile updates per hour per user."""
+    scope = 'profile_update'
+
+
+# ─── HELPERS ──────────────────────────────────────────────────
+
 def _go(method, path, **kwargs):
     try:
         return requests.request(method, f"{GO_SERVICE}{path}", timeout=0.5, **kwargs)
@@ -35,35 +52,41 @@ def _go(method, path, **kwargs):
 
 # ─── AUTH ─────────────────────────────────────────────────────
 
-
- 
-@ratelimit(key='ip', rate='10/m', method='POST', block=True)   # 10 login attempts per minute per IP
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            return redirect('home')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'blog/login.html', {'form': form})
-
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)    # 5 registrations per minute per IP
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+@throttle_classes([RegisterThrottle])
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = RegisterForm()
-    return render(request, 'blog/register.html', {'form': form})
- 
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        tokens = RefreshToken.for_user(user)
+        return Response({
+            'user': UserSerializer(user, context={'request': request}).data,
+            'access': str(tokens.access_token),
+            'refresh': str(tokens),
+        }, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+@throttle_classes([LoginThrottle])
+def login(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        data = serializer.validated_data
+        user = data['user']
+
+        # Set presence in Go/Redis
+        _go('POST', '/api/go/presence/heartbeat', json={'user_id': str(user.id)})
+
+        return Response({
+            'user': UserSerializer(user, context={'request': request}).data,
+            'access': data['access'],
+            'refresh': data['refresh'],
+        })
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -73,7 +96,6 @@ def logout(request):
         token.blacklist()
     except Exception:
         pass
-    # Clear presence
     _go('POST', '/api/go/presence/heartbeat', json={'user_id': str(request.user.id)})
     return Response({'detail': 'Logged out.'})
 
@@ -81,10 +103,11 @@ def logout(request):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def me(request):
-    # Refresh presence
     _go('POST', '/api/go/presence/heartbeat', json={'user_id': str(request.user.id)})
     return Response(UserSerializer(request.user, context={'request': request}).data)
 
+
+# ─── USERS ────────────────────────────────────────────────────
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -99,6 +122,7 @@ def user_profile(request, username):
 @api_view(['PATCH'])
 @permission_classes([permissions.IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
+@throttle_classes([ProfileUpdateThrottle])
 def update_profile(request, username):
     serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
     if serializer.is_valid():
@@ -117,7 +141,6 @@ def follow_toggle(request, username):
     if target == request.user:
         return Response({'detail': 'Cannot follow yourself.'}, status=400)
 
-    # Rate limit follows via Go
     rl = _go('POST', '/api/go/rate-limit/check', json={
         'user_id': str(request.user.id),
         'action': 'follow',
@@ -132,7 +155,6 @@ def follow_toggle(request, username):
         follow.delete()
         return Response({'following': False})
 
-    # Publish Kafka event → Java writes follow notification to Cassandra
     try:
         from apps.kafka_events import publish_user_followed
         publish_user_followed(request.user, target)
@@ -187,14 +209,11 @@ def suggested_users(request):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def presence(request, username):
-    """GET /api/users/{username}/presence — check if user is online via Go/Redis."""
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return Response({'detail': 'User not found.'}, status=404)
-
     resp = _go('GET', f'/api/go/presence/{user.id}')
     if resp and resp.status_code == 200:
         return Response(resp.json())
     return Response({'online': False, 'last_seen': None})
-
