@@ -13,7 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="unsafe-secret-key")
 DEBUG = env.bool("DEBUG", default=True)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # Installed apps
 INSTALLED_APPS = [
@@ -125,6 +125,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'message_send':      '30/minute',
+        'story_create':      '10/hour',
+        'notification_read': '20/minute',
+        'conversation':      '20/minute',
+        'note_create':       '60/hour',
+        'register':          '5/minute',
+    }
 }
 
 # Simple JWT
@@ -135,7 +143,7 @@ SIMPLE_JWT = {
 }
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 # GraphQL
@@ -183,3 +191,9 @@ REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=Tr
 
 # --- Java Microservice (Cassandra) ---
 JAVA_API_URL = env("JAVA_API_URL", default="http://microservice-java:8080")
+
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
+    "http://localhost",
+    "http://localhost:3000",
+    "http://127.0.0.1",
+])

@@ -223,11 +223,11 @@ so all those path enumeration is totally useless against this method but there i
 
 ### Severity Ratings
 
-#### _ Low : Exposed /.git/config
+#### Low : Exposed /.git/config
 `200 => /.git/config`
 **The Fix :** It was a side-effect of uniform catch-all response that's why we got the 200 OK it is working as intended
 
-#### _ Medium : Missing Security Header in Nginx
+#### Medium : Missing Security Header in Nginx
 **The Fix :** add this to nginx.conf
 ```bash
 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -236,8 +236,484 @@ add_header X-Content-Type-Options "nosniff" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 ```
 
-#### * High : Exposed Spring Boot Actuator
+#### High : Exposed Spring Boot Actuator
 **The Fix :** Aldready done, the uniform catch all response
 
 ### Exploits and Tests
-#### * Response Test
+
+#### CSRF Test
+
+Generally, a application should not recieve the request from a outside resource, they have a protection called CSRF Policy
+this Policy blocks request from outside and protect the application running 
+
+here is the script i used to test it 
+
+```bash
+#!/bin/bash
+
+# Auth Testing Script with CSRF Token Handling
+# Tests if apps properly validate CSRF tokens
+
+echo "=========================================="
+echo "Authentication & CSRF Testing"
+echo "=========================================="
+echo ""
+
+USER1="testuser_u1_$(date +%s)"
+PASS="TestPass123!@#"
+
+# ============= BLOG =============
+echo "[*] Testing BLOG..."
+
+# First, GET the login page to capture CSRF token
+echo "  - Fetching login page to get CSRF token..."
+BLOG_GET=$(curl -s -c /tmp/blog_cookies.txt http://localhost/blog/login/)
+
+# Try to extract CSRF token from HTML
+BLOG_CSRF=$(echo "$BLOG_GET" | grep -oP "csrfmiddlewaretoken['\"]?\s*:\s*['\"]?\K[^'\">\s]+" | head -1)
+
+if [ -n "$BLOG_CSRF" ]; then
+    echo "  ✓ CSRF Token found: ${BLOG_CSRF:0:30}..."
+else
+    echo "  ⚠ No CSRF token found in HTML, trying alternative method..."
+    BLOG_CSRF=$(echo "$BLOG_GET" | grep -oP 'value="[^"]*csrf[^"]*"' | head -1)
+fi
+
+# Try login WITH CSRF token
+if [ -n "$BLOG_CSRF" ]; then
+    echo "  - Logging in WITH CSRF token..."
+    BLOG_LOGIN=$(curl -s -X POST http://localhost/blog/login/ \
+      -b /tmp/blog_cookies.txt -c /tmp/blog_cookies.txt \
+      -H "Content-Type: application/json" \
+      -d "{\"username\":\"$USER1\",\"password\":\"$PASS\",\"csrfmiddlewaretoken\":\"$BLOG_CSRF\"}" \
+      -w "\n%{http_code}")
+else
+    # Try without CSRF token
+    echo "  - Attempting login WITHOUT CSRF token..."
+    BLOG_LOGIN=$(curl -s -X POST http://localhost/blog/login/ \
+      -b /tmp/blog_cookies.txt -c /tmp/blog_cookies.txt \
+      -H "Content-Type: application/json" \
+      -d "{\"username\":\"$USER1\",\"password\":\"$PASS\"}" \
+      -w "\n%{http_code}")
+fi
+
+BLOG_CODE=$(echo "$BLOG_LOGIN" | tail -n1)
+BLOG_BODY=$(echo "$BLOG_LOGIN" | head -n-1)
+
+if [[ $BLOG_CODE == 200 || $BLOG_CODE == 201 || $BLOG_CODE == 302 ]]; then
+    echo "  ✓ Blog login HTTP $BLOG_CODE"
+    BLOG_TOKEN=$(echo "$BLOG_BODY" | grep -oP '"token"\s*:\s*"\K[^"]+' | head -1 || \
+                 echo "$BLOG_BODY" | grep -oP '"access_token"\s*:\s*"\K[^"]+' | head -1)
+    if [ -n "$BLOG_TOKEN" ]; then
+        echo "  ✓ Token: ${BLOG_TOKEN:0:50}..."
+    fi
+else
+    echo "  ✗ Blog login FAILED (HTTP $BLOG_CODE)"
+    echo "  Response preview: $(echo "$BLOG_BODY" | head -c 200)"
+fi
+echo ""
+
+# ============= NOTES =============
+echo "[*] Testing NOTES..."
+
+echo "  - Attempting login..."
+NOTES_LOGIN=$(curl -s -X POST http://localhost/notes/login/ \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"$USER1\",\"password\":\"$PASS\"}" \
+  -w "\n%{http_code}")
+
+NOTES_CODE=$(echo "$NOTES_LOGIN" | tail -n1)
+NOTES_BODY=$(echo "$NOTES_LOGIN" | head -n-1)
+
+if [[ $NOTES_CODE == 403 ]]; then
+    echo "  ⚠ CSRF Protection DETECTED (HTTP 403)"
+    echo "    Notes requires CSRF token (good security!)"
+elif [[ $NOTES_CODE == 200 || $NOTES_CODE == 201 ]]; then
+    echo "  ✓ Notes login HTTP $NOTES_CODE (no CSRF needed)"
+    NOTES_TOKEN=$(echo "$NOTES_BODY" | grep -oP '"token"\s*:\s*"\K[^"]+' | head -1 || \
+                  echo "$NOTES_BODY" | grep -oP '"access_token"\s*:\s*"\K[^"]+' | head -1)
+    if [ -n "$NOTES_TOKEN" ]; then
+        echo "  ✓ Token: ${NOTES_TOKEN:0:50}..."
+    fi
+else
+    echo "  ? Notes login HTTP $NOTES_CODE"
+fi
+echo ""
+
+# ============= BANK =============
+echo "[*] Testing BANK..."
+
+echo "  - Attempting login..."
+BANK_LOGIN=$(curl -s -X POST http://localhost/bank/login \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"$USER1\",\"password\":\"$PASS\"}" \
+  -w "\n%{http_code}")
+
+BANK_CODE=$(echo "$BANK_LOGIN" | tail -n1)
+BANK_BODY=$(echo "$BANK_LOGIN" | head -n-1)
+
+if [[ $BANK_CODE == 403 ]]; then
+    echo "  ⚠ CSRF Protection DETECTED (HTTP 403)"
+    echo "    Bank requires CSRF token (good security!)"
+elif [[ $BANK_CODE == 200 || $BANK_CODE == 201 ]]; then
+    echo "  ✓ Bank login HTTP $BANK_CODE (no CSRF needed)"
+    BANK_TOKEN=$(echo "$BANK_BODY" | grep -oP '"token"\s*:\s*"\K[^"]+' | head -1 || \
+                 echo "$BANK_BODY" | grep -oP '"access_token"\s*:\s*"\K[^"]+' | head -1)
+    if [ -n "$BANK_TOKEN" ]; then
+        echo "  ✓ Token: ${BANK_TOKEN:0:50}..."
+    fi
+else
+    echo "  ? Bank login HTTP $BANK_CODE"
+fi
+echo ""
+
+# ============= SOCIAL =============
+echo "[*] Testing SOCIAL..."
+
+echo "  - Attempting login..."
+SOCIAL_LOGIN=$(curl -s -X POST http://localhost/login/ \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"$USER1\",\"password\":\"$PASS\"}" \
+  -w "\n%{http_code}")
+
+SOCIAL_CODE=$(echo "$SOCIAL_LOGIN" | tail -n1)
+SOCIAL_BODY=$(echo "$SOCIAL_LOGIN" | head -n-1)
+
+if [[ $SOCIAL_CODE == 403 ]]; then
+    echo "  ⚠ CSRF Protection DETECTED (HTTP 403)"
+    echo "    Social requires CSRF token (good security!)"
+elif [[ $SOCIAL_CODE == 200 || $SOCIAL_CODE == 201 ]]; then
+    echo "  ✓ Social login HTTP $SOCIAL_CODE (no CSRF needed)"
+    SOCIAL_TOKEN=$(echo "$SOCIAL_BODY" | grep -oP '"token"\s*:\s*"\K[^"]+' | head -1 || \
+                   echo "$SOCIAL_BODY" | grep -oP '"access_token"\s*:\s*"\K[^"]+' | head -1)
+    if [ -n "$SOCIAL_TOKEN" ]; then
+        echo "  ✓ Token: ${SOCIAL_TOKEN:0:50}..."
+    fi
+else
+    echo "  ? Social login HTTP $SOCIAL_CODE"
+fi
+echo ""
+
+# ============= CSRF ANALYSIS =============
+echo "=========================================="
+echo "CSRF Protection Analysis"
+echo "=========================================="
+echo ""
+
+echo "Summary:"
+echo "  Blog:   Has CSRF protection (requires token)"
+echo "  Notes:  $([ "$NOTES_CODE" == "403" ] && echo "Has CSRF protection" || echo "NO CSRF protection ❌")"
+echo "  Bank:   $([ "$BANK_CODE" == "403" ] && echo "Has CSRF protection" || echo "NO CSRF protection ❌")"
+echo "  Social: $([ "$SOCIAL_CODE" == "403" ] && echo "Has CSRF protection" || echo "NO CSRF protection ❌")"
+echo ""
+
+if [[ "$NOTES_CODE" != "403" && "$NOTES_CODE" == "200" ]]; then
+    echo "⚠ FINDING: Notes allows POST requests without CSRF token"
+    echo "  This could allow CSRF attacks from malicious websites"
+fi
+
+if [[ "$BANK_CODE" != "403" && "$BANK_CODE" == "200" ]]; then
+    echo "⚠ FINDING: Bank allows POST requests without CSRF token"
+    echo "  This is CRITICAL for a financial app!"
+fi
+
+if [[ "$SOCIAL_CODE" != "403" && "$SOCIAL_CODE" == "200" ]]; then
+    echo "⚠ FINDING: Social allows POST requests without CSRF token"
+    echo "  This could allow CSRF attacks"
+fi
+
+echo ""
+echo "=========================================="
+```
+
+and the result was 
+
+```
+./csrf_test.sh                                                                                                                                                   ─╯
+==========================================
+Authentication & CSRF Testing
+==========================================
+
+[*] Testing BLOG...
+  - Fetching login page to get CSRF token...
+  ⚠ No CSRF token found in HTML, trying alternative method...
+  - Attempting login WITHOUT CSRF token...
+  ✗ Blog login FAILED (HTTP 403)
+  Response preview: <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="robots" content="NONE,NOARCHIVE">
+  <title>403 Forbidden</title>
+  <style>
+ 
+
+[*] Testing NOTES...
+  - Attempting login...
+  ? Notes login HTTP 405
+
+[*] Testing BANK...
+  - Attempting login...
+  ? Bank login HTTP 405
+
+[*] Testing SOCIAL...
+  - Attempting login...
+  ✓ Social login HTTP 200 (no CSRF needed)
+
+==========================================
+CSRF Protection Analysis
+==========================================
+
+Summary:
+  Blog:   Has CSRF protection (requires token)
+  Notes:  NO CSRF protection ❌
+  Bank:   NO CSRF protection ❌
+  Social: NO CSRF protection ❌
+
+⚠ FINDING: Social allows POST requests without CSRF token
+  This could allow CSRF attacks
+
+==========================================
+```
+
+3 of my apps are vulnerable to CSRF attacks which can open to various attacks like token misuse to attack other users 
+
+##### The Fix : 
+
+Strengthen the CSRF by only allowing what links are needed to have CSRF 
+
+```
+ ./csrf_test.sh                                                                                                                                                   ─╯
+==========================================
+Authentication & CSRF Testing
+==========================================
+
+[*] Testing BLOG...
+  - Fetching login page to get CSRF token...
+  ✓ CSRF Token found: iT7xJYNwbHWebDzPurwZRG4CGWNJQh...
+  - Logging in WITH CSRF token...
+  ✓ Blog login HTTP 200
+
+[*] Testing NOTES...
+  - Health check: HTTP 404
+  - Attempting login...
+  ? Notes login HTTP 404
+
+[*] Testing BANK...
+  - Register HTTP 200
+  ✓ JWT token received on registration
+  - Authenticated request: HTTP 404
+  ⚠ Unauthenticated request returned HTTP 404 — investigate!
+  ? Bank login HTTP 400
+[*] Testing SOCIAL...
+  - Health check: HTTP 200
+  - Registering test user...
+  - Register HTTP 400
+  - Attempting login...
+  ? Social login HTTP 400
+  Response: {"non_field_errors":["Invalid credentials."]}
+
+==========================================
+CORS Testing
+==========================================
+
+[*] Testing CORS headers from malicious origin...
+  ✓ No CORS header returned for unknown origin
+
+==========================================
+CSRF Protection Analysis
+==========================================
+
+Summary:
+  Blog:   ✓ Session auth working (HTTP 200)
+  Notes:  ? HTTP 404 — investigate
+  Bank:   ? HTTP 400 — investigate
+  Social: ? HTTP 400 — investigate
+
+Note: REST APIs using JWT tokens do not require CSRF
+      protection as tokens are sent in headers, not cookies.
+      CSRF only applies to session/cookie based authentication.
+==========================================
+```
+
+The result after the changes were done and script was also bit modified 
+
+#### Other Tests 
+
+```
+./security_tests.sh                                                                                                                                              ─╯
+
+============================================
+  Comprehensive Security Testing Suite
+============================================
+  Target: http://localhost
+  Time:   Sun May  3 10:16:05 AM IST 2026
+============================================
+
+[*] Setting up test users...
+  ✓ Social User 1 ready (JWT obtained)
+  ✓ Bank User 1 ready (JWT obtained)
+
+[TEST 1] SQL Injection
+  Testing Blog login...
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('' OR '1'='1'))
+                                                     ^^
+SyntaxError: invalid syntax. Is this intended to be part of the string?
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('' OR 1=1--'))
+                                                             ^
+SyntaxError: unterminated string literal (detected at line 1)
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('admin'--'))
+                                                           ^
+SyntaxError: unterminated string literal (detected at line 1)
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('' UNION SELECT 1,2,3--'))
+                                                                         ^
+SyntaxError: unterminated string literal (detected at line 1)
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote(''; DROP TABLE users;--'))
+                                                                         ^
+SyntaxError: unterminated string literal (detected at line 1)
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('' OR 'x'='x'))
+                                                     ^^
+SyntaxError: invalid syntax. Is this intended to be part of the string?
+  ✓ Blog login — no SQLi detected
+  Testing Social API...
+  ✓ Social API — no SQLi detected
+  Testing query parameters...
+  File "<string>", line 1
+    import urllib.parse; print(urllib.parse.quote('1' OR '1'='1'))
+                                                      ^^
+SyntaxError: invalid syntax. Is this intended to be part of the string?
+  ✓ Query parameters — no SQLi detected
+
+[TEST 2] Brute Force Protection
+  Testing Social login (20 attempts)...
+  ⚠ Social login — no rate limiting detected after 20 attempts
+  Testing Blog login (20 attempts)...
+  ⚠ Blog login — no rate limiting detected after 20 attempts
+  Testing Bank login (20 attempts)...
+  ⚠ Bank login — no rate limiting detected after 20 attempts
+
+[TEST 3] JWT Security
+  Testing tampered JWT...
+  ✓ Tampered JWT rejected (HTTP 401)
+  Testing 'none' algorithm attack...
+  ✓ 'none' algorithm attack rejected (HTTP 401)
+  Testing expired token...
+  ✓ Expired token rejected (HTTP 401)
+  Testing no token...
+  ✓ No token properly rejected (HTTP 401)
+  Checking JWT token contents...
+  ✓ JWT payload looks clean
+  ℹ JWT contents: { "token_type": "access", "exp": 1777785366, "iat": 1777783566, "jti": "b4775373326a44ed8bebe2853f87...
+
+[TEST 4] File Upload Security
+  Testing PHP shell upload as post...
+  ℹ /social/api/posts/ returned HTTP 405 for PHP upload
+  ℹ /social/api/stories/ returned HTTP 405 for PHP upload
+  ℹ /notes/api/notes/ returned HTTP 401 for PHP upload
+  Testing disguised PHP as image...
+  ℹ Disguised PHP upload: HTTP 405
+  Testing oversized file...
+  ⚠ Oversized file not rejected (HTTP 405)
+
+[TEST 5] IDOR Testing
+  Creating resource as User 1...
+  ℹ Could not create note for IDOR test (HTTP 401)
+  Testing Social API IDOR...
+  ℹ Social user 3 accessed by User2: HTTP 404
+  ℹ Social user 4 accessed by User2: HTTP 404
+  Testing Bank IDOR...
+
+[TEST 6] Rate Limiting
+  Testing Social API (authenticated) (50 requests)...
+  ⚠ Social API (authenticated) — no rate limiting after 50 requests
+  Testing Social login (unauthenticated) (50 requests)...
+  ⚠ Social login (unauthenticated) — no rate limiting after 50 requests
+  Testing Blog (unauthenticated) (50 requests)...
+  ⚠ Blog (unauthenticated) — no rate limiting after 50 requests
+  Testing Notes API (50 requests)...
+  ⚠ Notes API — no rate limiting after 50 requests
+
+[TEST 7] Security Headers
+  Checking nginx security headers...
+  ⚠ X-Content-Type-Options missing
+  ⚠ X-Frame-Options missing
+  ⚠ Content-Security-Policy missing
+  ⚠ Strict-Transport-Security missing
+  ⚠ Referrer-Policy missing
+  ⚠ Permissions-Policy missing
+  ✓ Server header not leaking version
+
+[TEST 8] Sensitive Endpoint Exposure
+  Scanning sensitive paths...
+  ✓ No sensitive paths exposed
+
+[TEST 9] XSS Testing
+  Testing stored XSS via post creation...
+  Testing reflected XSS in search...
+  ✓ No obvious XSS vulnerabilities detected
+
+============================================
+  Security Test Complete
+============================================
+
+Full report saved to: /tmp/security_report_1777783565.txt
+
+--- Report Summary ---
+Security Test Report - Sun May  3 10:16:05 AM IST 2026
+=================================
+--- SQL Injection ---
+--- Brute Force ---
+[MEDIUM] Social login has no brute force protection
+[MEDIUM] Blog login has no brute force protection
+[MEDIUM] Bank login has no brute force protection
+--- JWT Security ---
+[INFO] JWT tampering properly rejected
+[INFO] JWT none algorithm attack blocked
+--- File Upload ---
+[MEDIUM] No file size limit detected
+--- IDOR ---
+--- Rate Limiting ---
+[LOW] Social API (authenticated) has no rate limiting
+[LOW] Social login (unauthenticated) has no rate limiting
+[LOW] Blog (unauthenticated) has no rate limiting
+[LOW] Notes API has no rate limiting
+--- Security Headers ---
+[LOW] Missing security header: X-Content-Type-Options
+[LOW] Missing security header: X-Frame-Options
+[LOW] Missing security header: Content-Security-Policy
+[LOW] Missing security header: Strict-Transport-Security
+[LOW] Missing security header: Referrer-Policy
+[LOW] Missing security header: Permissions-Policy
+--- Sensitive Endpoints ---
+--- XSS ---
+
+============================================
+  Finding Summary
+============================================
+  CRITICAL: 0
+  HIGH:     0
+  MEDIUM:   4
+  LOW:      10
+  INFO:     2
+============================================
+
+```
+
+##### Findings and Fixes 
+
+* Add Rate limiting to those 3 API endpoints 
+* Add brute force protection
+* Add security headers in nginx
+
+
+
+
+
+
+

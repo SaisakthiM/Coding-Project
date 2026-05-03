@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django_ratelimit.decorators import ratelimit
 
 from .models import Post, PostMedia, Comment, Like, Save
 from .serializers import PostSerializer, CreatePostSerializer, CommentSerializer
@@ -102,6 +103,7 @@ def explore(request):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
+@ratelimit(key='user', rate='20/h', method='POST', block=True)  # 20 posts per hour per user
 def create_post(request):
     serializer = CreatePostSerializer(data=request.data, context={'request': request})
     if not serializer.is_valid():
@@ -145,6 +147,7 @@ def create_post(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
+@ratelimit(key='user', rate='20/h', method='POST', block=True)  # 20 posts per hour per user
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == 'GET':
@@ -205,6 +208,7 @@ def save_toggle(request, pk):
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
+@ratelimit(key='user', rate='30/h', method='POST', block=True)  # 30 edits per hour per user
 def post_comments(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == 'GET':

@@ -49,6 +49,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Bucket 4j Rate limiter -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.10.1</version>
+		</dependency>
+
 		<!-- Lombok (optional) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

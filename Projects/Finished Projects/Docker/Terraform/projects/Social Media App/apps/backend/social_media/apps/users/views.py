@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django_ratelimit.decorators import ratelimit
 
 from .models import Follow
 from .serializers import (
@@ -32,39 +33,37 @@ def _go(method, path, **kwargs):
         return None
 
 
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
+# ─── AUTH ─────────────────────────────────────────────────────
+
+
+ 
+@ratelimit(key='ip', rate='10/m', method='POST', block=True)   # 10 login attempts per minute per IP
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'blog/login.html', {'form': form})
+
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)    # 5 registrations per minute per IP
 def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        tokens = RefreshToken.for_user(user)
-        return Response({
-            'user': UserSerializer(user, context={'request': request}).data,
-            'access': str(tokens.access_token),
-            'refresh': str(tokens),
-        }, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-def login(request):
-    serializer = LoginSerializer(data=request.data)
-    if serializer.is_valid():
-        data = serializer.validated_data
-        user = data['user']
-
-        # Set presence in Go/Redis
-        _go('POST', '/api/go/presence/heartbeat', json={'user_id': str(user.id)})
-
-        return Response({
-            'user': UserSerializer(user, context={'request': request}).data,
-            'access': data['access'],
-            'refresh': data['refresh'],
-        })
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    if request.user.is_authenticated:
+        return redirect('home')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = RegisterForm()
+    return render(request, 'blog/register.html', {'form': form})
+ 
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
