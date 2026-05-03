@@ -15,10 +15,7 @@ redis
 environ
 django-environ
 django-prometheus
-
-
-
-
+django-ratelimit
 requests>=2.31.0
 django-storages[s3]>=1.14
 boto3>=1.34

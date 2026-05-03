@@ -15,6 +15,7 @@ redis
 environ
 django-environ
 django-prometheus
+django-ratelimit
 
 
 
