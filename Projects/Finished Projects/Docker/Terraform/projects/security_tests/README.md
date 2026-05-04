@@ -4,6 +4,19 @@ This file has all the tests conducted on this terraform ecosystem and the fixes 
 
 ---
 
+## Executive Summary
+
+Conducted a security assessment of the Terraform-managed 
+multi-app ecosystem on [date]. The assessment covered 9 
+applications across reconnaissance, authentication, injection, 
+and access control testing.
+
+Overall Risk Rating: LOW-MEDIUM
+No critical or high vulnerabilities were found.
+The application demonstrates solid security fundamentals.
+
+---
+
 ## Scans and Reconnaissance
 
 ### Nmap Scan
@@ -534,11 +547,179 @@ Note: REST APIs using JWT tokens do not require CSRF
 
 ---
 
+### Static Analysis : Semgrep 
+
+it is a python tool used for scanning vulnerabilities inside the application like SQL injection or hardcode secrets
+
+Here was the result for one of the app
+
+```bash
+semgrep --config=p/django .                                                                                                                                                       ─╯
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+Scanning 41 files (only git-tracked) with 28 Code rules:
+            
+  CODE RULES
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  python           27      16          Community      28                                                                
+  <multilang>       1       9                                                                                           
+                                                                                                                        
+                    
+  SUPPLY CHAIN RULES
+                                                                       
+  💎 Sign in with `semgrep login` and run               
+     `semgrep ci` to find dependency vulnerabilities and
+     advanced cross-file findings.                                     
+                                                                       
+          
+  PROGRESS
+   
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00                                                                                                                        
+                   
+                   
+┌─────────────────┐
+│ 4 Code Findings │
+└─────────────────┘
+                                                              
+    blogsite/blog/templates/blog/edit_post.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+           10┆ <form method="post" style="display:flex;flex-direction:column;gap:1.2rem;">
+           11┆   {% csrf_token %}
+           12┆   {% for field in form %}
+           13┆     <div>
+           14┆       <label>{{ field.label }}</label>
+           15┆       {{ field }}
+           16┆       {% for error in field.errors %}
+           17┆         <p style="color:var(--accent);font-size:0.82rem;margin-top:0.3rem;">{{ error
+               }}</p>                                                                              
+           18┆       {% endfor %}
+           19┆     </div>
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+                                                          
+    blogsite/blog/templates/blog/login.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+           12┆ <form method="post" style="display:flex;flex-direction:column;gap:1.2rem;">
+           13┆   {% csrf_token %}
+           14┆   {% for field in form %}
+           15┆     <div>
+           16┆       <label>{{ field.label }}</label>
+           17┆       {{ field }}
+           18┆       {% for error in field.errors %}
+           19┆         <p style="color:var(--accent);font-size:0.82rem;margin-top:0.3rem;">{{ error
+               }}</p>                                                                              
+           20┆       {% endfor %}
+           21┆     </div>
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+                                                            
+    blogsite/blog/templates/blog/profile.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+           38┆ <form method="post" enctype="multipart/form-data" style="display:flex;flex-
+               direction:column;gap:1.2rem;">                                             
+           39┆   {% csrf_token %}
+           40┆   {% for field in form %}
+           41┆     <div>
+           42┆       <label>{{ field.label }}</label>
+           43┆       {{ field }}
+           44┆       {% if field.help_text %}
+           45┆         <p style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem;">{{
+               field.help_text }}</p>                                                      
+           46┆       {% endif %}
+           47┆       {% for error in field.errors %}
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+                                                             
+    blogsite/blog/templates/blog/register.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+           12┆ <form method="post" style="display:flex;flex-direction:column;gap:1.2rem;">
+           13┆   {% csrf_token %}
+           14┆   {% for field in form %}
+           15┆     <div>
+           16┆       <label>{{ field.label }}</label>
+           17┆       {{ field }}
+           18┆       {% if field.help_text %}
+           19┆         <p style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">{{
+               field.help_text }}</p>                                                        
+           20┆       {% endif %}
+           21┆       {% for error in field.errors %}
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 4 (4 blocking)
+ • Rules run: 28
+ • Targets scanned: 25
+ • Parsed lines: ~100.0%
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 28 rules on 25 files: 4 findings.
+💎 Missed out on 155 pro rules since you aren't logged in!
+⚡ Supercharge Semgrep OSS when you create a free account at https://sg.run/rules.
+```
+
+the 4 error reported is wrong as I aldready included the {% csrf_token %}. It is a bug in semgrep itself that it can't read well between tags inside the templates
+
+---
+
 ### Findings and Fixes
 
 - **Add rate limiting** to the 3 API endpoints flagged in Test 6
 - **Add brute force protection** to login endpoints across blog, social, and bank
 - **Add security headers** in nginx for all locations
+
+---
+
+## Positive Security Findings
+
+* Uniform catch-all response defeats directory enumeration
+* JWT implementation secure (tampering, none-algo, expiry all blocked)
+* IDOR protection working on all tested endpoints  
+* SQL injection not detected across all endpoints
+* XSS not detected
+* No sensitive files exposed publicly
+* Database ports not exposed externally
+* Generic error messages prevent username enumeration
+* CORS properly restricted after fix
+
+---
+
+## Testing Methodology
+
+Tools Used:
+- Nmap 7.98 — port scanning and service detection
+- Gobuster 3.8.2 — directory enumeration
+- Nikto 2.6.0 — web vulnerability scanning
+- Custom bash scripts — CSRF, auth, IDOR, rate limit testing
+- curl — manual endpoint testing
+- Wireshark — traffic analysis (separate session)
+
+Scope:
+- localhost (dev environment only)
+- All 9 apps in the terraform ecosystem
+- No external services tested
 
 ---
 

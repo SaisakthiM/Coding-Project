@@ -45,25 +45,22 @@ resource "docker_volume" "notes_dist"    { name = "gateway_notes-dist" }
 resource "docker_volume" "bank_dist"     { name = "gateway_bank-dist" }
 resource "docker_volume" "quiz_dist"     { name = "gateway_quiz-dist" }
 resource "docker_volume" "video_dist"    { name = "gateway_video-dist" }
-resource "docker_volume" "api_dist"      { name = "gateway_api-dist" }       # NEW
+resource "docker_volume" "api_dist"      { name = "gateway_api-dist" }
 resource "docker_volume" "notes_pgdata"  { name = "gateway_notes-pgdata" }
 resource "docker_volume" "notes_static"  { name = "gateway_notes-static" }
 resource "docker_volume" "notes_media"   { name = "gateway_notes-media" }
 resource "docker_volume" "bank_pgdata"   { name = "gateway_bank-pgdata" }
-resource "docker_volume" "doc_mysql"     { name = "gateway_doc-mysql" }      # NEW
-resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }      # NEW
-resource "docker_volume" "doc_dist" { name = "gateway_doc-dist" }
-resource "docker_volume" "blog_mysql" { name = "gateway_blog-mysql" }
-resource "docker_volume" "blog_minio" { name = "gateway_blog-minio" }
-resource "docker_volume" "intro_dist" { name = "gateway_intro-dist" }
-
-
+resource "docker_volume" "doc_mysql"     { name = "gateway_doc-mysql" }
+resource "docker_volume" "doc_minio"     { name = "gateway_doc-minio" }
+resource "docker_volume" "doc_dist"      { name = "gateway_doc-dist" }
+resource "docker_volume" "blog_mysql"    { name = "gateway_blog-mysql" }
+resource "docker_volume" "blog_minio"    { name = "gateway_blog-minio" }
+resource "docker_volume" "intro_dist"    { name = "gateway_intro-dist" }
 
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
   name         = "bankmanager-backend:latest"
   keep_locally = true
-  
   build {
     context    = abspath("${path.module}/../../projects/Bank Manager/backend/bank_management")
     dockerfile = "Dockerfile"
@@ -80,7 +77,6 @@ resource "docker_image" "bank_backend" {
 resource "docker_image" "bank_frontend_build" {
   name         = "bank-frontend-build:latest"
   keep_locally = true
-  
   build {
     context    = abspath("${path.module}/../../projects/Bank Manager/frontend")
     dockerfile = "Dockerfile.prod"
@@ -109,78 +105,6 @@ resource "docker_image" "blog_website" {
     ]))
   }
 }
-
-
-# ─── BLOG MySQL ───────────────────────────────────────────────
-resource "docker_container" "blog_db" {
-  name    = "blog-db"
-  image   = "mysql:8.0"
-  restart = "always"
-  env = [
-    "MYSQL_ROOT_PASSWORD=saisakthi2008",
-    "MYSQL_DATABASE=blog_db"
-  ]
-  networks_advanced { name = docker_network.gateway_net.name }
-  mounts {
-    source = docker_volume.blog_mysql.name
-    target = "/var/lib/mysql"
-    type   = "volume"
-  }
-  healthcheck {
-    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psaisakthi2008"]
-    interval     = "10s"
-    timeout      = "5s"
-    retries      = 5
-    start_period = "30s"
-  }
-}
-
-# ─── BLOG MinIO ───────────────────────────────────────────────
-resource "docker_container" "blog_minio" {
-  name    = "blog-minio"
-  image   = "quay.io/minio/minio:latest"
-  restart = "always"
-  command = ["server", "/data", "--console-address", ":9091"]
-  env = [
-    "MINIO_ROOT_USER=admin",
-    "MINIO_ROOT_PASSWORD=password123"
-  ]
-  networks_advanced { name = docker_network.gateway_net.name }
-  mounts {
-    source = docker_volume.blog_minio.name
-    target = "/data"
-    type   = "volume"
-  }
-  healthcheck {
-    test         = ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-    interval     = "10s"
-    timeout      = "5s"
-    retries      = 5
-    start_period = "20s"
-  }
-}
-
-# ─── BLOG MinIO bucket init ───────────────────────────────────
-resource "docker_container" "blog_minio_init" {
-  name       = "blog-minio-init"
-  image      = "quay.io/minio/mc:latest"
-  must_run   = false
-  restart    = "no"
-  entrypoint = ["/bin/sh", "-c"]
-  command = [
-    <<-EOT
-      until mc alias set blogminio http://blog-minio:9000 admin password123; do
-        echo "Waiting for MinIO..."; sleep 2;
-      done
-      mc mb --ignore-existing blogminio/blog-media
-      mc anonymous set download blogminio/blog-media
-      echo "Bucket setup complete!"
-    EOT
-  ]
-  networks_advanced { name = docker_network.gateway_net.name }
-  depends_on = [docker_container.blog_minio]
-}
-
 
 resource "docker_image" "hospital_management" {
   name         = "hospital_management:latest"
@@ -265,7 +189,6 @@ resource "docker_image" "notes_frontend_build" {
 resource "docker_image" "notes_backend" {
   name         = "notesapp-backend:latest"
   keep_locally = true
-  
   build {
     context    = abspath("${path.module}/../../projects/Notes App/backend")
     dockerfile = "Dockerfile"
@@ -342,6 +265,7 @@ resource "docker_image" "doc_frontend_build" {
     ]))
   }
 }
+
 # ─── GATEWAY ──────────────────────────────────────────────────
 module "gateway" {
   source        = "../../modules/docker_app"
@@ -372,15 +296,15 @@ module "gateway" {
 
 # ─── NOTES APP ────────────────────────────────────────────────
 resource "docker_container" "notes_postgres" {
-  name    = "notes-postgres"
-  image   = "postgres:16"
-  restart = "always"
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "notes-postgres"
+  image                 = "postgres:16"
+  restart               = "always"
+  destroy_grace_seconds = 30
   must_run              = true
   env = [
-    "POSTGRES_DB=notes_app",
-    "POSTGRES_USER=saisakthi",
-    "POSTGRES_PASSWORD=sai2008"
+    "POSTGRES_DB=${var.notes_db_name}",
+    "POSTGRES_USER=${var.notes_db_user}",
+    "POSTGRES_PASSWORD=${var.notes_db_password}",
   ]
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -398,17 +322,17 @@ module "notes_backend" {
   external_port = 0
   network       = docker_network.gateway_net.name
   env = [
-    "DATABASE_NAME=notes_app",
-    "DATABASE_USER=saisakthi",
-    "DATABASE_PASSWORD=sai2008",
-    "DATABASE_HOST=notes-postgres"
+    "DATABASE_NAME=${var.notes_db_name}",
+    "DATABASE_USER=${var.notes_db_user}",
+    "DATABASE_PASSWORD=${var.notes_db_password}",
+    "DATABASE_HOST=notes-postgres",
   ]
 }
 
 resource "docker_container" "notes_frontend_build" {
-  name  = "notes-frontend-build"
-  image = docker_image.notes_frontend_build.name
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "notes-frontend-build"
+  image                 = docker_image.notes_frontend_build.name
+  destroy_grace_seconds = 30
   must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -420,15 +344,15 @@ resource "docker_container" "notes_frontend_build" {
 
 # ─── BANK APP ─────────────────────────────────────────────────
 resource "docker_container" "bank_postgres" {
-  name    = "bank-postgres"
-  image   = "postgres:16-alpine"
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "bank-postgres"
+  image                 = "postgres:16-alpine"
+  destroy_grace_seconds = 30
   must_run              = true
-  restart = "always"
+  restart               = "always"
   env = [
-    "POSTGRES_USER=bankmanagement",
-    "POSTGRES_PASSWORD=bankmanagement@2008",
-    "POSTGRES_DB=bank"
+    "POSTGRES_USER=${var.bank_db_user}",
+    "POSTGRES_PASSWORD=${var.bank_db_password}",
+    "POSTGRES_DB=${var.bank_db_name}",
   ]
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -446,18 +370,18 @@ module "bank_backend" {
   external_port = 0
   network       = docker_network.gateway_net.name
   env = [
-    "SPRING_DATASOURCE_URL=jdbc:postgresql://bank-postgres:5432/bank",
-    "SPRING_DATASOURCE_USERNAME=bankmanagement",
-    "SPRING_DATASOURCE_PASSWORD=bankmanagement@2008"
+    "SPRING_DATASOURCE_URL=jdbc:postgresql://bank-postgres:5432/${var.bank_db_name}",
+    "SPRING_DATASOURCE_USERNAME=${var.bank_db_user}",
+    "SPRING_DATASOURCE_PASSWORD=${var.bank_db_password}",
   ]
 }
 
 resource "docker_container" "bank_frontend_build" {
-  name  = "bank-frontend-build"
-  image = docker_image.bank_frontend_build.name
-  networks_advanced { name = docker_network.gateway_net.name }
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "bank-frontend-build"
+  image                 = docker_image.bank_frontend_build.name
+  destroy_grace_seconds = 30
   must_run              = true
+  networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.bank_dist.name
     target = "/dist"
@@ -467,9 +391,9 @@ resource "docker_container" "bank_frontend_build" {
 
 # ─── QUIZ ─────────────────────────────────────────────────────
 resource "docker_container" "quiz_frontend_build" {
-  name  = "quiz-frontend-build"
-  image = docker_image.quiz_frontend_build.name
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "quiz-frontend-build"
+  image                 = docker_image.quiz_frontend_build.name
+  destroy_grace_seconds = 30
   must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -491,9 +415,9 @@ module "video_backend" {
 }
 
 resource "docker_container" "video_frontend_build" {
-  name  = "video-frontend-build"
-  image = docker_image.video_frontend_build.name
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "video-frontend-build"
+  image                 = docker_image.video_frontend_build.name
+  destroy_grace_seconds = 30
   must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -514,32 +438,97 @@ module "hospital_management" {
 }
 
 # ─── BLOG ─────────────────────────────────────────────────────
+resource "docker_container" "blog_db" {
+  name    = "blog-db"
+  image   = "mysql:8.0"
+  restart = "always"
+  env = [
+    "MYSQL_ROOT_PASSWORD=${var.blog_db_password}",
+    "MYSQL_DATABASE=${var.blog_db_name}",
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.blog_mysql.name
+    target = "/var/lib/mysql"
+    type   = "volume"
+  }
+  healthcheck {
+    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${var.blog_db_password}"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "30s"
+  }
+}
+
+resource "docker_container" "blog_minio" {
+  name    = "blog-minio"
+  image   = "quay.io/minio/minio:latest"
+  restart = "always"
+  command = ["server", "/data", "--console-address", ":9091"]
+  env = [
+    "MINIO_ROOT_USER=${var.blog_minio_user}",
+    "MINIO_ROOT_PASSWORD=${var.blog_minio_password}",
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.blog_minio.name
+    target = "/data"
+    type   = "volume"
+  }
+  healthcheck {
+    test         = ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "20s"
+  }
+}
+
+resource "docker_container" "blog_minio_init" {
+  name       = "blog-minio-init"
+  image      = "quay.io/minio/mc:latest"
+  must_run   = false
+  restart    = "no"
+  entrypoint = ["/bin/sh", "-c"]
+  command = [
+    <<-EOT
+      until mc alias set blogminio http://blog-minio:9000 ${var.blog_minio_user} ${var.blog_minio_password}; do
+        echo "Waiting for MinIO..."; sleep 2;
+      done
+      mc mb --ignore-existing blogminio/blog-media
+      mc anonymous set download blogminio/blog-media
+      echo "Bucket setup complete!"
+    EOT
+  ]
+  networks_advanced { name = docker_network.gateway_net.name }
+  depends_on = [docker_container.blog_minio]
+}
+
 module "blog_website" {
   source        = "../../modules/docker_app"
   name          = "blog-website"
   image         = docker_image.blog_website.name
-  
   internal_port = 8000
   external_port = 0
   network       = docker_network.gateway_net.name
   depends_on    = [docker_container.blog_db, docker_container.blog_minio]
   env = [
-    "DB_NAME=blog_db",
+    "DB_NAME=${var.blog_db_name}",
     "DB_USER=root",
-    "DB_PASSWORD=saisakthi2008",
+    "DB_PASSWORD=${var.blog_db_password}",
     "DB_HOST=blog-db",
     "DB_PORT=3306",
-    "MINIO_ACCESS_KEY=admin",
-    "MINIO_SECRET_KEY=password123",
+    "MINIO_ACCESS_KEY=${var.blog_minio_user}",
+    "MINIO_SECRET_KEY=${var.blog_minio_password}",
     "MINIO_BUCKET=blog-media",
     "MINIO_ENDPOINT=http://blog-minio:9000",
-    "SECRET_KEY=sai-key",
+    "SECRET_KEY=${var.blog_secret_key}",
     "DEBUG=False",
-    "ALLOWED_HOSTS=['localhost', '127.0.0.1']",
-    "MINIO_ENDPOINT=http://blog-minio:9000",          # internal — for Django uploads
-    "MINIO_PUBLIC_URL=http://localhost/blog/minio",   # public — for browser URLs
-    "MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs`", 
-    "MYSQLCLIENT_CFLAGS=`pkg-config mysqlclient --cflags`"
+    "ALLOWED_HOSTS=${var.blog_allowed_hosts}",
+    "MINIO_PUBLIC_URL=http://localhost/blog/minio",
+    "MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs`",
+    "MYSQLCLIENT_CFLAGS=`pkg-config mysqlclient --cflags`",
   ]
 }
 
@@ -552,16 +541,16 @@ module "api_service_backend" {
   external_port = 0
   network       = docker_network.gateway_net.name
   env = [
-    "API_KEY_WEATHER=a9dba91e24c88d7a4cdd395211df339a"
+    "API_KEY_WEATHER=${var.api_key_weather}",
   ]
 }
 
 resource "docker_container" "api_service_frontend_build" {
-  name  = "api-service-frontend-build"
-  image = docker_image.api_service_frontend_build.name
-  must_run = false    # ← add this
-  restart  = "no"
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "api-service-frontend-build"
+  image                 = docker_image.api_service_frontend_build.name
+  must_run              = false
+  restart               = "no"
+  destroy_grace_seconds = 30
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.api_dist.name
@@ -571,14 +560,13 @@ resource "docker_container" "api_service_frontend_build" {
 }
 
 # ─── DOCUMENT INTELLIGENCE PLATFORM ──────────────────────────
-
 resource "docker_container" "doc_mysql" {
   name    = "doc-mysql"
   image   = "mysql:8.0"
   restart = "always"
   env = [
-    "MYSQL_ROOT_PASSWORD=saisakthi2008",
-    "MYSQL_DATABASE=book_db"
+    "MYSQL_ROOT_PASSWORD=${var.doc_db_password}",
+    "MYSQL_DATABASE=${var.doc_db_name}",
   ]
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -586,9 +574,8 @@ resource "docker_container" "doc_mysql" {
     target = "/var/lib/mysql"
     type   = "volume"
   }
-
   healthcheck {
-    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psaisakthi2008"]
+    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${var.doc_db_password}"]
     interval     = "10s"
     timeout      = "5s"
     retries      = 5
@@ -597,15 +584,15 @@ resource "docker_container" "doc_mysql" {
 }
 
 resource "docker_container" "doc_minio" {
-  name    = "doc-minio"
-  image   = "quay.io/minio/minio:latest"
-  restart = "always"
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "doc-minio"
+  image                 = "quay.io/minio/minio:latest"
+  restart               = "always"
+  destroy_grace_seconds = 30
   must_run              = true
-  command = ["server", "/data", "--console-address", ":9001"]
+  command               = ["server", "/data", "--console-address", ":9001"]
   env = [
-    "MINIO_ROOT_USER=admin",
-    "MINIO_ROOT_PASSWORD=password123"
+    "MINIO_ROOT_USER=${var.doc_minio_user}",
+    "MINIO_ROOT_PASSWORD=${var.doc_minio_password}",
   ]
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
@@ -625,29 +612,29 @@ module "doc_backend" {
   env = [
     "DB_HOST=doc-mysql",
     "DB_PORT=3306",
-    "DB_NAME=book_db",
+    "DB_NAME=${var.doc_db_name}",
     "DB_USER=root",
-    "DB_PASSWORD=saisakthi2008",
+    "DB_PASSWORD=${var.doc_db_password}",
     "MINIO_ENDPOINT=doc-minio:9000",
-    "MINIO_ACCESS_KEY=admin",
-    "MINIO_SECRET_KEY=password123",
+    "MINIO_ACCESS_KEY=${var.doc_minio_user}",
+    "MINIO_SECRET_KEY=${var.doc_minio_password}",
     "MINIO_BUCKET=documents",
     "MINIO_SECURE=False",
-    "GEMINI_API_KEY=AIzaSyDgDMtJN5DrFfBfwym2x7Ea_sjqzOvSSLc",
+    "GEMINI_API_KEY=${var.doc_gemini_api_key}",
     "OLLAMA_HOST=host.docker.internal",
     "PORT_AI=11434",
-    "DJANGO_SECRET_KEY=your-secret-key-change-in-production",
+    "DJANGO_SECRET_KEY=${var.doc_django_secret_key}",
     "DEBUG=False",
-    "ALLOWED_HOSTS=localhost,127.0.0.1,gateway,doc-backend"
+    "ALLOWED_HOSTS=localhost,127.0.0.1,gateway,doc-backend",
   ]
 }
 
 resource "docker_container" "doc_frontend_build" {
-  name  = "doc-frontend-build"
-  image = docker_image.doc_frontend_build.name
-  must_run = false    # ← add this
-  restart  = "no"   
-  destroy_grace_seconds = 30  # ← wait 30s for graceful shutdown before force kill
+  name                  = "doc-frontend-build"
+  image                 = docker_image.doc_frontend_build.name
+  must_run              = false
+  restart               = "no"
+  destroy_grace_seconds = 30
   networks_advanced { name = docker_network.gateway_net.name }
   mounts {
     source = docker_volume.doc_dist.name
@@ -659,11 +646,9 @@ resource "docker_container" "doc_frontend_build" {
 # ─── INTRO PAGE ───────────────────────────────────────────────
 resource "null_resource" "intro_page" {
   depends_on = [module.gateway]
-  
   triggers = {
     file_sha = filesha256("${path.module}/../../projects/intro/index.html")
   }
-
   provisioner "local-exec" {
     command = <<-EOT
       docker run --rm \
@@ -673,7 +658,6 @@ resource "null_resource" "intro_page" {
     EOT
   }
 }
-
 
 # ═══════════════════════════════════════════════════════════════
 # SOCIAL MEDIA APP — Kubernetes / kind
@@ -763,13 +747,10 @@ resource "docker_image" "social_minio" {
   }
 }
 
-
-
 resource "null_resource" "kind_cluster" {
   triggers = {
     kind_config = filesha256("${path.module}/../../projects/Social Media App/infrastructure/kind/kind-config.yaml")
   }
-
   provisioner "local-exec" {
     command = <<-EOT
       if ! kind get clusters | grep -q "social-media"; then
@@ -777,7 +758,6 @@ resource "null_resource" "kind_cluster" {
       fi
     EOT
   }
-
   provisioner "local-exec" {
     when    = destroy
     command = "kind delete cluster --name social-media"
@@ -793,7 +773,6 @@ resource "null_resource" "kind_load_images" {
     docker_image.social_java,
     docker_image.social_minio,
   ]
-
   triggers = {
     django_id   = docker_image.social_django.image_id
     frontend_id = docker_image.social_frontend.image_id
@@ -801,7 +780,6 @@ resource "null_resource" "kind_load_images" {
     java_id     = docker_image.social_java.image_id
     minio_id    = docker_image.social_minio.image_id
   }
-
   provisioner "local-exec" {
     command = <<-EOT
       kind load docker-image socialmediaapp-django:latest --name social-media
@@ -814,19 +792,11 @@ resource "null_resource" "kind_load_images" {
 }
 
 resource "null_resource" "gateway_kind_network" {
-  depends_on = [
-    null_resource.kind_cluster,
-    module.gateway,
-  ]
-
-  triggers = {
-    cluster_id = null_resource.kind_cluster.id
-  }
-
+  depends_on = [null_resource.kind_cluster, module.gateway]
+  triggers   = { cluster_id = null_resource.kind_cluster.id }
   provisioner "local-exec" {
     command = "docker network connect kind gateway || true"
   }
-
   provisioner "local-exec" {
     when    = destroy
     command = "docker network disconnect kind gateway || true"
@@ -842,7 +812,6 @@ resource "helm_release" "ingress_nginx" {
   create_namespace = true
   wait             = true
   timeout          = 120
-
   set {
     name  = "controller.service.type"
     value = "NodePort"
@@ -861,7 +830,6 @@ resource "helm_release" "ingress_nginx" {
   }
 }
 
-# ─── KUBERNETES RESOURCES (unchanged) ────────────────────────
 resource "kubectl_manifest" "postgres_secret" {
   depends_on = [null_resource.kind_cluster]
   yaml_body  = <<-YAML
@@ -871,7 +839,7 @@ resource "kubectl_manifest" "postgres_secret" {
       name: postgres-secret
     type: Opaque
     data:
-      POSTGRES_PASSWORD: cGFzc3dvcmQ=
+      POSTGRES_PASSWORD: ${base64encode(var.social_db_password)}
   YAML
 }
 
@@ -916,9 +884,9 @@ resource "kubectl_manifest" "postgres_statefulset" {
                 - containerPort: 5432
               env:
                 - name: POSTGRES_DB
-                  value: socialdb
+                  value: ${var.social_db_name}
                 - name: POSTGRES_USER
-                  value: admin
+                  value: ${var.social_db_user}
                 - name: POSTGRES_PASSWORD
                   valueFrom:
                     secretKeyRef:
@@ -957,11 +925,8 @@ resource "kubectl_manifest" "backend_service" {
 }
 
 resource "kubectl_manifest" "backend_deployment" {
-  depends_on = [
-    null_resource.kind_load_images,
-    kubectl_manifest.postgres_statefulset,
-  ]
-  yaml_body = <<-YAML
+  depends_on = [null_resource.kind_load_images, kubectl_manifest.postgres_statefulset]
+  yaml_body  = <<-YAML
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -984,11 +949,14 @@ resource "kubectl_manifest" "backend_deployment" {
                 - containerPort: 8000
               env:
                 - name: DB_NAME
-                  value: socialdb
+                  value: ${var.social_db_name}
                 - name: DB_USER
-                  value: admin
+                  value: ${var.social_db_user}
                 - name: DB_PASSWORD
-                  value: password
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
                 - name: DB_HOST
                   value: postgres
                 - name: DB_PORT
@@ -997,7 +965,7 @@ resource "kubectl_manifest" "backend_deployment" {
                   value: "True"
                 - name: RUNNING_IN_DOCKER
                   value: "True"
-                - name: REDIS_PORT      
+                - name: REDIS_PORT
                   value: "6379"
   YAML
 }
@@ -1208,16 +1176,16 @@ resource "kubectl_manifest" "minio_deployment" {
                 - containerPort: 9004
               env:
                 - name: MINIO_ROOT_USER
-                  value: minio
+                  value: ${var.social_minio_user}
                 - name: MINIO_ROOT_PASSWORD
-                  value: minio123
+                  value: ${var.social_minio_password}
               volumeMounts:
                 - name: minio-data
                   mountPath: /data
           volumes:
             - name: minio-data
               emptyDir:
-                sizeLimit: 2Gi 
+                sizeLimit: 2Gi
   YAML
 }
 
@@ -1300,6 +1268,53 @@ resource "kubectl_manifest" "ingress_frontend" {
                       number: 80
   YAML
 }
+
+resource "kubectl_manifest" "redis_deployment" {
+  yaml_body = <<-YAML
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: redis
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: redis
+      template:
+        metadata:
+          labels:
+            app: redis
+        spec:
+          containers:
+          - name: redis
+            image: redis:7-alpine
+            ports:
+            - containerPort: 6379
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "50m"
+  YAML
+}
+
+resource "kubectl_manifest" "redis_service" {
+  depends_on = [kubectl_manifest.redis_deployment]
+  yaml_body  = <<-YAML
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: redis
+      namespace: default
+    spec:
+      selector:
+        app: redis
+      ports:
+      - port: 6379
+        targetPort: 6379
+  YAML
+}
+
 /*
 # ─── CASSANDRA ────────────────────────────────────────────────
 resource "helm_release" "cassandra" {
@@ -1437,49 +1452,3 @@ resource "helm_release" "promtail" {
   }
 }
 */
-
-resource "kubectl_manifest" "redis_deployment" {
-  yaml_body = <<-YAML
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: redis
-      namespace: default
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: redis
-      template:
-        metadata:
-          labels:
-            app: redis
-        spec:
-          containers:
-          - name: redis
-            image: redis:7-alpine
-            ports:
-            - containerPort: 6379
-            resources:
-              requests:
-                memory: "64Mi"
-                cpu: "50m"
-  YAML
-}
-
-resource "kubectl_manifest" "redis_service" {
-  depends_on = [kubectl_manifest.redis_deployment]
-  yaml_body = <<-YAML
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: redis
-      namespace: default
-    spec:
-      selector:
-        app: redis
-      ports:
-      - port: 6379
-        targetPort: 6379
-  YAML
-}
