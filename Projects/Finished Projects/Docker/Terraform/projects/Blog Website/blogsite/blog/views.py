@@ -6,6 +6,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseForbidden
 from django.contrib.auth import login, logout
 from django_ratelimit.decorators import ratelimit
+# Add this temporarily to any view
+import traceback
+traceback.print_stack()
 
 
 # ─── AUTH ─────────────────────────────────────────────────────
