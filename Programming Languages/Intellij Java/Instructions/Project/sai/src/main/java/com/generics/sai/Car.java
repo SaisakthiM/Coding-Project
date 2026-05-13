@@ -1,4 +1,4 @@
-package com.sai.generics;
+package com.generics.sai;
 import java.util.ArrayList;
 import java.util.List;
 
