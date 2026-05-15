@@ -5,32 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "java",
+            "type": "jdk",
             "name": "SaiApplication",
             "request": "launch",
             "mainClass": "com.generics.sai.SaiApplication",
-            "projectName": "com.generics-sai"
+            
         },
         {
-            "type": "java",
+            "type": "jdk",
             "name": "Others",
             "request": "launch",
             "mainClass": "Exercises.Others.Others",
-            "projectName": "Coding Project_3ddd251b"
+            
         },
         {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "Coding Project_3ddd251b"
-        },
-        {
-            "type": "java",
+            "type": "jdk",
             "name": "Vehicle",
             "request": "launch",
             "mainClass": "Vehicle",
-            "projectName": "Coding Project_3ddd251b"
         },
         {
             "name": "Python Debugger: Current File",
@@ -66,24 +58,20 @@
             "args": []
         },
         {
-            "type": "java",
+            "type": "jdk",
             "name": "Spring Boot-SaisakthiApplication<saisakthi>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "spring_boot.saisakthi.SaisakthiApplication",
-            "projectName": "saisakthi",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
         },
         {
-            "type": "java",
+            "type": "jdk",
             "name": "Spring Boot-Application2<spring>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "spring_project.spring.Application2",
-            "projectName": "spring",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
