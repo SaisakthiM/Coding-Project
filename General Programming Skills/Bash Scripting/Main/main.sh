@@ -1,19 +1,47 @@
-# Start of the program to run my docker container and see if any errors are there
+#!/bin/bash
 
-cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Notes App"
-if [ -f find "docker-compose.yml" ]; then
-    printf "Missing file"
-    exit 1
-fi
+whoami
+date
+date
+uptime
+df -h /
 
-result=$(docker compose up -d | grep "❌")
+count=0
+for i in {1..10}; do
+  count=$((count + 1))
+done
 
-if [ -n "$result" ]; then
-    echo "Some services failed:"
-    echo "$result"
+echo $count
+
+for i in {1..10}; do
+  touch log$i.log
+  touch text$i.txt
+done
+for file in $(ls -v *.log); do
+  echo "Processing $file"
+done
+for file in $(ls -v *.txt); do
+  echo "Processing $file"
+done
+rm *.txt *.log
+
+touch server.log
+
+if [ -f "server.log" ]; then
+  echo "file exists"
 else
-    echo "All services are OK"
+  echo "file not exists"
 fi
 
+if [ -f "main.log" ]; then
+  echo "file exists : main.log"
+else
+  echo "file not exists : main.log"
+fi
 
+rm server.log
 
+files=($(touch main.log), $(touch server.log), $(touch k.log))
+for i in *.log; do
+  echo "${files[i]}"
+done
