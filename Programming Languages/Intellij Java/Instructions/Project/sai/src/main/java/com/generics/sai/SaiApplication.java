@@ -60,7 +60,7 @@ public class SaiApplication extends Car {
 		stack.pop();
 		System.out.print(stack.peek());
 
-((java.util.HashMap)map).table		
+
 	}
 
 }
