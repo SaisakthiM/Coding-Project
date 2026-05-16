@@ -3,6 +3,7 @@ package com.generics.sai;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Stack;
 import java.util.TreeMap;
 
 import org.springframework.boot.SpringApplication;
@@ -42,7 +43,24 @@ public class SaiApplication extends Car {
 		link.pop();
 		link.poll();
 
-		HashSet<
+		HashSet<Integer> set = new HashSet<>();
+		set.add(1);
+		set.add(2);
+		set.add(3);
+		set.add(4);
+		set.add(2);
+		set.remove(1);
+
+		Stack<Integer> stack = new Stack<>();
+		stack.add(1);
+		stack.add(2);
+		stack.add(3);
+		stack.add(4);
+		stack.remove(1);
+		stack.pop();
+		System.out.print(stack.peek());
+
+((java.util.HashMap)map).table		
 	}
 
 }
