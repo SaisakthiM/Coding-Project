@@ -1,0 +1,193 @@
+server {
+    listen 80;
+    server_name localhost;
+    client_max_body_size 1000M;
+
+    resolver 127.0.0.11 valid=30s ipv6=off;
+
+    # ─── NOTES ────────────────────────────────────────────────
+    location /notes/api/ {
+        set $notes_backend "notes-backend:8000";
+        rewrite ^/notes/api/(.*)$ /api/$1 break;
+        proxy_pass http://$notes_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    location /notes/ {
+        root /apps;
+        try_files $uri $uri/ /notes/index.html;
+    }
+
+    # ─── BANK ─────────────────────────────────────────────────
+    location /bank/api/ {
+        set $bank_backend "bank-backend:8080";
+        rewrite ^/bank/api/(.*)$ /api/$1 break;
+        proxy_pass http://$bank_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    location /bank/ {
+        root /apps;
+        try_files $uri $uri/ /bank/index.html;
+    }
+
+    # ─── QUIZ ─────────────────────────────────────────────────
+    location /quiz/ {
+        root /apps;
+        try_files $uri $uri/ /quiz/index.html;
+    }
+
+    # ─── VIDEO ────────────────────────────────────────────────
+    location /video/api/ {
+        set $video_backend "video-uploader-backend:8080";
+        rewrite ^/video/api/(.*)$ /$1 break;
+        proxy_pass http://$video_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    location /video/ {
+        root /apps;
+        try_files $uri $uri/ /video/index.html;
+    }
+
+    # ─── HOSPITAL ─────────────────────────────────────────────
+    location /hospital/ {
+        set $hospital_backend "hospital-management:8000";
+        rewrite ^/hospital/(.*)$ /hospital/$1 break;
+        proxy_pass http://$hospital_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    # ─── BLOG ─────────────────────────────────────────────────
+    location /blog/ {
+        set $blog_backend "blog-website:8000";
+        rewrite ^/blog/(.*)$ /blog/$1 break;
+        proxy_pass http://$blog_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    location /accounts/login/ {
+        return 302 /blog/login/;
+    }
+
+    location /accounts/logout/ {
+        return 302 /blog/logout/;
+    }
+
+    # ─── BLOG MINIO ───────────────────────────────────────────  
+    location /blog/minio/ {
+        set $blog_minio "blog-minio:9000";
+        rewrite ^/blog/minio/(.*)$ /$1 break;
+        proxy_pass http://$blog_minio;
+
+        # Critical: send MinIO's own host, not the browser's
+        proxy_set_header Host blog-minio:9000;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # Critical: disable buffering for uploads to work
+        proxy_buffering off;
+        proxy_request_buffering off;
+        client_max_body_size 1000M;
+
+        # Required for presigned URL signature validation
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+ 
+
+    # ─── SOCIAL MEDIA (Kubernetes via kind) ───────────────────
+    location /social/ {
+        set $social_upstream "social-media-control-plane:30080";
+        proxy_pass http://$social_upstream;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, X-CSRFToken" always;
+
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type, X-CSRFToken";
+            return 204;
+        }
+    }
+
+    # ─── API SERVICE ──────────────────────────────────────────
+    location /api-service/api/ {
+        set $api_service_backend "api-service-backend:8000";
+        rewrite ^/api-service/api/(.*)$ /$1 break;
+        proxy_pass http://$api_service_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+    }
+
+    location /api-service/ {
+        root /apps;
+        try_files $uri $uri/ /api-service/index.html;
+    }
+
+    # ─── DOCUMENT INTELLIGENCE PLATFORM ──────────────────────
+    location /document/api/ {
+        set $doc_backend "doc-backend:8000";
+        rewrite ^/document/api/(.*)$ /$1 break;
+        proxy_pass http://$doc_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+    }
+
+    location /document/ {
+        root /apps;
+        try_files $uri $uri/ /document/index.html;
+    }
+
+    location /intro/ {
+        root /apps;
+        try_files $uri $uri/ /intro/index.html;
+    }
+
+    # ─── GATEWAY STATUS ───────────────────────────────────────
+    location / {
+        return 200 '{"status":"gateway running","apps":["/notes/","/bank/","/quiz/","/video/","/hospital/","/blog/","/social/","/api-service/","/document/"]}';
+        add_header Content-Type application/json;
+    }
+}

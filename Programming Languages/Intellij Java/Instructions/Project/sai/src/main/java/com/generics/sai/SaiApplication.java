@@ -1,11 +1,11 @@
 package com.generics.sai;
 
-import com.generics.sai.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.TreeMap;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 @SpringBootApplication
@@ -21,7 +21,26 @@ public class SaiApplication extends Car {
 		map.put("cherry", 3);
 		map.put("Aa", 1);      // breakpoint
 		map.put("BB", 2);      // breakpoint — collision happens here!
-        
+		map.remove("apple");
+
+        TreeMap<String, Integer> tree = new TreeMap<>();
+
+		tree.put("apple", 1);
+		tree.put("banana", 2);
+		tree.put("cherry", 3);
+		tree.put("Aa", 1);      // breakpoint
+		tree.put("BB", 2);      // breakpoint — collision happens here!
+		tree.remove("apple");
+
+		LinkedList<Integer> link = new LinkedList<>();
+		link.add(1);
+		link.add(2);
+		link.add(3);
+		link.add(4);
+		link.remove(1);
+		link.pop();
+		link.poll();
+
 	}
 
 }
