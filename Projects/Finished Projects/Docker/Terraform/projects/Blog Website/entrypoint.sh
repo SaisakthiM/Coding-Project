@@ -8,4 +8,5 @@ echo "MySQL is ready!"
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
+python manage.py test blog.tests -v 2
 exec gunicorn blogsite.wsgi:application --bind 0.0.0.0:8000
