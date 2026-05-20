@@ -93,7 +93,6 @@ Further into the tutorial the concepts become more complex, and it is therefore 
 
 And as mentioned on the previous page, you should be comfortable in at least one of the most common programming languages, like for example JavaScript, C or Python, before doing this tutorial.
 
-On the next page we will look at two different algorithms that prints out the first 100 Fibonacci numbers using only primitive data structures (two integer variables). One algorithm uses a loop, and one algorithm uses something called recursion.
 
 Click the 'Next' button to continue.
 """

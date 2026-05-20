@@ -29,7 +29,7 @@ class HomeViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_unauthenticated_create_post_redirects(self):
-        response = self.client.get("/blog/create/")
+        response = self.client.get("/blog/post/new/")
         self.assertEqual(response.status_code, 302)
 
     def test_login_with_valid_credentials(self):
@@ -48,7 +48,7 @@ class HomeViewTest(TestCase):
 
     def test_authenticated_user_can_access_create_post(self):
         self.client.login(username="testuser1", password="TestPass123!")
-        response = self.client.get("/blog/create/")
+        response = self.client.get("/blog/post/new/")
         self.assertEqual(response.status_code, 200)
 
     def test_owner_can_edit_post(self):
@@ -63,7 +63,7 @@ class HomeViewTest(TestCase):
 
     def test_delete_post_by_owner(self):
         self.client.login(username="testuser1", password="TestPass123!")
-        response = self.client.post(f"/blog/delete/{self.post.pk}/")
+        response = self.client.post(f"/blog/post/{self.post.pk}/delete/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Post.objects.count(), 0)
 
