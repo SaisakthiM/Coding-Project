@@ -13,7 +13,7 @@ public class ApiResponse {
     private Object data;
     
     // Convenience constructor for responses without data
-    public ApiResponse(boolean success, String message) {
+    public ApiResponse(boolean success, String message, AccountResponse account) {
         this.success = success;
         this.message = message;
     }
