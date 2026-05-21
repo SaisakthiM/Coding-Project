@@ -1,29 +1,24 @@
 package com.bankmanagement.bank_management.service;
 
-import org.junit.jupiter.api.Test;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.bankmanagement.bank_management.database.Bank;
 import com.bankmanagement.bank_management.dto.AccountRequest;
 import com.bankmanagement.bank_management.dto.AccountResponse;
 import com.bankmanagement.bank_management.repository.BankRepository;
 
-@ExtendWith(MockitoExtension.class) 
+@ExtendWith(MockitoExtension.class)
 public class BankServiceTest {
 
     @Mock
@@ -42,7 +37,7 @@ public class BankServiceTest {
         request.setCustomerName("John");
         when(bankRepository.existsByAccountNumber("ACC001")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> {
-        bankService.createAccount(request);
+            bankService.createAccount(request);
         });
     }
 
@@ -67,7 +62,6 @@ public class BankServiceTest {
         assertEquals(0L, response.getBalance());
     }
 
-
     @Test
     void notFound_getAccountById_shouldThrow() {
         // ARRANGE — repo returns nothing for this ID
@@ -79,7 +73,7 @@ public class BankServiceTest {
         });
     }
 
-    @Test 
+    @Test
     void accountFound_getAccountById_Success() {
         Bank savedBank = new Bank();
         savedBank.setAccountNumber("BC001");
@@ -103,9 +97,11 @@ public class BankServiceTest {
         savedBank.setCustomerName("John");
         savedBank.setBalance(0L);
 
-        when(bankRepository.findById(1L)).thenReturn(Optional.of(savedBank));
-        assertThrows(IllegalArgumentException.class, () -> {bankService.deposit(1L, -2L);});
+        assertThrows(IllegalArgumentException.class, () -> {
+            bankService.deposit(1L, -2L);
+        });
     }
+
     @Test
     void moneyDeposit_deposit_success() {
         Bank savedBank = new Bank();
@@ -113,20 +109,57 @@ public class BankServiceTest {
         savedBank.setId(1L);
         savedBank.setCustomerName("John");
         savedBank.setBalance(0L);
-        
+
         when(bankRepository.findById(1L)).thenReturn(Optional.of(savedBank));
+        when(bankRepository.save(any())).thenReturn(savedBank);
 
         AccountResponse response = bankService.deposit(1L, 20L);
-
-        
-
+        assertEquals(1L, response.getId());
+        assertEquals("BC001", response.getAccountNumber());
+        assertEquals("John", response.getCustomerName());
     }
 
+    @Test
+    void excessWithdraw_withdraw_shouldThrow() {
+        Bank savedBank = new Bank();
+        savedBank.setAccountNumber("BC001");
+        savedBank.setId(1L);
+        savedBank.setCustomerName("John");
+        savedBank.setBalance(0L);
 
+        when(bankRepository.findById(1L)).thenReturn(Optional.of(savedBank));
 
-    
+        assertThrows(IllegalArgumentException.class, () -> {bankService.withdraw(1L, 10000L);});
+    }
+
+    @Test
+    void havingWithdraw_withdraw_success() {
+        Bank savedBank = new Bank();
+        savedBank.setAccountNumber("BC001");
+        savedBank.setId(1L);
+        savedBank.setCustomerName("John");
+        savedBank.setBalance(1000L);
+
+        when(bankRepository.findById(1L)).thenReturn(Optional.of(savedBank));
+        when(bankRepository.save(any())).thenReturn(savedBank);
+
+        AccountResponse response = bankService.withdraw(1L, 100L);
+
+        assertEquals(1L, response.getId());
+        assertEquals("BC001", response.getAccountNumber());
+        assertEquals("John", response.getCustomerName());
+        assertEquals(900L, response.getBalance());
+    }
+
+    @Test
+    void negativeWithdraw_withdraw_shouldThrow() {
+        Bank savedBank = new Bank();
+        savedBank.setAccountNumber("BC001");
+        savedBank.setId(1L);
+        savedBank.setCustomerName("John");
+        savedBank.setBalance(0L);
+
+        assertThrows(IllegalArgumentException.class, () -> {bankService.withdraw(1L, -4L);});
+    }
+
 }
-
-
-    
-
