@@ -373,6 +373,9 @@ module "bank_backend" {
     "SPRING_DATASOURCE_URL=jdbc:postgresql://bank-postgres:5432/${var.bank_db_name}",
     "SPRING_DATASOURCE_USERNAME=${var.bank_db_user}",
     "SPRING_DATASOURCE_PASSWORD=${var.bank_db_password}",
+    "DB_HOST=bank-postgres",
+    "DB_PORT=5432",
+    "DB_USER=${var.bank_db_user}",
   ]
 }
 

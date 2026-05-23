@@ -10,18 +10,36 @@ router.get("/", (req,res) => {
 })
 router.get('/api/weather/', async function(req, res, next) {
   const { lat, lon } = req.query;
-  const val = await axios.get(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY_WEATHER}&units=metric`
-  );
-  res.json(val.data);
+  if (lat < -90 || lat > 90) {
+    setError("Latitude must be between -90 and 90");
+    return; // ← stop here, don't call the API
+  }
+  if (lon < -180 || lon > 180) {
+    setError("Longitude must be between -180 and 180");
+    return;
+  }
+  try {
+    const val = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY_WEATHER}&units=metric`
+    );
+    res.json(val.data);
+  }
+  catch (err) {
+    console.log(err)
+  }
 });
 
 router.get('/api/geo/cod/', async function(req, res, next) {
   const { city, state_code, country_code } = req.query;
-  const val = await axios.get(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${city},${state_code},${country_code}&appid=${process.env.API_KEY_WEATHER}`
-  );
-  res.json(val.data);
+  try {
+    const val = await axios.get(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${city},${state_code},${country_code}&appid=${process.env.API_KEY_WEATHER}`
+    );
+    res.json(val.data);
+  }
+  catch (err) {
+    console.log(err)
+  }
 });
 
 

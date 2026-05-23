@@ -21,7 +21,7 @@ public class AuthController {
             AuthResponse response = authService.register(request);
             return ResponseEntity.ok(new ApiResponse(true, "Registration successful", response));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), account));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
         }
     }
 
@@ -31,7 +31,7 @@ public class AuthController {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(new ApiResponse(true, "Login successful", response));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), account));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
         }
     }
 }

@@ -24,7 +24,7 @@ export function Home() {
                     <Link to="/geo/cod" className="api-card">
                         <div className="api-card-icon">🌐</div>
                         <div className="api-card-content">
-                            <h2>Geocoding API</h2>
+                            <h2 id="geocod">Geocoding API</h2>
                             <p>Convert a city name, state, and country code into latitude and longitude coordinates.</p>
                         </div>
                         <span className="api-card-arrow">→</span>
