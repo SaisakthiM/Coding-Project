@@ -28,7 +28,7 @@ public class BankController {
                     .body(new ApiResponse(true, "Account created successfully", account));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), null));
         }
     }
     
@@ -40,7 +40,7 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponse(true, "Account found", account));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), null));
         }
     }
     
@@ -61,7 +61,7 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponse(true, "Deposit successful", account));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), null));
         }
     }
     
@@ -75,7 +75,7 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponse(true, "Withdrawal successful", account));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), null));
         }
     }
 }
