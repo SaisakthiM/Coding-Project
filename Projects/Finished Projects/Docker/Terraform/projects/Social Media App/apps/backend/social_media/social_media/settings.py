@@ -13,7 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="unsafe-secret-key")
 DEBUG = env.bool("DEBUG", default=True)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "saisakthi.qzz.io"])
 
 # Installed apps
 INSTALLED_APPS = [
@@ -168,7 +168,7 @@ STORAGES = {
             "secret_key":        "minio123",
             "bucket_name":       "media",
             "endpoint_url":      "http://minio:9000",
-            "custom_domain":     None,
+            "custom_domain":     "saisakthi.qzz.io/social/minio/media",
             "url_protocol":      "http:",
             "querystring_auth":  False,
             "file_overwrite":    False,
@@ -194,4 +194,11 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
     "http://localhost",
     "http://localhost:3000",
     "http://127.0.0.1",
+    "http://saisakthi.qzz.io"
 ])
+
+FORCE_SCRIPT_NAME = '/social'
+LOGIN_URL = '/social/login/'
+LOGIN_REDIRECT_URL = '/social/'
+LOGOUT_REDIRECT_URL = '/social/login/'
+REGISTER_REDIRECT_URL = '/social/register/'

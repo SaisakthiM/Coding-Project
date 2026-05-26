@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-_9$gh=u4#z*o9!f!+i#43(2ma$of1pt)!_fbl^w(@6z31yqn5y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'saisakthi.qzz.io']
 
 
 # Application definition
@@ -114,7 +114,7 @@ STORAGES = {
             "file_overwrite": False,
             "url_protocol": "http:",
             # ↓ CRITICAL: Include bucket name in custom_domain for correct URL generation
-            "custom_domain": f"{MINIO_PUBLIC_URL.replace('http://', '').replace('https://', '')}/{MINIO_BUCKET}",
+            "custom_domain": "saisakthi.qzz.io/blog/minio",
         }
     },
     "staticfiles": {
@@ -125,10 +125,11 @@ STORAGES = {
 # CSP — whitelist what the blog templates actually use
 SECURE_CONTENT_SECURITY_POLICY = (
     "default-src 'self'; "
-    "script-src 'self' https://cdn.tailwindcss.com; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "script-src 'self' https://cdn.tailwindcss.com https://static.cloudflareinsights.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://static.cloudflareinsights.com; "
     "font-src 'self' https://fonts.gstatic.com; "
-    "img-src 'self' data: blob:;"
+    "img-src 'self' data: blob:; "
+    "connect-src 'self' https://cloudflareinsights.com;"  
 )
 
 # ─── MinIO Bucket Initialization (Graceful) ───────────────────────

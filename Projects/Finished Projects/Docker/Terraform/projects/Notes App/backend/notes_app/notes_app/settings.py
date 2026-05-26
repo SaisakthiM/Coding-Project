@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-j-ywtgbj^=8b^h4!q84w@q(5nicncv%_v&an8*ho*$md*ge@kd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["localhost", '127.0.0.1', 'saisakthi.qzz.io']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # ← must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,7 +77,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = 'notes_app.urls'
@@ -118,6 +118,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:80",
     "http://127.0.0.1",
     "http://gateway",
+    "http://saisakthi.qzz.io"
 ]
 
 ALLOWED_HOSTS = [
@@ -125,7 +126,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "gateway",
     "notes-backend",
-    "*",
+    "saisakthi.qzz.io",
 ]
 
 
@@ -179,5 +180,5 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWS_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True 
 

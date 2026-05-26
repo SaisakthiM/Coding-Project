@@ -44,7 +44,7 @@ function AppRoutes() {
       <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
       {/* Protected routes inside Layout */}
-      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>} basename="/social">
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>} >
         <Route path="/"                       element={<HomePage />} />
         <Route path="/explore"                element={<ExplorePage />} />
         <Route path="/search"                 element={<SearchPage />} />
@@ -62,7 +62,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/social">
       <AuthProvider>
         <AppRoutes />
         <ToastContainer

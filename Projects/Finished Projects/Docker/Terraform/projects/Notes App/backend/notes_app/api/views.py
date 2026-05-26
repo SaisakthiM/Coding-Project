@@ -6,6 +6,7 @@ from .serializers import UserSerializer, NoteSerializer
 from .models import Note
 
 
+
 # ─── CUSTOM THROTTLE CLASSES ──────────────────────────────────
 # Define these here or in a shared throttles.py file
 
@@ -23,12 +24,14 @@ class RegisterThrottle(AnonRateThrottle):
 # ─── VIEWS ────────────────────────────────────────────────────
 
 class CreateUserView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     throttle_classes = [RegisterThrottle]   # rate limit registration
 
 
 class NoteViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
     serializer_class = NoteSerializer
     permission_classes = [permissions.IsAuthenticated]
     throttle_classes = [NoteCreateThrottle]

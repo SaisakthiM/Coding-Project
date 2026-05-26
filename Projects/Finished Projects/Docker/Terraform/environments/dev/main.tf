@@ -1255,22 +1255,20 @@ resource "kubectl_manifest" "ingress_frontend" {
     kind: Ingress
     metadata:
       name: social-media-frontend-ingress
-      namespace: default
       annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
         nginx.ingress.kubernetes.io/use-regex: "true"
     spec:
       ingressClassName: nginx
       rules:
-        - http:
-            paths:
-              - path: /social(/|$)(.*)
-                pathType: ImplementationSpecific
-                backend:
-                  service:
-                    name: frontend-prod
-                    port:
-                      number: 80
+      - http:
+          paths:
+          - path: /social(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend-prod
+                port:
+                  number: 80
   YAML
 }
 
