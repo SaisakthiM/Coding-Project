@@ -96,7 +96,7 @@ public class AuthControllerTest {
         AuthRequest request = new AuthRequest();
         request.setUsername("sai");
         request.setPassword("saisakthi#2008");
-        AuthResponse response = new AuthResponse(null, null, null, null, null);
+        AuthResponse response = new AuthResponse(null, null, null, null, null, 700, 0L);
         response.setUsername("sai");
         when(authService.login(any())).thenReturn(response);
         mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)

@@ -37,10 +37,10 @@ export default function GetAccount() {
                         <h2>Account Information</h2>
                         <p><strong>Customer Name:</strong> {account.customerName}</p>
                         <p><strong>Account Number:</strong> {account.accountNumber}</p>
-                        <p><strong>Balance:</strong> ₹{account.balance?.toLocaleString()}</p>
+                        <p><strong>Balance:</strong> ₹{account.balance}</p>
                         <p><strong>Credit Score:</strong> {account.creditScore}</p>
-                        <p><strong>Created At:</strong> {new Date(account.createdAt).toLocaleDateString()}</p>
-                        <p><strong>Updated At:</strong> {new Date(account.updatedAt).toLocaleDateString()}</p>
+                        <p><strong>Created At:</strong> {account.createdAt}</p>
+                        <p><strong>Updated At:</strong> {account.updatedAt}</p>
                     </div>
                 )}
                 <div className="button-group">

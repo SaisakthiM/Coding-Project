@@ -16,5 +16,6 @@ public class ApiResponse {
     public ApiResponse(boolean success, String message, AccountResponse account) {
         this.success = success;
         this.message = message;
+        this.data = account; 
     }
 }

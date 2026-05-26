@@ -19,8 +19,12 @@ export default function AddDeposit() {
         try {
             const response = await bankService.deposit(user.accountId, parseInt(amount));
             if (response.success) {
-                setMessage(`Successfully deposited ₹${amount}! New balance: ₹${response.balance}`);
-                login({ ...user, balance: response.balance });
+                setMessage(`Successfully deposited ₹${amount}! New balance: ₹${response.data.balance}`);
+                login({ ...user, 
+                    balance: response.data.balance,
+                    creditScore: response.data.creditScore,
+                    loanBalance: response.data.loanBalance
+                });
                 setAmount("");
             }
         } catch (err) {
@@ -36,7 +40,7 @@ export default function AddDeposit() {
                 <h1>Add Deposit</h1>
                 <div className="account-details">
                     <p><strong>Account:</strong> {user?.accountNumber}</p>
-                    <p><strong>Current Balance:</strong> ₹{user?.balance?.toLocaleString()}</p>
+                    <p><strong>Current Balance:</strong> ₹{user.balance}</p>
                 </div>
                 {message && <div className="success-message">{message}</div>}
                 {error && <div className="error-message">{error}</div>}

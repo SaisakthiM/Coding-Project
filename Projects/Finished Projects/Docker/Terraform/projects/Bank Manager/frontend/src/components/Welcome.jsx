@@ -17,7 +17,7 @@ export default function Welcome() {
         <div className="account-details">
           <h2>Your Account Details</h2>
           <p><strong>Account Number:</strong> {user?.accountNumber}</p>
-          <p><strong>Balance:</strong> ₹{user?.balance?.toLocaleString()}</p>
+          <p><strong>Balance:</strong> ₹{user?.balance?.toLocaleString() ?? 0}</p>
           <p><strong>Credit Score:</strong> {user?.creditScore}</p>
           <p><strong>Loan Balance:</strong> ₹{user?.loanBalance?.toLocaleString() ?? 0}</p>
         </div>

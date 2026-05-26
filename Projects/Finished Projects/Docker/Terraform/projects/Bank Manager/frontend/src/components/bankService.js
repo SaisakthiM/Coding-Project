@@ -11,6 +11,7 @@ const bankService = {
         customerName,
         accountNumber,
       });
+      console.log(response)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -43,6 +44,7 @@ const bankService = {
       const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/deposit`, {
         amount,
       });
+      console.log(response)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
