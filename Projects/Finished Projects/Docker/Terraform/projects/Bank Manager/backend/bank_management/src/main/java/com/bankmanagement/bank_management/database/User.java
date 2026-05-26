@@ -22,7 +22,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column()
+    private Long creditScore = 700L;
+
     @OneToOne
     @JoinColumn(name = "account_id")
     private Bank account;
+
+
 }

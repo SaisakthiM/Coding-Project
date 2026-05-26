@@ -8,12 +8,13 @@ import com.bankmanagement.bank_management.service.BankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 @RequiredArgsConstructor
 public class BankController {
     
@@ -78,4 +79,35 @@ public class BankController {
                     .body(new ApiResponse(false, e.getMessage(), null));
         }
     }
+
+    @PostMapping("/{id}/loan")
+    public ResponseEntity<ApiResponse> loan(
+        @PathVariable Long id, 
+        @RequestBody TransactionRequest request
+    ) {
+        try {
+            AccountResponse account = bankService.loan(id, request.getAmount());
+            return ResponseEntity.ok(new ApiResponse(true, "Loan successful, Added into your balance", account));
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("/{id}/repay")
+    public ResponseEntity<ApiResponse> repay(
+        @PathVariable Long id, 
+        @RequestBody TransactionRequest request
+    ) {
+        try {
+            AccountResponse account = bankService.repay(id, request.getAmount());
+            return ResponseEntity.ok(new ApiResponse(true, "Repay successful, Reduced from your balance", account));
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
+    }
+
 }

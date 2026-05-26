@@ -19,8 +19,8 @@ export default function Withdraw() {
         try {
             const response = await bankService.withdraw(user.accountId, parseInt(amount));
             if (response.success) {
-                setMessage(`Successfully withdrew ₹${amount}! New balance: ₹${response.data.balance}`);
-                login({ ...user, balance: response.data.balance });
+                setMessage(`Successfully withdrew ₹${amount}! New balance: ₹${response.balance}`);
+                login({ ...user, balance: response.balance });
                 setAmount("");
             }
         } catch (err) {

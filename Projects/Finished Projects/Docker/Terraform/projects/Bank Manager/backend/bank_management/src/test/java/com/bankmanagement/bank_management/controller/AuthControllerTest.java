@@ -55,7 +55,7 @@ public class AuthControllerTest {
         AuthRequest request = new AuthRequest();
         request.setUsername("sai");
         request.setPassword("saisakthi#2008");
-        AuthResponse response = new AuthResponse(null, null, null, null, null);
+        AuthResponse response = new AuthResponse(null, null, null, null, null, 700, 0L);
         response.setUsername("sai");
         when(authService.register(any())).thenReturn(response);
         mockMvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
@@ -82,7 +82,7 @@ public class AuthControllerTest {
         AuthRequest request = new AuthRequest();
         request.setUsername("sai");
         request.setPassword("sai#2008");
-        AuthResponse response = new AuthResponse(null, null, null, null, null);
+        AuthResponse response = new AuthResponse(null, null, null, null, null, 700, 0L);
         response.setUsername("sai");
         when(authService.login(any())).thenThrow(new IllegalArgumentException("Invalid username or password"));
         mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).

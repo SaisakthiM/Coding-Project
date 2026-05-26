@@ -42,7 +42,7 @@ public class BankControllerTest {
 
         when(bankService.createAccount(any())).thenThrow(new IllegalArgumentException("Account number already exists"));
 
-        mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/accounts").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
               
@@ -59,7 +59,7 @@ public class BankControllerTest {
 
         when(bankService.createAccount(any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/accounts").contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.success").value(true))
@@ -70,7 +70,7 @@ public class BankControllerTest {
         when(bankService.getAccountById(any()))
             .thenThrow(new IllegalArgumentException("Account Does not exists"));
 
-        mockMvc.perform(get("/accounts/1"))
+        mockMvc.perform(get("/api/accounts/1"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").value("Account Does not exists"));
@@ -84,7 +84,7 @@ public class BankControllerTest {
 
         when(bankService.getAccountById(1L)).thenReturn(response);
 
-        mockMvc.perform(get("/accounts/1"))
+        mockMvc.perform(get("/api/accounts/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true));
     }
@@ -95,7 +95,7 @@ public class BankControllerTest {
         request.setAccountNumber("BC001");
         
         when(bankService.deposit(anyLong(), any())).thenThrow(new IllegalArgumentException("Account does not exists"));
-        mockMvc.perform(post("/accounts/1/deposit").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/accounts/1/deposit").contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
@@ -113,7 +113,7 @@ public class BankControllerTest {
 
         when(bankService.deposit(anyLong(), any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts/1/deposit")
+        mockMvc.perform(post("/api/accounts/1/deposit")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
@@ -130,7 +130,7 @@ public class BankControllerTest {
         when(bankService.deposit(anyLong(), any()))
     .thenThrow(new IllegalArgumentException("Deposit amount must be positive"));
         
-        mockMvc.perform(post("/accounts/1/deposit").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/accounts/1/deposit").contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
@@ -145,7 +145,7 @@ public class BankControllerTest {
         when(bankService.withdraw(anyLong(), any()))
             .thenThrow(new IllegalArgumentException("Withdrawal amount must be positive"));
 
-        mockMvc.perform(post("/accounts/1/withdraw")
+        mockMvc.perform(post("/api/accounts/1/withdraw")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -161,7 +161,7 @@ public class BankControllerTest {
         when(bankService.withdraw(anyLong(), any()))
             .thenThrow(new IllegalArgumentException("Insufficient balance. Current balance: 0"));
 
-        mockMvc.perform(post("/accounts/1/withdraw")
+        mockMvc.perform(post("/api/accounts/1/withdraw")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -181,7 +181,7 @@ public class BankControllerTest {
 
         when(bankService.withdraw(anyLong(), any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts/1/withdraw")
+        mockMvc.perform(post("/api/accounts/1/withdraw")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())

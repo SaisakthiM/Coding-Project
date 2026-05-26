@@ -2,12 +2,14 @@ package com.bankmanagement.bank_management.database;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bank_accounts")
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +30,9 @@ public class Bank {
     
     @Column(unique = true, nullable = false)
     private String accountNumber;
+
+    @Column(nullable = false)
+    private Long loanBalance = 0L;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

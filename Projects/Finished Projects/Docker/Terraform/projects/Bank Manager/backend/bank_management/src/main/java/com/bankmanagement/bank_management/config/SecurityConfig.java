@@ -11,9 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,20 +20,17 @@ public class SecurityConfig {
     public SecurityConfig(RateLimitFilter rateLimitFilter) {
         this.rateLimitFilter = rateLimitFilter;
     }
-    @Autowired
-    CorsConfigSource source;
+    
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-            .cors(cors -> cors.configurationSource(source.corsConfigSource()))
             .csrf(csrf -> csrf.disable())  // safe for stateless REST API
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated());
+                .anyRequest().permitAll());
 
         return http.build();
     }

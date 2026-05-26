@@ -14,7 +14,9 @@ public class AccountResponse {
     private String customerName;
     private String accountNumber;
     private Long balance;
+    private Long loanBalance;
     private Integer creditScore;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
 }

@@ -46,7 +46,8 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(request.getUsername());
-        return new AuthResponse(token, request.getUsername(), accountNumber, savedAccount.getId(), 0L);
+        return new AuthResponse(token, request.getUsername(), accountNumber, 
+    savedAccount.getId(), 0L, 700, 0L);
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -60,7 +61,8 @@ public class AuthService {
         Bank account = user.getAccount();
         String token = jwtUtil.generateToken(request.getUsername());
         return new AuthResponse(token, user.getUsername(),
-                account.getAccountNumber(), account.getId(), account.getBalance());
+    account.getAccountNumber(), account.getId(), 
+    account.getBalance(), account.getCreditScore(), account.getLoanBalance());
     }
 
     private String generateAccountNumber() {

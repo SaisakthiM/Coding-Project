@@ -52,7 +52,7 @@ class BankManagementApplicationTests {
         bank.setBalance(1000L);
         bankRepository.save(bank);
 
-        User user = new User(null, "saisakthi", passwordEncoder.encode("saisakthi2008"), bank);
+        User user = new User(null, "saisakthi", passwordEncoder.encode("saisakthi2008"), 700L, bank);
         userRepository.save(user);
     }
 

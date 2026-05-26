@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
   datasource:
     url: jdbc:postgresql://localhost:5432/bank
     username: bankmanagement
@@ -7,20 +10,13 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: update  # Creates/updates tables automatically
-    show-sql: true      # Shows SQL queries in console (helpful for learning)
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true  # Formats SQL output for readability
+        format_sql: true
   
-  web:
-    cors:
-      allowed-origins: "http://localhost:3000"
-      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-      allowed-headers: "*"
-      allow-credentials: true
-    
   application:
     name: bank-management
 

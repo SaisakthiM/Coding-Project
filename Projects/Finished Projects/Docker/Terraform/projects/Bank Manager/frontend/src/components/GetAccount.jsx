@@ -15,7 +15,7 @@ export default function GetAccount() {
             try {
                 const response = await bankService.getAccountById(user.accountId);
                 if (response.success) {
-                    setAccount(response.data);
+                    setAccount(response);
                 }
             } catch (err) {
                 setError(err.message || "Failed to fetch account");

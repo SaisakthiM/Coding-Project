@@ -19,8 +19,8 @@ export default function AddDeposit() {
         try {
             const response = await bankService.deposit(user.accountId, parseInt(amount));
             if (response.success) {
-                setMessage(`Successfully deposited ₹${amount}! New balance: ₹${response.data.balance}`);
-                login({ ...user, balance: response.data.balance });
+                setMessage(`Successfully deposited ₹${amount}! New balance: ₹${response.balance}`);
+                login({ ...user, balance: response.balance });
                 setAmount("");
             }
         } catch (err) {

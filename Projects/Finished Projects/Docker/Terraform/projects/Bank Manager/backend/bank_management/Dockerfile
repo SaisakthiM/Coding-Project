@@ -4,7 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn test-compile
 
 RUN mvn dependency:copy-dependencies -DincludeScope=test
 

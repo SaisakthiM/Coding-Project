@@ -60,6 +60,30 @@ const bankService = {
       throw error.response?.data || error.message;
     }
   },
+
+  takeLoan: async (accountId, amount, months) => {
+      try {
+          const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/loan`, {
+              amount, months,
+          });
+          return response;
+      } catch (error) {
+          throw error.response?.data || error.message;
+      }
+  },
+
+  repayLoan: async (accountId, amount) => {
+      try {
+          const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/repay`, {
+              amount,
+          });
+          return response;
+      } catch (error) {
+          throw error.response?.data || error.message;
+      }
+  },
 };
+
+
 
 export default bankService;

@@ -11,4 +11,6 @@ public class AuthResponse {
     private String accountNumber;
     private Long accountId;
     private Long balance;
+    private Integer creditScore;  // ← add
+    private Long loanBalance;     // ← add
 }
