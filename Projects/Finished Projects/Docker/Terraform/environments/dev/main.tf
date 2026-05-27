@@ -56,7 +56,7 @@ resource "docker_volume" "doc_dist"      { name = "gateway_doc-dist" }
 resource "docker_volume" "blog_mysql"    { name = "gateway_blog-mysql" }
 resource "docker_volume" "blog_minio"    { name = "gateway_blog-minio" }
 resource "docker_volume" "intro_dist"    { name = "gateway_intro-dist" }
-
+resource "docker_volume" "record_dist"   { name = "gateway_record-dist"}
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
   name         = "bankmanager-backend:latest"
@@ -291,6 +291,7 @@ module "gateway" {
     { volume_name = docker_volume.api_dist.name,   container_path = "/apps/api-service", read_only = true },
     { volume_name = docker_volume.doc_dist.name,   container_path = "/apps/document",    read_only = true },
     { volume_name = docker_volume.intro_dist.name, container_path = "/apps/intro",       read_only = true },
+    { volume_name = docker_volume.record_dist.name, container_path = "/apps/record",       read_only = true },
   ]
 }
 
@@ -646,7 +647,9 @@ resource "docker_container" "doc_frontend_build" {
   }
 }
 
-# ─── INTRO PAGE ───────────────────────────────────────────────
+# ─── INTRO PAGE AND RECORD PAGE ───────────────────────────────────────────────
+
+
 resource "null_resource" "intro_page" {
   depends_on = [module.gateway]
   
@@ -660,6 +663,24 @@ resource "null_resource" "intro_page" {
       docker run --rm \
         -v gateway_intro-dist:/dest \
         -v "${abspath("${path.module}/../../projects/intro")}:/src:ro" \
+        alpine sh -c "cp -r /src/. /dest/"
+    EOT
+  }
+}
+
+resource "null_resource" "record_page" {
+  depends_on = [module.gateway]
+  
+  triggers = {
+    file_sha = filesha256("${path.module}/../../projects/security_tests/record.html")
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = <<-EOT
+      docker pull alpine && \
+      docker run --rm \
+        -v gateway_record-dist:/dest \
+        -v "${abspath("${path.module}/../../projects/security_tests")}:/src:ro" \
         alpine sh -c "cp -r /src/. /dest/"
     EOT
   }
@@ -801,7 +822,7 @@ resource "null_resource" "kind_load_images" {
 
 resource "null_resource" "gateway_kind_network" {
   depends_on = [null_resource.kind_cluster, module.gateway]
-  triggers   = { cluster_id = null_resource.kind_cluster.id }
+  triggers   = { cluster_id = null_resource.kind_cluster.id,  always_run = timestamp()}
   provisioner "local-exec" {
     command = "docker network connect kind gateway || true"
   }

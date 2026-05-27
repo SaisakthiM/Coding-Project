@@ -79,8 +79,8 @@ STORAGES = {
             "bucket_name": MINIO_BUCKET,
             "endpoint_url": MINIO_ENDPOINT,
             "file_overwrite": False,
-            "url_protocol": "https:",   # BUG FIX 1: was "http:" — caused mixed-content errors on HTTPS site
-            "custom_domain": "saisakthi.qzz.io/blog/minio",
+            "url_protocol": "https:",
+            "custom_domain": "saisakthi.qzz.io/blog/minio/blog-media",  # ← added /blog-media
         }
     },
     "staticfiles": {
@@ -88,8 +88,6 @@ STORAGES = {
     }
 }
 
-# BUG FIX 2: img-src was missing saisakthi.qzz.io — browser CSP blocked all
-# uploaded images because they're served from that domain via MinIO.
 SECURE_CONTENT_SECURITY_POLICY = (
     "default-src 'self'; "
     "script-src 'self' https://cdn.tailwindcss.com https://static.cloudflareinsights.com; "

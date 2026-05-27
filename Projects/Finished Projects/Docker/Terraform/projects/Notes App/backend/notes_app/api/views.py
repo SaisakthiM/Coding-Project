@@ -3,6 +3,7 @@ from rest_framework.exceptions import Throttled
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, NoteSerializer
+from rest_framework.permissions import AllowAny
 from .models import Note
 
 
