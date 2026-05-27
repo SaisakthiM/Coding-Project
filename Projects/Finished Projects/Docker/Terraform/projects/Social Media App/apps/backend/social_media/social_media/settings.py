@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "graphene_django",
-    'django_prometheus', 
+    'django_prometheus',
 
     # Your apps
     "apps.users",
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 RUNNING_IN_DOCKER = env.bool("RUNNING_IN_DOCKER", default=False)
 if DEBUG and not RUNNING_IN_DOCKER:
     INSTALLED_APPS.append("debug_toolbar")
+
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -128,8 +129,8 @@ REST_FRAMEWORK = {
         'conversation':      '20/minute',
         'note_create':       '60/hour',
         'register':          '5/minute',
-        'login':             '10/minute',   # ← add this
-        'profile_update':    '10/hour',     # ← add this
+        'login':             '10/minute',
+        'profile_update':    '10/hour',
     }
 }
 
@@ -153,13 +154,12 @@ GRAPHENE = {
 if "debug_toolbar" in INSTALLED_APPS:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = ["127.0.0.1", "localhost"] + [ip[:-1] + "1" for ip in ips]
-    
+
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG and not RUNNING_IN_DOCKER
     }
 
 # --- MinIO Storage ---
-# Django 5.x storage config (replaces deprecated DEFAULT_FILE_STORAGE)
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -169,7 +169,7 @@ STORAGES = {
             "bucket_name":       "media",
             "endpoint_url":      "http://minio:9000",
             "custom_domain":     "saisakthi.qzz.io/social/minio/media",
-            "url_protocol":      "http:",
+            "url_protocol":      "https:",   # BUG FIX 2: was "http:" — caused mixed-content errors on HTTPS site
             "querystring_auth":  False,
             "file_overwrite":    False,
             "default_acl":       "public-read",
@@ -180,8 +180,8 @@ STORAGES = {
     },
 }
 
-# --- Redis (Go Microservice) ---
-REDIS_HOST = env("REDIS_HOST", default="microservice-go")
+# --- Redis ---
+REDIS_HOST = env("REDIS_HOST", default="redis")
 REDIS_PORT = env.int("REDIS_PORT", default=6379)
 
 import redis
@@ -190,11 +190,13 @@ REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=Tr
 # --- Java Microservice (Cassandra) ---
 JAVA_API_URL = env("JAVA_API_URL", default="http://microservice-java:8080")
 
+# concatenate them into "http://saisakthi.qzz.iohttps://saisakthi.qzz.io" (one broken URL).
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
     "http://localhost",
     "http://localhost:3000",
     "http://127.0.0.1",
-    "http://saisakthi.qzz.io"
+    "http://saisakthi.qzz.io",   # ← comma was missing here
+    "https://saisakthi.qzz.io",
 ])
 
 FORCE_SCRIPT_NAME = '/social'

@@ -649,15 +649,18 @@ resource "docker_container" "doc_frontend_build" {
 # ─── INTRO PAGE ───────────────────────────────────────────────
 resource "null_resource" "intro_page" {
   depends_on = [module.gateway]
+  
   triggers = {
     file_sha = filesha256("${path.module}/../../projects/intro/index.html")
+    always_run = timestamp()
   }
   provisioner "local-exec" {
     command = <<-EOT
+      docker pull alpine && \
       docker run --rm \
-        -v ${docker_volume.intro_dist.name}:/dest \
+        -v gateway_intro-dist:/dest \
         -v "${abspath("${path.module}/../../projects/intro")}:/src:ro" \
-        alpine sh -c "cp /src/index.html /dest/index.html"
+        alpine sh -c "cp -r /src/. /dest/"
     EOT
   }
 }
