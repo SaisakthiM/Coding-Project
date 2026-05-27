@@ -18,11 +18,11 @@ export default function Withdraw() {
         setError("");
         try {
             const response = await bankService.withdraw(user.accountId, parseInt(amount));
-            if (response.success) {
-                setMessage(`Successfully withdrew ₹${amount}! New balance: ₹${response.balance}`);
-                login({ ...user, balance: response.balance });
-                setAmount("");
-            }
+        if (response.data) {
+            setMessage(`Successfully withdrew ₹${amount}! New balance: ₹${response.data.balance}`);
+            login({ ...user, balance: response.data.balance, creditScore: response.data.creditScore, loanBalance: response.data.loanBalance });
+            setAmount("");
+        }
         } catch (err) {
             setError(err.message || "Failed to withdraw money");
         } finally {

@@ -19,9 +19,9 @@ export default function Loan() {
         setError("");
         try {
             const response = await bankService.takeLoan(user.accountId, parseInt(amount), parseInt(months));
-            if (response.data.success) {
-                setMessage(`Loan of ₹${amount} approved! EMI: ₹${response.data.data.emiAmount}/month for ${months} months`);
-                login({ ...user, balance: response.data.data.balance });
+            if (response.data) {
+                setMessage(`Loan of ₹${amount} approved! New balance: ₹${response.data.balance}`);
+                login({ ...user, balance: response.data.balance, creditScore: response.data.creditScore, loanBalance: response.data.loanBalance });
                 setAmount("");
                 setMonths("");
             }

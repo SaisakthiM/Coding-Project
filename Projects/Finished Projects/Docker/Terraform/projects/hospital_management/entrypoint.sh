@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "Collecting Static"
+python manage.py collectstatic --noinput
+
 echo "Running tests..."
 python manage.py test hospital.tests.test_hospital -v 2
 
