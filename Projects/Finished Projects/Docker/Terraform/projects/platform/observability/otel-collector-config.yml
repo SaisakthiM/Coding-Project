@@ -1,0 +1,309 @@
+# ─────────────────────────────────────────────────────────────
+# otel-collector-values.yml  — Helm values for
+#   open-telemetry/opentelemetry-collector
+#
+# The collector runs inside the kind cluster and acts as the
+# single ingest point for all three signals:
+#   • Metrics  → scraped from Docker services + k8s pods,
+#                forwarded to Prometheus remote_write
+#   • Logs     → received from Docker services via OTLP,
+#                forwarded to Loki
+#   • Traces   → received from all services via OTLP gRPC/HTTP,
+#                forwarded to Tempo
+# ─────────────────────────────────────────────────────────────
+
+mode: deployment   # single replica; use daemonset if you need host metrics
+
+replicaCount: 1
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: ""          # chart default — always pull latest contrib image
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# ── Ports ────────────────────────────────────────────────────
+ports:
+  otlp:
+    enabled: true
+    containerPort: 4317
+    servicePort: 4317
+    protocol: TCP
+  otlp-http:
+    enabled: true
+    containerPort: 4318
+    servicePort: 4318
+    protocol: TCP
+  metrics:
+    enabled: true
+    containerPort: 8888
+    servicePort: 8888
+    protocol: TCP
+  zipkin:
+    enabled: true
+    containerPort: 9411
+    servicePort: 9411
+    protocol: TCP
+  prometheus:
+    enabled: true
+    containerPort: 8889
+    servicePort: 8889
+    protocol: TCP
+
+# ── Main collector config ─────────────────────────────────────
+config:
+  # ── RECEIVERS ──────────────────────────────────────────────
+  receivers:
+    # Accept OTLP from all instrumented services
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+          cors:
+            allowed_origins: ["*"]
+
+    # Prometheus scrape — pulls metrics from Docker-network services
+    # (gateway connects Docker and kind networks)
+    prometheus:
+      config:
+        scrape_configs:
+          # Django services — notes, blog, hospital, api-service, doc-backend
+          - job_name: docker-django-services
+            scrape_interval: 15s
+            static_configs:
+              - targets:
+                  - notes-backend:8000
+                  - blog-website:8000
+                  - hospital-management:8000
+                  - api-service-backend:8000
+                  - doc-backend:8000
+            relabel_configs:
+              - source_labels: [__address__]
+                target_label: instance
+
+          # Spring Boot services
+          - job_name: docker-spring-services
+            scrape_interval: 15s
+            metrics_path: /actuator/prometheus
+            static_configs:
+              - targets:
+                  - bank-backend:8080
+            relabel_configs:
+              - source_labels: [__address__]
+                target_label: instance
+
+          # nginx gateway stub_status exporter
+          - job_name: docker-nginx
+            scrape_interval: 15s
+            static_configs:
+              - targets:
+                  - gateway:9113
+
+    # Collect host-level metrics (CPU, memory, disk, net)
+    hostmetrics:
+      collection_interval: 30s
+      scrapers:
+        cpu:
+          metrics:
+            system.cpu.utilization:
+              enabled: true
+        memory:
+          metrics:
+            system.memory.utilization:
+              enabled: true
+        disk: {}
+        filesystem:
+          exclude_mount_points:
+            mount_points: [/dev, /sys, /proc, /var/lib/kubelet, /run/k3s]
+            match_type: strict
+        network:
+          include:
+            interfaces: [eth0, ens3]
+            match_type: strict
+        load: {}
+        processes: {}
+
+    # Kubernetes cluster metadata (resource attributes)
+    k8s_cluster:
+      collection_interval: 30s
+      node_conditions_to_report: [Ready, MemoryPressure, DiskPressure]
+      allocatable_types_to_report: [cpu, memory]
+
+  # ── PROCESSORS ─────────────────────────────────────────────
+  processors:
+    # Batch to reduce outbound requests
+    batch:
+      timeout: 5s
+      send_batch_size: 1024
+      send_batch_max_size: 2048
+
+    # Drop spans/metrics that would flood storage
+    filter/drop_health:
+      error_mode: ignore
+      traces:
+        span:
+          - 'attributes["http.route"] == "/health"'
+          - 'attributes["http.route"] == "/healthz"'
+          - 'attributes["http.route"] == "/actuator/health"'
+          - 'attributes["http.route"] == "/metrics"'
+      metrics:
+        metric:
+          - 'name == "up" and resource.attributes["job"] =~ ".*health.*"'
+
+    # Add k8s metadata to all signals
+    k8sattributes:
+      auth_type: serviceAccount
+      passthrough: false
+      filter:
+        node_from_env_var: KUBE_NODE_NAME
+      extract:
+        metadata:
+          - k8s.pod.name
+          - k8s.namespace.name
+          - k8s.deployment.name
+          - k8s.node.name
+          - k8s.pod.uid
+        labels:
+          - tag_name: app
+            key: app
+            from: pod
+        annotations:
+          - tag_name: git_commit
+            key: git-commit
+            from: pod
+
+    # Enrich resource attributes
+    resource:
+      attributes:
+        - key: cluster
+          value: kind-social-media
+          action: insert
+        - key: environment
+          value: local
+          action: insert
+
+    # Memory limiter — prevent OOM on the collector pod
+    memory_limiter:
+      check_interval: 5s
+      limit_mib: 400
+      spike_limit_mib: 100
+
+  # ── EXPORTERS ──────────────────────────────────────────────
+  exporters:
+    # Metrics → Prometheus remote_write (kube-prometheus-stack)
+    prometheusremotewrite:
+      endpoint: http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/write
+      tls:
+        insecure: true
+      resource_to_telemetry_conversion:
+        enabled: true
+
+    # Logs → Loki
+    loki:
+      endpoint: http://loki-gateway.monitoring.svc/loki/api/v1/push
+      tls:
+        insecure: true
+      default_labels_enabled:
+        exporter: false
+        job: true
+        instance: true
+        level: true
+      labels:
+        resource:
+          service.name: "app"
+          k8s.namespace.name: "namespace"
+          k8s.pod.name: "pod"
+          k8s.deployment.name: "deployment"
+        attributes:
+          http.method: "method"
+          http.status_code: "status"
+          level: "level"
+          trace_id: "trace_id"
+
+    # Traces → Tempo
+    otlp/tempo:
+      endpoint: tempo.monitoring.svc:4317
+      tls:
+        insecure: true
+      compression: gzip
+
+    # Debug exporter — logs to collector stdout (disable in prod)
+    debug:
+      verbosity: basic
+      sampling_initial: 5
+      sampling_thereafter: 200
+
+  # ── SERVICE (wires receivers → processors → exporters) ─────
+  service:
+    telemetry:
+      logs:
+        level: info
+      metrics:
+        level: detailed
+        address: "0.0.0.0:8888"
+
+    pipelines:
+      # Traces pipeline
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, resource, filter/drop_health, batch]
+        exporters: [otlp/tempo]
+
+      # Metrics pipeline
+      metrics:
+        receivers: [otlp, prometheus, hostmetrics, k8s_cluster]
+        processors: [memory_limiter, k8sattributes, resource, batch]
+        exporters: [prometheusremotewrite]
+
+      # Logs pipeline
+      logs:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, resource, batch]
+        exporters: [loki]
+
+# ── RBAC (needed for k8sattributes + k8s_cluster receivers) ──
+clusterRole:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources:
+        - nodes
+        - nodes/proxy
+        - nodes/metrics
+        - services
+        - endpoints
+        - pods
+        - namespaces
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["apps"]
+      resources: [deployments, replicasets, statefulsets, daemonsets]
+      verbs: ["get", "list", "watch"]
+    - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+      verbs: ["get"]
+
+serviceAccount:
+  create: true
+
+# ── Env vars injected into the collector pod ─────────────────
+env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+# ── ServiceMonitor so Prometheus scrapes the collector ───────
+serviceMonitor:
+  enabled: true
+  metricsEndpoints:
+    - port: metrics
+      interval: 30s
+  extraLabels:
+    release: kube-prometheus-stack

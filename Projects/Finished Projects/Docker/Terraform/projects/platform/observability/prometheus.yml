@@ -1,0 +1,204 @@
+# ─────────────────────────────────────────────────────────────
+# prometheus.yml  — additionalScrapeConfigs for kube-prometheus-stack
+#
+# This file is loaded via:
+#   additionalScrapeConfigs = yamldecode(file("…/prometheus.yml"))
+# so the root is a LIST of job objects, not a full prometheus config.
+# ─────────────────────────────────────────────────────────────
+
+# ── 1. OpenTelemetry Collector (exposes its own /metrics) ────
+- job_name: otel-collector
+  scrape_interval: 15s
+  static_configs:
+    - targets:
+        - otel-collector:8888   # collector self-metrics inside kind network
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: instance
+
+# ── 2. Docker gateway — nginx ────────────────────────────────
+# nginx-prometheus-exporter must run as a sidecar or separate
+# container exposing /stub_status on port 9113.
+- job_name: gateway-nginx
+  scrape_interval: 15s
+  static_configs:
+    - targets:
+        - gateway:9113
+  relabel_configs:
+    - target_label: app
+      replacement: gateway
+
+# ── 3. Notes App backend (Django / DRF) ──────────────────────
+# Add django-prometheus to the app; it exposes /metrics on the
+# same port as the app (8000).
+- job_name: notes-backend
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - notes-backend:8000
+  relabel_configs:
+    - target_label: app
+      replacement: notes-backend
+
+# ── 4. Bank backend (Spring Boot Actuator) ───────────────────
+# application.yml: management.endpoints.web.exposure.include=prometheus
+- job_name: bank-backend
+  scrape_interval: 15s
+  metrics_path: /actuator/prometheus
+  static_configs:
+    - targets:
+        - bank-backend:8080
+  relabel_configs:
+    - target_label: app
+      replacement: bank-backend
+
+# ── 5. Blog website (Django) ─────────────────────────────────
+- job_name: blog-website
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - blog-website:8000
+  relabel_configs:
+    - target_label: app
+      replacement: blog-website
+
+# ── 6. Hospital management (Django) ──────────────────────────
+- job_name: hospital-management
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - hospital-management:8000
+  relabel_configs:
+    - target_label: app
+      replacement: hospital-management
+
+# ── 7. API service backend (Django) ──────────────────────────
+- job_name: api-service-backend
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - api-service-backend:8000
+  relabel_configs:
+    - target_label: app
+      replacement: api-service-backend
+
+# ── 8. Document Intelligence backend (Django) ────────────────
+- job_name: doc-backend
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - doc-backend:8000
+  relabel_configs:
+    - target_label: app
+      replacement: doc-backend
+
+# ── 9. Video uploader backend (Go / custom metrics) ──────────
+# If using net/http + promhttp, it exposes /metrics on 8080.
+- job_name: video-uploader-backend
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - video-uploader-backend:8080
+  relabel_configs:
+    - target_label: app
+      replacement: video-uploader-backend
+
+# ── 10. Social Media — Django backend (k8s) ──────────────────
+- job_name: social-backend
+  scrape_interval: 15s
+  metrics_path: /metrics
+  kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names: [default]
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_label_app]
+      regex: backend
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_name]
+      target_label: pod
+    - target_label: app
+      replacement: social-backend
+
+# ── 11. Social Media — Go microservice (k8s) ─────────────────
+- job_name: social-microservice-go
+  scrape_interval: 15s
+  metrics_path: /metrics
+  kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names: [default]
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_label_app]
+      regex: microservice-go
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_name]
+      target_label: pod
+    - target_label: app
+      replacement: social-go
+
+# ── 12. Social Media — Java microservice (Spring Boot, k8s) ──
+- job_name: social-microservice-java
+  scrape_interval: 15s
+  metrics_path: /actuator/prometheus
+  kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names: [default]
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_label_app]
+      regex: microservice-java
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_name]
+      target_label: pod
+    - target_label: app
+      replacement: social-java
+
+# ── 13. Redis (standalone, inside kind) ──────────────────────
+# redis-exporter runs as a sidecar or deployment beside Redis.
+- job_name: redis
+  scrape_interval: 15s
+  static_configs:
+    - targets:
+        - redis-exporter:9121
+  relabel_configs:
+    - target_label: app
+      replacement: redis
+
+# ── 14. MinIO (social-media, k8s) ────────────────────────────
+- job_name: minio-social
+  scrape_interval: 30s
+  metrics_path: /minio/v2/metrics/cluster
+  static_configs:
+    - targets:
+        - minio:9000
+  relabel_configs:
+    - target_label: app
+      replacement: minio-social
+
+# ── 15. Kubernetes nodes (kube-prometheus-stack already adds
+#        node-exporter, but this job exposes raw cAdvisor) ────
+- job_name: kubernetes-cadvisor
+  scrape_interval: 30s
+  scheme: https
+  tls_config:
+    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    insecure_skip_verify: true
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  kubernetes_sd_configs:
+    - role: node
+  relabel_configs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+    - target_label: __address__
+      replacement: kubernetes.default.svc:443
+    - source_labels: [__meta_kubernetes_node_name]
+      regex: (.+)
+      target_label: __metrics_path__
+      replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor

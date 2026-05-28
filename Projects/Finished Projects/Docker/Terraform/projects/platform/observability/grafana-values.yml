@@ -1,0 +1,125 @@
+# ─────────────────────────────────────────────────────────────
+# grafana-values.yml
+#
+# Extra values passed to the grafana subchart inside
+# kube-prometheus-stack.  Passed as a second entry in the
+# helm_release "kube_prometheus_stack" values list.
+#
+# Key changes vs the inline yamlencode block:
+#   1. Grafana exposed at /grafana/ (path-based, matching the
+#      gateway pattern for every other app)
+#   2. GF_SERVER_ROOT_URL and SERVE_FROM_SUB_PATH set so
+#      assets, redirects, and WebSocket all resolve correctly
+#   3. Loki, Tempo, Jaeger datasources auto-provisioned
+#   4. Correlation links wired up (log ↔ trace ↔ metrics)
+# ─────────────────────────────────────────────────────────────
+
+grafana:
+  adminPassword: "admin"
+
+  # ── Sub-path config ───────────────────────────────────────
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://%(domain)s/grafana/"
+      serve_from_sub_path: true
+
+  # ── Ingress: expose at /grafana/ inside kind ──────────────
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      - "" # match any host
+    path: /grafana(/|$)(.*)
+    pathType: ImplementationSpecific
+
+  # ── Auto-provision all datasources ────────────────────────
+  additionalDataSources:
+    # Prometheus
+    - name: Prometheus
+      type: prometheus
+      uid: prometheus
+      url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      access: proxy
+      isDefault: true
+      jsonData:
+        timeInterval: 15s
+
+    # Loki — with trace-to-log correlation
+    - name: Loki
+      type: loki
+      uid: loki
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      access: proxy
+      jsonData:
+        derivedFields:
+          # When a log line contains a trace_id label, clicking it
+          # opens the trace in Tempo
+          - name: TraceID
+            matcherRegex: '"trace_id":"(\w+)"'
+            url: "$${__value.raw}"
+            datasourceUid: tempo
+
+    # Tempo
+    - name: Tempo
+      type: tempo
+      uid: tempo
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      access: proxy
+      jsonData:
+        # Trace → log correlation
+        tracesToLogsV2:
+          datasourceUid: loki
+          tags:
+            - key: service.name
+              value: app
+          filterByTraceID: true
+          filterBySpanID: false
+        # Trace → metrics correlation
+        tracesToMetrics:
+          datasourceUid: prometheus
+          tags:
+            - key: service.name
+              value: app
+          queries:
+            - name: Request rate
+              query: 'rate(http_server_requests_seconds_count{app="$${__tags.app}"}[5m])'
+            - name: Error rate
+              query: 'rate(http_server_requests_seconds_count{app="$${__tags.app}",status=~"5.."}[5m])'
+        # Service graph
+        serviceMap:
+          datasourceUid: prometheus
+        # Node graph
+        nodeGraph:
+          enabled: true
+        # Search scope
+        lokiSearch:
+          datasourceUid: loki
+
+    # Jaeger — as a secondary trace viewer
+    - name: Jaeger
+      type: jaeger
+      uid: jaeger
+      url: http://jaeger-all-in-one-query.monitoring.svc.cluster.local:16686
+      access: proxy
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: loki
+          tags:
+            - key: service.name
+              value: app
+          filterByTraceID: true
+
+  # ── Resources ─────────────────────────────────────────────
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

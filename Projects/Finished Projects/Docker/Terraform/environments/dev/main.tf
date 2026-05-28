@@ -35,6 +35,10 @@ provider "helm" {
   }
 }
 
+locals {
+  obs_path = "${path.module}/../../projects/platform/observability"
+}
+
 # ─── NETWORK ──────────────────────────────────────────────────
 resource "docker_network" "gateway_net" {
   name = "gateway-net"
@@ -1342,7 +1346,67 @@ resource "kubectl_manifest" "redis_service" {
   YAML
 }
 
-/*
+# ─── Otel ────────────────────────────────────────────────
+
+resource "docker_image" "otel_collector" {
+  name = "otel/opentelemetry-collector:latest"
+}
+
+resource "docker_container" "otel" {
+  name  = "otel-collector"
+  image = docker_image.otel_collector.image_id
+
+  ports {
+    internal = 4317
+    external = 4317
+  }
+
+  ports {
+    internal = 4318
+    external = 4318
+  }
+
+  volumes {
+    host_path      = abspath("${local.obs_path}/loki-config.yml")
+    container_path = "/etc/otelcol/config.yaml"
+  }
+
+  command = [
+    "--config=/etc/otelcol/config.yaml"
+  ]
+}
+
+
+## ═══════════════════════════════════════════════════════════════
+# observability.tf
+#
+# Deploys the full observability stack into the kind cluster.
+#
+# Components
+# ──────────────────────────────────────────────────────────────
+#  • kube-prometheus-stack  (Prometheus + Grafana + Alertmanager)
+#  • Loki                   (log aggregation)
+#  • Tempo                  (distributed traces)
+#  • Promtail               (k8s pod log collector)
+#  • OpenTelemetry Collector (metrics/traces/logs pipeline)
+#  • Jaeger                 (secondary trace UI)
+#
+# Networking topology
+# ──────────────────────────────────────────────────────────────
+#  Docker services (gateway-net)
+#       │
+#       │  gateway container bridges both networks
+#       │
+#  kind network  ──►  kind ingress-nginx (NodePort 30080)
+#                          │
+#                          ├─ /grafana/   → Grafana pod
+#                          ├─ /jaeger/    → Jaeger all-in-one pod
+#                          └─ /otel/      → OTEL Collector OTLP/HTTP
+#
+# The OTEL Collector (inside kind) scrapes Docker services using
+# container hostnames that resolve via the gateway bridge.
+# ═══════════════════════════════════════════════════════════════
+
 # ─── CASSANDRA ────────────────────────────────────────────────
 resource "helm_release" "cassandra" {
   depends_on = [null_resource.kind_cluster]
@@ -1352,10 +1416,10 @@ resource "helm_release" "cassandra" {
   namespace  = "default"
   wait       = true
   timeout    = 300
-  
+
   set {
     name  = "replicaCount"
-    value = "1"  # Keep it 1 for local dev, saves resources
+    value = "1"
   }
   set {
     name  = "resources.requests.memory"
@@ -1367,7 +1431,7 @@ resource "helm_release" "cassandra" {
   }
 }
 
-# ─── REDIS ────────────────────────────────────────────────────
+# ─── REDIS (Helm — in-cluster, for social-media microservices) ─
 resource "helm_release" "redis" {
   depends_on = [null_resource.kind_cluster, helm_release.cassandra]
   name       = "redis"
@@ -1383,99 +1447,255 @@ resource "helm_release" "redis" {
   }
   set {
     name  = "architecture"
-    value = "standalone"  # Saves resources vs replication
+    value = "standalone"
   }
 }
 
+# ─── KUBE-PROMETHEUS-STACK ────────────────────────────────────
+#
+# FIX 1: additionalScrapeConfigs must be a decoded YAML list
+#         — yamldecode(file()) is the correct pattern; set{} silently breaks it.
+#
+# FIX 2: Grafana is now configured via a separate values file
+#         (grafana-values.yml) that sets serve_from_sub_path,
+#         root_url=/grafana/, and provisions all datasources.
+#         Merging two yamlencode blocks was causing deep-merge
+#         conflicts with the Grafana subchart's own values.
+#
+# FIX 3: Prometheus remote-write receiver enabled so the OTEL
+#         Collector can push metrics via prometheusremotewrite.
+#
 resource "helm_release" "kube_prometheus_stack" {
-  depends_on = [null_resource.kind_cluster, helm_release.redis]
-  name       = "kube-prometheus-stack"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
+  depends_on       = [null_resource.kind_cluster, helm_release.redis]
+  name             = "kube-prometheus-stack"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  namespace        = "monitoring"
   create_namespace = true
-  wait       = true
-  timeout    = 600 # This chart can take a while to deploy
+  wait             = true
+  timeout          = 600
 
-  set {
-    name  = "prometheus.prometheusSpec.additionalScrapeConfigs"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/prometheus.yml")
-    type  = "string"
-  }
-  set {
-    name  = "grafana.adminPassword"
-    value = "admin" # Consider using a Kubernetes secret for production
-  }
-  set {
-    name  = "grafana.ingress.enabled"
-    value = "true"
-  }
-  set {
-    name  = "grafana.ingress.ingressClassName"
-    value = "nginx"
-  }
-  set {
-    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
-    value = "/"
-  }
-  set {
-    name  = "grafana.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/ssl-redirect"
-    value = "false"
-  }
-  set {
-    name  = "grafana.ingress.hosts[0]"
-    value = "grafana.local" # You might need to add this to your /etc/hosts
-  }
+  values = [
+    # ── Value set 1: Prometheus scrape + remote-write config ──
+    yamlencode({
+      prometheus = {
+        prometheusSpec = {
+          # Accept remote-write from OTEL Collector
+          enableRemoteWriteReceiver = true
+
+          # Additional scrape jobs on top of the k8s auto-discovery
+          # jobs that kube-prometheus-stack sets up by default.
+          # NOTE: Docker service targets (notes-backend, bank-backend…)
+          # resolve because the gateway container is connected to both
+          # gateway-net AND the kind network via gateway_kind_network.
+          additionalScrapeConfigs = yamldecode(file("${local.obs_path}/prometheus.yml"))
+
+          resources = {
+            requests = { cpu = "200m", memory = "512Mi" }
+            limits   = { cpu = "1000m", memory = "2Gi" }
+          }
+        }
+      }
+    }),
+
+    # ── Value set 2: Grafana sub-path + datasource provisioning ──
+    # Kept separate so Terraform's yamlencode doesn't flatten the
+    # nested grafana.ini block (it uses dots as key separators).
+    file(abspath("${local.obs_path}/grafana-values.yml"))
+  ]
 }
 
+# ─── LOKI ─────────────────────────────────────────────────────
+#
+# FIX: set{ name="loki.config" value=file() } silently discards
+#      multi-line YAML values.  values = [file()] is correct.
+#
 resource "helm_release" "loki" {
-  depends_on = [helm_release.kube_prometheus_stack]
-  name       = "loki"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "loki"
-  namespace  = "monitoring"
+  depends_on       = [helm_release.kube_prometheus_stack]
+  name             = "loki"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "loki"
+  namespace        = "monitoring"
   create_namespace = true
-  wait       = true
-  timeout    = 300
+  wait             = true
+  timeout          = 300
 
-  set {
-    name  = "loki.config"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/loki-config.yml")
-    type  = "string"
-  }
+  values = [file("${local.obs_path}/loki-config.yml")]
 }
 
+# ─── TEMPO ────────────────────────────────────────────────────
+#
+# FIX: same set{} + file() issue as Loki.
+#
 resource "helm_release" "tempo" {
-  depends_on = [helm_release.loki, kubectl_manifest.minio_service]
-  name       = "tempo"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "tempo"
-  namespace  = "monitoring"
+  depends_on       = [helm_release.loki, kubectl_manifest.minio_service]
+  name             = "tempo"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "tempo"
+  namespace        = "monitoring"
   create_namespace = true
-  wait       = true
-  timeout    = 300
+  wait             = true
+  timeout          = 300
 
-  set {
-    name  = "tempo.config"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/tempo-config.yml")
-    type  = "string"
-  }
+  values = [file("${local.obs_path}/tempo-config.yml")]
 }
 
+# ─── PROMTAIL ─────────────────────────────────────────────────
+#
+# FIX: config.snippets.scrapeConfigs via set{} silently breaks
+#      YAML list values.  values = [file()] is correct.
+#
 resource "helm_release" "promtail" {
-  depends_on = [helm_release.loki]
-  name       = "promtail"
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "promtail"
-  namespace  = "monitoring"
+  depends_on       = [helm_release.loki]
+  name             = "promtail"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "promtail"
+  namespace        = "monitoring"
   create_namespace = true
-  wait       = true
-  timeout    = 180
+  wait             = true
+  timeout          = 180
 
-  set {
-    name  = "config.snippets.scrapeConfigs"
-    value = file("${path.module}/../../projects/Social Media App/platform/observability/promtail-config.yml")
-    type  = "string"
-  }
+  values = [file("${local.obs_path}/promtail-config.yml")]
 }
-*/
+
+# ─── OPENTELEMETRY COLLECTOR ──────────────────────────────────
+#
+# REPLACES the broken docker_container.otel resource which had
+# three critical problems:
+#   1. Mounted loki-config.yml as the OTEL config (wrong file)
+#   2. Used otel/opentelemetry-collector (base image — missing
+#      the loki, prometheusremotewrite, and k8sattributes
+#      extensions that are only in the -contrib image)
+#   3. Ran in Docker instead of kind, so it couldn't reach
+#      Prometheus/Loki/Tempo over cluster DNS
+#
+# The collector is now a Helm release inside kind so it:
+#   • Resolves tempo.monitoring.svc.cluster.local etc. natively
+#   • Can use the k8s service account for k8sattributes
+#   • Is scraped by kube-prometheus-stack via ServiceMonitor
+#
+# Docker services are still scraped: the gateway container
+# bridges gateway-net ↔ kind network, so hostnames like
+# "notes-backend" resolve from inside the cluster.
+#
+resource "helm_release" "otel_collector" {
+  depends_on       = [helm_release.tempo, helm_release.loki, helm_release.kube_prometheus_stack]
+  name             = "otel-collector"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  chart            = "opentelemetry-collector"
+  namespace        = "monitoring"
+  create_namespace = true
+  wait             = true
+  timeout          = 300
+
+  values = [file("${local.obs_path}/otel-collector-config.yml")]
+}
+
+# ─── JAEGER ───────────────────────────────────────────────────
+#
+# All-in-one Jaeger (collector + query + UI in one pod).
+# Exposed at /jaeger/ via:
+#   • kind ingress-nginx  (in-cluster path rewrite)
+#   • nginx gateway       (forwards /jaeger/ → kind:30080)
+#
+# Uses in-memory span storage (50k traces).  Traces arrive via:
+#   • OTLP gRPC/HTTP from the OTEL Collector
+#   • Direct Jaeger Thrift/gRPC from services that use the
+#     Jaeger client library
+#
+resource "helm_release" "jaeger" {
+  depends_on       = [helm_release.ingress_nginx, helm_release.otel_collector]
+  name             = "jaeger"
+  repository       = "https://jaegertracing.github.io/helm-charts"
+  chart            = "jaeger"
+  namespace        = "monitoring"
+  create_namespace = true
+  wait             = true
+  timeout          = 180
+
+  values = [file("${local.obs_path}/jaeger-config.yml")]
+}
+
+# ─── OTEL INGRESS (NodePort routes for OTLP/HTTP) ─────────────
+#
+# Exposes the OTEL Collector's OTLP/HTTP port (4318) through
+# kind's ingress-nginx at /otel/ so browser-instrumented
+# frontends can send spans without going through gRPC.
+#
+# The nginx gateway then forwards /otel/ → kind:30080 → here.
+#
+resource "kubectl_manifest" "otel_ingress" {
+  depends_on = [helm_release.ingress_nginx, helm_release.otel_collector]
+  yaml_body  = <<-YAML
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: otel-collector-ingress
+      namespace: monitoring
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+        # CORS for browser OTLP SDKs
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+        nginx.ingress.kubernetes.io/cors-allow-methods: "POST, OPTIONS"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, traceparent, tracestate"
+    spec:
+      ingressClassName: nginx
+      rules:
+        - http:
+            paths:
+              - path: /otel(/|$)(.*)
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: otel-collector
+                    port:
+                      number: 4318
+  YAML
+}
+
+# ─── GRAFANA INGRESS ──────────────────────────────────────────
+#
+# Grafana's ingress is already defined in grafana-values.yml
+# via the grafana.ingress block inside kube-prometheus-stack.
+# This manifest is NOT needed — it would create a duplicate.
+# Left here as a comment for reference only.
+#
+# resource "kubectl_manifest" "grafana_ingress" { ... }
+
+# ─── NGINX-EXPORTER SIDECAR (gateway container metrics) ───────
+#
+# The prometheus.yml job "gateway-nginx" scrapes port 9113.
+# Add an nginx-prometheus-exporter container alongside the
+# gateway to expose /stub_status on that port.
+#
+# NOTE: nginx.conf already has the stub_status block (see
+#       the /nginx_status location below — add it if missing).
+#       This container reads from it and exposes Prometheus
+#       metrics that the OTEL Collector scrapes.
+#
+resource "docker_container" "nginx_exporter" {
+  name  = "nginx-exporter"
+  image = "nginx/nginx-prometheus-exporter:1.1"
+
+  # Reads nginx stub_status from the gateway container
+  command = [
+    "-nginx.scrape-uri=http://gateway:8080/nginx_status",
+  ]
+
+  ports {
+    internal = 9113
+    external = 9113
+  }
+
+  networks_advanced {
+    name = docker_network.gateway_net.name
+  }
+
+  depends_on = [module.gateway]
+
+  restart = "always"
+}
