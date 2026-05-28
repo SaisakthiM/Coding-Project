@@ -14,4 +14,3 @@ RUN chmod +x /entrypoint.sh
 COPY . .
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "document_backend.wsgi", "--workers", "3", "--bind", "0.0.0.0:8000", "--timeout", "120"]

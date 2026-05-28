@@ -7,11 +7,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV DJANGO_SETTINGS_MODULE=hospital_management.settings
+
 RUN python manage.py migrate
 
 EXPOSE 8000
 
-# Copy and use entrypoint instead
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

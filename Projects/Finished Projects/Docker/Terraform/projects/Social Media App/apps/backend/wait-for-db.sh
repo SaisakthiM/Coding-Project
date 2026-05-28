@@ -68,7 +68,11 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn server..."
-exec gunicorn social_media.wsgi:application \
-     --bind 0.0.0.0:8000 \
-     --workers 3 \
-     --log-level info
+exec opentelemetry-instrument \
+    --service_name=hospital-management \
+    --exporter_otlp_endpoint=http://otel-gateway:4318 \
+    --exporter_otlp_protocol=http/protobuf \
+    --traces_exporter=otlp \
+    --metrics_exporter=otlp \
+    --logs_exporter=otlp \
+    gunicorn social_media.wsgi:application --bind 0.0.0.0:8000

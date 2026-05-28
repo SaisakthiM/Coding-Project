@@ -1,8 +1,0 @@
-services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-    container_name: quiz-frontend-prod
-    ports:
-      - "80:80"

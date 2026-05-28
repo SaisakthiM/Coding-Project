@@ -11,5 +11,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+echo "Running opentelemetry-bootstrap..."
+opentelemetry-bootstrap -a install
+
 echo "Tests passed — starting server..."
-exec gunicorn hospital_management.wsgi:application --bind 0.0.0.0:8000
+exec opentelemetry-instrument \
+    --service_name=hospital-management \
+    --exporter_otlp_endpoint=http://otel-gateway:4318 \
+    --exporter_otlp_protocol=http/protobuf \
+    --traces_exporter=otlp \
+    --metrics_exporter=otlp \
+    --logs_exporter=otlp \
+    gunicorn hospital_management.wsgi:application --bind 0.0.0.0:8000

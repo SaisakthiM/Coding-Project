@@ -3,58 +3,72 @@ provisionDataStore:
   elasticsearch: false
   kafka: false
 
-allInOne:
+userconfig:
+  service:
+    extensions: [jaeger_storage, jaeger_query, healthcheckv2, remote_sampling, zpages, expvar, jaeger_mcp]
+    pipelines:
+      traces:
+        receivers: [otlp, jaeger]
+        exporters: [jaeger_storage_exporter]
+
+  extensions:
+    healthcheckv2:
+      use_v2: true
+      http:
+        endpoint: 0.0.0.0:13133
+
+    jaeger_storage:
+      backends:
+        some_storage:
+          memory:
+            max_traces: 50000
+
+    jaeger_query:
+      storage:
+        traces: some_storage
+      base_path: /jaeger
+
+    remote_sampling:
+      file:
+        path: ""
+
+    zpages:
+      endpoint: 0.0.0.0:27778
+
+    expvar:
+      endpoint: "[::]:27777"
+
+    jaeger_mcp:
+      http:
+        endpoint: 0.0.0.0:16687
+
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+    jaeger:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:14250
+        thrift_http:
+          endpoint: 0.0.0.0:14268
+        thrift_binary:
+          endpoint: 0.0.0.0:6832
+        thrift_compact:
+          endpoint: 0.0.0.0:6831
+
+  exporters:
+    jaeger_storage_exporter:
+      trace_storage: some_storage
+
+jaeger:
   enabled: true
-  image:
-    repository: jaegertracing/all-in-one
-    tag: "1.57"
-    pullPolicy: IfNotPresent
 
-  args:
-    - "--query.base-path=/jaeger"
-
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-
-  extraEnv:
-    - name: SPAN_STORAGE_TYPE
-      value: memory
-    - name: MEMORY_MAX_TRACES
-      value: "50000"
-    - name: COLLECTOR_OTLP_ENABLED
-      value: "true"
-
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      # FIX: don't strip /jaeger prefix — Jaeger handles it internally
-      # via --query.base-path=/jaeger. Just pass the full path through.
-      nginx.ingress.kubernetes.io/rewrite-target: /$1
-      nginx.ingress.kubernetes.io/use-regex: "true"
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    hosts:
-      - localhost
-      - saisakthi.qzz.io
-    # FIX: paths is a sibling of hosts, not nested under it
-    paths:
-      - path: /jaeger(/?.*)
-        pathType: ImplementationSpecific
-
-collector:
-  enabled: false
-query:
-  enabled: false
-agent:
-  enabled: false
-
-service:
-  type: ClusterIP
+storage:
+  type: memory
 
 serviceMonitor:
   enabled: true

@@ -13,4 +13,8 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn notes_app.wsgi:application --bind 0.0.0.0:8000"]
+ENV DJANGO_SETTINGS_MODULE=notes_app.settings
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]

@@ -32,5 +32,16 @@ COPY --from=build /app/target/*.jar /app/
 COPY wait-for-cassandra.sh /wait-for-cassandra.sh
 RUN chmod +x /wait-for-cassandra.sh
 
+# Download the agent at build time
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar /app/opentelemetry-javaagent.jar
+
+ENV JAVA_TOOL_OPTIONS="-javaagent:/app/opentelemetry-javaagent.jar"
+ENV OTEL_SERVICE_NAME="bank-backend"
+ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-gateway:4317"
+ENV OTEL_EXPORTER_OTLP_PROTOCOL="grpc"
+ENV OTEL_TRACES_EXPORTER="otlp"
+ENV OTEL_METRICS_EXPORTER="otlp"
+ENV OTEL_LOGS_EXPORTER="otlp"
+
 # Run the wait script, which launches the JAR
 ENTRYPOINT ["/wait-for-cassandra.sh"]

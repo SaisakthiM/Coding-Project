@@ -1455,19 +1455,11 @@ resource "helm_release" "kube_prometheus_stack" {
   namespace        = "monitoring"
   create_namespace = true
   wait             = true
-  reuse_values     = true
   timeout          = 600
 
   values = [
-    # 1. prometheus.yml is already a full Helm values file:
-    #    prometheus.prometheusSpec.additionalScrapeConfigs: [...]
-    #    Pass it directly — do NOT yamldecode/re-wrap it.
     file("${local.obs_path}/prometheus.yml"),
-
-    # 2. Grafana datasources, ingress, etc.
     file("${local.obs_path}/grafana-values.yml"),
-
-    # 3. Any settings that don't belong in the above files
     yamlencode({
       prometheus = {
         prometheusSpec = {
@@ -1481,13 +1473,10 @@ resource "helm_release" "kube_prometheus_stack" {
     }),
   ]
 
-  set_sensitive {
-    name  = "prometheus_sha"
-    value = filebase64sha256("${local.obs_path}/prometheus.yml")
-  }
-  set_sensitive {
-    name  = "grafana_sha"
-    value = filebase64sha256("${local.obs_path}/grafana-values.yml")
+  lifecycle {
+    ignore_changes = [
+      values,  # prevents re-upgrade on every apply
+    ]
   }
 }
 
@@ -1754,5 +1743,113 @@ resource "kubectl_manifest" "otel_ingress" {
                     name: otel-collector
                     port:
                       number: 4318
+  YAML
+}
+
+resource "kubectl_manifest" "ingress_grafana" {
+  depends_on = [helm_release.ingress_nginx, helm_release.kube_prometheus_stack]
+  yaml_body  = <<-YAML
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: observability-grafana-ingress
+      namespace: monitoring
+      annotations:
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+        nginx.ingress.kubernetes.io/websocket-services: "kube-prometheus-stack-grafana"
+    spec:
+      ingressClassName: nginx
+      rules:
+        - http:
+            paths:
+              - path: /grafana
+                pathType: Prefix
+                backend:
+                  service:
+                    name: kube-prometheus-stack-grafana
+                    port:
+                      number: 80
+  YAML
+}
+
+resource "kubectl_manifest" "ingress_jaeger" {
+  depends_on = [helm_release.ingress_nginx, helm_release.otel_collector, kubectl_manifest.jaeger_v2_config]
+  yaml_body  = <<-YAML
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: observability-jaeger-ingress
+      namespace: monitoring
+      annotations:
+        nginx.ingress.kubernetes.io/use-regex: "true"
+    spec:
+      ingressClassName: nginx
+      rules:
+        - http:
+            paths:
+              - path: /jaeger
+                pathType: Prefix
+                backend:
+                  service:
+                    name: jaeger
+                    port:
+                      number: 16686
+  YAML
+}
+
+resource "kubectl_manifest" "jaeger_v2_config" {
+  depends_on = [null_resource.kind_cluster]
+  yaml_body  = <<-YAML
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: jaeger-v2-config
+      namespace: monitoring
+    data:
+      config.yaml: |
+        service:
+          extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+          pipelines:
+            traces:
+              receivers: [otlp, jaeger]
+              exporters: [jaeger_storage]
+
+        extensions:
+          healthcheckv2:
+            use_v2: true
+            http:
+              endpoint: 0.0.0.0:13133
+
+          jaeger_storage:
+            backends:
+              some_storage:
+                memory:
+                  max_traces: 50000
+
+          jaeger_query:
+            storage:
+              traces: some_storage
+            base_path: /jaeger
+
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+          jaeger:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:14250
+              thrift_http:
+                endpoint: 0.0.0.0:14268
+
+        exporters:
+          jaeger_storage:
+            trace_storage: some_storage
   YAML
 }

@@ -9,4 +9,11 @@ python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 python manage.py test blog.tests -v 2
-exec gunicorn blogsite.wsgi:application --bind 0.0.0.0:8000
+exec opentelemetry-instrument \
+    --service_name=hospital-management \
+    --exporter_otlp_endpoint=http://otel-gateway:4318 \
+    --exporter_otlp_protocol=http/protobuf \
+    --traces_exporter=otlp \
+    --metrics_exporter=otlp \
+    --logs_exporter=otlp \
+    gunicorn blog_website.wsgi:application --bind 0.0.0.0:8000
