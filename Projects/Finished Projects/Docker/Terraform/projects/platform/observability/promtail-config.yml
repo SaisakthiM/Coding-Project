@@ -1,18 +1,8 @@
-# ─────────────────────────────────────────────────────────────
-# promtail-config.yml  — Helm values for grafana/promtail
-#
-# Deployed via:
-#   helm_release "promtail" { values = [file("…/promtail-config.yml")] }
-#
-# Tails all pod logs in the kind cluster.  Extracts trace_id /
-# span_id from structured JSON logs (Django, Spring Boot, Go)
-# so Grafana can pivot from a log line directly to a Tempo trace.
-# ─────────────────────────────────────────────────────────────
+# promtail-config.yml — Helm values for grafana/promtail
 
 config:
-  # ── Loki push endpoint ────────────────────────────────────
   clients:
-    - url: http://loki-gateway/loki/api/v1/push
+    - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
       tenant_id: ""
       batchwait: 1s
       batchsize: 1048576
@@ -22,44 +12,33 @@ config:
         max_period: 5m
         max_retries: 10
 
-  # ── Server ───────────────────────────────────────────────
   server:
     http_listen_port: 3101
     grpc_listen_port: 0
     log_level: info
 
-  # ── Positions (tracks how far through each file we are) ──
   positions:
     filename: /run/promtail/positions.yaml
 
-  # ── Scrape configs ────────────────────────────────────────
   snippets:
     scrapeConfigs: |
-      # ── Kubernetes pods — automatic discovery ─────────────
       - job_name: kubernetes-pods
         kubernetes_sd_configs:
           - role: pod
         pipeline_stages:
-          # 1. Parse JSON logs (Django/Spring/Go all emit JSON)
           - json:
               expressions:
-                timestamp:    time
-                level:        level
-                message:      msg
-                trace_id:     trace_id
-                span_id:      span_id
+                timestamp: time
+                level: level
+                message: msg
+                trace_id: trace_id
+                span_id: span_id
                 service_name: service
-                logger:       logger
-
-          # 2. Promote trace_id into a Loki label so Grafana
-          #    can link directly to Tempo
+                logger: logger
           - labels:
-              trace_id:
-              span_id:
-              level:
-
-          # 3. Fall back to plain-text parsing for services
-          #    that don't emit JSON (nginx access log format)
+              trace_id: ""
+              span_id: ""
+              level: ""
           - match:
               selector: '{app="gateway"}'
               stages:
@@ -71,11 +50,9 @@ config:
                       (?P<status>\d+) (?P<body_bytes_sent>\d+)
                       "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"
                 - labels:
-                    method:
-                    status:
-                    path:
-
-          # 4. Spring Boot plain-text fallback
+                    method: ""
+                    status: ""
+                    path: ""
           - match:
               selector: '{app=~"bank-backend|social-java"}'
               stages:
@@ -88,20 +65,15 @@ config:
                       \s+(?P<level>\w+)\s+(?P<pid>\d+)\s+---\s+
                       \[(?P<thread>[^\]]+)\]\s+(?P<logger>\S+)\s*:\s+(?P<message>.*)
                 - labels:
-                    level:
-                    logger:
-
-          # 5. Drop noisy health-check lines to save storage
+                    level: ""
+                    logger: ""
           - drop:
               expression: '(GET /health|GET /actuator/health|GET /metrics)'
               drop_counter_reason: healthcheck
-
         relabel_configs:
-          # Only scrape pods that haven't opted out
           - source_labels: [__meta_kubernetes_pod_annotation_promtail_io_scrape]
             action: drop
             regex: "false"
-          # Standard k8s labels
           - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
           - source_labels: [__meta_kubernetes_pod_name]
@@ -112,21 +84,18 @@ config:
             target_label: app
           - source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
-          # Use pod UID to identify the log file on the node
           - source_labels:
               - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
             target_label: __path__
             separator: /
             replacement: /var/log/pods/*$1/*.log
-          # Multiline container runtime prefix (containerd / docker)
           - source_labels: [__meta_kubernetes_pod_container_runtime]
             action: replace
             regex: (containerd|cri-o)
             target_label: __path__
             replacement: /var/log/pods/*${1}*/${2}/*.log
 
-      # ── System / node logs ─────────────────────────────────
       - job_name: node-syslog
         static_configs:
           - targets: [localhost]
@@ -134,7 +103,6 @@ config:
               job: syslog
               __path__: /var/log/syslog
 
-      # ── Kind control-plane logs ───────────────────────────
       - job_name: kind-control-plane
         static_configs:
           - targets: [localhost]
@@ -149,7 +117,6 @@ config:
           - output:
               source: log
 
-# ── Resources ────────────────────────────────────────────────
 resources:
   requests:
     cpu: 50m
@@ -158,7 +125,6 @@ resources:
     cpu: 200m
     memory: 256Mi
 
-# ── DaemonSet tolerations (run on control-plane nodes too) ───
 tolerations:
   - key: node-role.kubernetes.io/control-plane
     operator: Exists
@@ -167,24 +133,12 @@ tolerations:
     operator: Exists
     effect: NoSchedule
 
-# ── Extra volumes to access the host log paths ───────────────
-extraVolumes:
-  - name: varlog
-    hostPath:
-      path: /var/log
-  - name: varlibdockercontainers
-    hostPath:
-      path: /var/lib/docker/containers
+# REMOVED: extraVolumes and extraVolumeMounts blocks.
+# The promtail chart already mounts these by default:
+#   /var/log                    → for pod/container logs
+#   /var/lib/docker/containers  → for docker container metadata
+# Adding them again caused: duplicate entries for mountPath
 
-extraVolumeMounts:
-  - name: varlog
-    mountPath: /var/log
-    readOnly: true
-  - name: varlibdockercontainers
-    mountPath: /var/lib/docker/containers
-    readOnly: true
-
-# ── ServiceMonitor so Prometheus scrapes Promtail itself ─────
 serviceMonitor:
   enabled: true
   labels:

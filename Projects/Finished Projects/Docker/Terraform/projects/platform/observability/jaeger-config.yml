@@ -1,18 +1,5 @@
-# ─────────────────────────────────────────────────────────────
-# jaeger-config.yml  — Helm values for jaegertracing/jaeger
-#
-# Deployed via:
-#   helm_release "jaeger" { values = [file("…/jaeger-config.yml")] }
-#
-# All-in-one mode (collector + query + agent in one pod).
-# Uses in-memory storage for kind/dev — traces are also
-# forwarded from Tempo so Jaeger UI is purely a secondary view.
-#
-# Exposed at /jaeger/ via the nginx gateway.
-# ─────────────────────────────────────────────────────────────
-
 provisionDataStore:
-  cassandra: false    # use in-memory; Cassandra is already used by social-media
+  cassandra: false
   elasticsearch: false
   kafka: false
 
@@ -23,8 +10,6 @@ allInOne:
     tag: "1.57"
     pullPolicy: IfNotPresent
 
-  # Tell Jaeger its UI is served under /jaeger so all asset
-  # paths and redirects are prefixed correctly
   args:
     - "--query.base-path=/jaeger"
 
@@ -36,32 +21,31 @@ allInOne:
       cpu: 500m
       memory: 512Mi
 
-  # Jaeger all-in-one uses in-memory span storage by default
   extraEnv:
     - name: SPAN_STORAGE_TYPE
       value: memory
     - name: MEMORY_MAX_TRACES
       value: "50000"
     - name: COLLECTOR_OTLP_ENABLED
-      value: "true"     # accept OTLP in addition to Jaeger native
+      value: "true"
 
   ingress:
     enabled: true
     ingressClassName: nginx
     annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /jaeger/$2
+      # FIX: don't strip /jaeger prefix — Jaeger handles it internally
+      # via --query.base-path=/jaeger. Just pass the full path through.
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
       nginx.ingress.kubernetes.io/use-regex: "true"
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
-      # Strip the /jaeger prefix before forwarding to Jaeger
-      # (Jaeger handles /jaeger internally via --query.base-path)
     hosts:
-      - host: ""    # match any host (same as gateway pattern)
-        paths:
-          - path: /jaeger(/|$)(.*)
-            pathType: ImplementationSpecific
+      - localhost
+      - saisakthi.qzz.io
+    # FIX: paths is a sibling of hosts, not nested under it
+    paths:
+      - path: /jaeger(/?.*)
+        pathType: ImplementationSpecific
 
-# Disable the separate collector/query/agent chart components
-# (all-in-one covers everything)
 collector:
   enabled: false
 query:
@@ -69,16 +53,9 @@ query:
 agent:
   enabled: false
 
-# ── Service ports ─────────────────────────────────────────────
-# 16686 — Jaeger UI / query HTTP
-# 14268 — Jaeger collector HTTP (Thrift)
-# 14250 — Jaeger collector gRPC
-# 4317  — OTLP gRPC (collector_otlp_enabled=true)
-# 9411  — Zipkin compatible endpoint
 service:
   type: ClusterIP
 
-# ── ServiceMonitor so Prometheus scrapes Jaeger self-metrics ──
 serviceMonitor:
   enabled: true
   additionalLabels:

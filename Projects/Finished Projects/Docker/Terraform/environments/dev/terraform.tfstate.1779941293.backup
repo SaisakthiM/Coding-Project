@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "1.14.6",
-  "serial": 2041,
+  "serial": 1937,
   "lineage": "d6808725-3cfc-aef7-1b8c-4e0ac9ea42a6",
   "outputs": {},
   "resources": [
@@ -3677,12 +3677,12 @@
                 "app_version": "3.11.3",
                 "chart": "cassandra",
                 "first_deployed": 1779940685,
-                "last_deployed": 1779943602,
+                "last_deployed": 1779940685,
                 "name": "cassandra",
                 "namespace": "default",
                 "notes": "Cassandra CQL can be accessed via port 9042 on the following DNS name from within your cluster:\nCassandra Thrift can be accessed via port 9160 on the following DNS name from within your cluster:\n\nIf you want to connect to the remote instance with your local Cassandra CQL cli. To forward the API port to localhost:9042 run the following:\n- kubectl port-forward --namespace default $(kubectl get pods --namespace default -l app=cassandra,release=cassandra -o jsonpath='{ .items[0].metadata.name }') 9042:9042\n\nIf you want to connect to the Cassandra CQL run the following:\n- kubectl port-forward --namespace default $(kubectl get pods --namespace default -l \"app=cassandra,release=cassandra\" -o jsonpath=\"{.items[0].metadata.name}\") 9042:9042\n  echo cqlsh 127.0.0.1 9042\n\nYou can also see the cluster status by run the following:\n- kubectl exec -it --namespace default $(kubectl get pods --namespace default -l app=cassandra,release=cassandra -o jsonpath='{.items[0].metadata.name}') nodetool status\n\nTo tail the logs for the Cassandra pod run the following:\n- kubectl logs -f --namespace default $(kubectl get pods --namespace default -l app=cassandra,release=cassandra -o jsonpath='{ .items[0].metadata.name }')\n\nNote that the cluster is running with node-local storage instead of PersistentVolumes. In order to prevent data loss,\npods will be decommissioned upon termination. Decommissioning may take some time, so you might also want to adjust the\npod termination gace period, which is currently set to 30 seconds.\n",
-                "revision": 2,
-                "values": "{\"image\":{\"repository\":\"cassandra\",\"tag\":\"5.0\"},\"persistence\":{\"enabled\":false},\"replicaCount\":1,\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"1Gi\"},\"requests\":{\"cpu\":\"250m\",\"memory\":\"768Mi\"}},\"values_sha\":\"(sensitive value)\"}",
+                "revision": 1,
+                "values": "{\"image\":{\"repository\":\"cassandra\",\"tag\":\"5.0\"},\"persistence\":{\"enabled\":false},\"replicaCount\":1,\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"1Gi\"},\"requests\":{\"cpu\":\"250m\",\"memory\":\"768Mi\"}}}",
                 "version": "0.13.0"
               }
             ],
@@ -3744,13 +3744,7 @@
               }
             ],
             "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "values_sha",
-                "type": "",
-                "value": "z+R1QWjP0Xwe7/OpYYNsuRefTgNLWSaDvxHLhJxzlaA="
-              }
-            ],
+            "set_sensitive": [],
             "skip_crds": false,
             "status": "deployed",
             "timeout": 300,
@@ -3766,12 +3760,6 @@
               {
                 "type": "get_attr",
                 "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
               }
             ]
           ],
@@ -3990,9 +3978,9 @@
             "atomic": false,
             "chart": "kube-prometheus-stack",
             "cleanup_on_fail": false,
-            "create_namespace": true,
+            "create_namespace": false,
             "dependency_update": false,
-            "description": null,
+            "description": "Preparing upgrade",
             "devel": null,
             "disable_crd_hooks": false,
             "disable_openapi_validation": false,
@@ -4007,13 +3995,13 @@
               {
                 "app_version": "v0.91.0",
                 "chart": "kube-prometheus-stack",
-                "first_deployed": 1779945513,
-                "last_deployed": 1779945513,
+                "first_deployed": 1779939223,
+                "last_deployed": 1779940894,
                 "name": "kube-prometheus-stack",
                 "namespace": "monitoring",
-                "notes": "kube-prometheus-stack has been installed. Check its status by running:\n  kubectl --namespace monitoring get pods -l \"release=kube-prometheus-stack\"\n\nGet Grafana 'admin' user password by running:\n\n  kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath=\"{.data.admin-password}\" | base64 -d ; echo\n\nAccess Grafana local instance:\n\n  export POD_NAME=$(kubectl --namespace monitoring get pod -l \"app.kubernetes.io/name=grafana,app.kubernetes.io/instance=kube-prometheus-stack\" -oname)\n  kubectl --namespace monitoring port-forward $POD_NAME 3000\n\nGet your grafana admin user password by running:\n\n  kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath=\"{.items[0].data.admin-password}\" | base64 --decode ; echo\n\n\nVisit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create \u0026 configure Alertmanager and Prometheus instances using the Operator.\n\n1. Get your 'admin' user password by running:\n\n   kubectl get secret --namespace monitoring kube-prometheus-stack-grafana -o jsonpath=\"{.data.admin-password}\" | base64 --decode ; echo\n\n\n2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:\n\n   kube-prometheus-stack-grafana.monitoring.svc.cluster.local\n\n   If you bind grafana to 80, please update values in values.yaml and reinstall:\n   ```\n   securityContext:\n     runAsUser: 0\n     runAsGroup: 0\n     fsGroup: 0\n\n   command:\n   - \"setcap\"\n   - \"'cap_net_bind_service=+ep'\"\n   - \"/usr/sbin/grafana-server \u0026\u0026\"\n   - \"sh\"\n   - \"/run.sh\"\n   ```\n   Details refer to https://grafana.com/docs/installation/configuration/#http-port.\n   Or grafana would always crash.\n\n   From outside the cluster, the server URL(s) are:\n     http://*.local\n     http://*.qzz.io\n\n3. Login with the password from step 1 and the username: admin\n#################################################################################\n######   WARNING: Persistence is disabled!!! You will lose your data when   #####\n######            the Grafana pod is terminated.                            #####\n#################################################################################\n\n1. Get the application URL by running these commands:\n  export POD_NAME=$(kubectl get pods --namespace monitoring -l \"app.kubernetes.io/name=prometheus-node-exporter,app.kubernetes.io/instance=kube-prometheus-stack\" -o jsonpath=\"{.items[0].metadata.name}\")\n  echo \"Visit http://127.0.0.1:9100 to use your application\"\n  kubectl port-forward --namespace monitoring $POD_NAME 9100\nkube-state-metrics is a simple service that listens to the Kubernetes API server and generates metrics about the state of the objects.\nThe exposed metrics can be found here:\nhttps://github.com/kubernetes/kube-state-metrics/blob/master/docs/README.md#exposed-metrics\n\nThe metrics are exported on the HTTP endpoint /metrics on the listening port.\nIn your case, kube-prometheus-stack-kube-state-metrics.monitoring.svc.cluster.local:8080/metrics\n\nThey are served either as plaintext or protobuf depending on the Accept header.\nThey are designed to be consumed either by Prometheus itself or by a scraper that is compatible with scraping a Prometheus client endpoint.\n",
-                "revision": 1,
-                "values": "{\"grafana\":{\"additionalDataSources\":[{\"access\":\"proxy\",\"jsonData\":{\"timeInterval\":\"15s\"},\"name\":\"Prometheus\",\"type\":\"prometheus\",\"uid\":\"prometheus\",\"url\":\"http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090\"},{\"access\":\"proxy\",\"jsonData\":{\"derivedFields\":[{\"datasourceUid\":\"tempo\",\"matcherRegex\":\"\\\"trace_id\\\":\\\"(\\\\w+)\\\"\",\"name\":\"TraceID\",\"url\":\"$${__value.raw}\"}]},\"name\":\"Loki\",\"type\":\"loki\",\"uid\":\"loki\",\"url\":\"http://loki-gateway.monitoring.svc.cluster.local\"},{\"access\":\"proxy\",\"jsonData\":{\"lokiSearch\":{\"datasourceUid\":\"loki\"},\"nodeGraph\":{\"enabled\":true},\"serviceMap\":{\"datasourceUid\":\"prometheus\"},\"tracesToLogsV2\":{\"datasourceUid\":\"loki\",\"filterBySpanID\":false,\"filterByTraceID\":true,\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]},\"tracesToMetrics\":{\"datasourceUid\":\"prometheus\",\"queries\":[{\"name\":\"Request rate\",\"query\":\"rate(http_server_requests_seconds_count{app=\\\"$${__tags.app}\\\"}[5m])\"},{\"name\":\"Error rate\",\"query\":\"rate(http_server_requests_seconds_count{app=\\\"$${__tags.app}\\\",status=~\\\"5..\\\"}[5m])\"}],\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]}},\"name\":\"Tempo\",\"type\":\"tempo\",\"uid\":\"tempo\",\"url\":\"http://tempo.monitoring.svc.cluster.local:3200\"},{\"access\":\"proxy\",\"jsonData\":{\"tracesToLogsV2\":{\"datasourceUid\":\"loki\",\"filterByTraceID\":true,\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]}},\"name\":\"Jaeger\",\"type\":\"jaeger\",\"uid\":\"jaeger\",\"url\":\"http://jaeger-all-in-one-query.monitoring.svc.cluster.local:16686\"}],\"adminPassword\":\"admin\",\"grafana.ini\":{\"server\":{\"root_url\":\"%(protocol)s://%(domain)s/grafana/\",\"serve_from_sub_path\":true}},\"ingress\":{\"annotations\":{\"nginx.ingress.kubernetes.io/proxy-read-timeout\":\"3600\",\"nginx.ingress.kubernetes.io/proxy-send-timeout\":\"3600\",\"nginx.ingress.kubernetes.io/rewrite-target\":\"/$2\",\"nginx.ingress.kubernetes.io/ssl-redirect\":\"false\",\"nginx.ingress.kubernetes.io/use-regex\":\"true\"},\"enabled\":true,\"hosts\":[\"*.local\",\"*.qzz.io\"],\"ingressClassName\":\"nginx\",\"path\":\"/grafana(/|$)(.*)\",\"pathType\":\"ImplementationSpecific\"},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"512Mi\"},\"requests\":{\"cpu\":\"100m\",\"memory\":\"128Mi\"}},\"securityContext\":{\"fsGroup\":472,\"runAsGroup\":472,\"runAsUser\":472},\"sidecar\":{\"securityContext\":{\"runAsGroup\":472,\"runAsUser\":472}}},\"grafana_sha\":\"(sensitive value)\",\"prometheus\":{\"prometheusSpec\":{\"additionalScrapeConfigs\":[{\"job_name\":\"otel-collector-kind\",\"relabel_configs\":[{\"replacement\":\"otel-collector-kind\",\"target_label\":\"app\"},{\"replacement\":\"kind\",\"target_label\":\"cluster\"}],\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"otel-collector.monitoring.svc.cluster.local:8888\"]}]},{\"job_name\":\"jaeger\",\"relabel_configs\":[{\"replacement\":\"jaeger\",\"target_label\":\"app\"},{\"replacement\":\"kind\",\"target_label\":\"cluster\"}],\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"jaeger-all-in-one.monitoring.svc.cluster.local:14269\"]}]},{\"bearer_token_file\":\"/var/run/secrets/kubernetes.io/serviceaccount/token\",\"job_name\":\"kubernetes-cadvisor\",\"kubernetes_sd_configs\":[{\"role\":\"node\"}],\"relabel_configs\":[{\"action\":\"labelmap\",\"regex\":\"__meta_kubernetes_node_label_(.+)\"},{\"replacement\":\"kubernetes.default.svc:443\",\"target_label\":\"__address__\"},{\"regex\":\"(.+)\",\"replacement\":\"/api/v1/nodes/$1/proxy/metrics/cadvisor\",\"source_labels\":[\"__meta_kubernetes_node_name\"],\"target_label\":\"__metrics_path__\"}],\"scheme\":\"https\",\"scrape_interval\":\"30s\",\"tls_config\":{\"ca_file\":\"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\",\"insecure_skip_verify\":true}}],\"enableRemoteWriteReceiver\":true,\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"2Gi\"},\"requests\":{\"cpu\":\"200m\",\"memory\":\"512Mi\"}}}},\"prometheus_sha\":\"(sensitive value)\"}",
+                "notes": "1. Get the application URL by running these commands:\n  export POD_NAME=$(kubectl get pods --namespace monitoring -l \"app.kubernetes.io/name=prometheus-node-exporter,app.kubernetes.io/instance=kube-prometheus-stack\" -o jsonpath=\"{.items[0].metadata.name}\")\n  echo \"Visit http://127.0.0.1:9100 to use your application\"\n  kubectl port-forward --namespace monitoring $POD_NAME 9100\nkube-state-metrics is a simple service that listens to the Kubernetes API server and generates metrics about the state of the objects.\nThe exposed metrics can be found here:\nhttps://github.com/kubernetes/kube-state-metrics/blob/master/docs/README.md#exposed-metrics\n\nThe metrics are exported on the HTTP endpoint /metrics on the listening port.\nIn your case, kube-prometheus-stack-kube-state-metrics.monitoring.svc.cluster.local:8080/metrics\n\nThey are served either as plaintext or protobuf depending on the Accept header.\nThey are designed to be consumed either by Prometheus itself or by a scraper that is compatible with scraping a Prometheus client endpoint.\n\n1. Get your 'admin' user password by running:\n\n   kubectl get secret --namespace monitoring kube-prometheus-stack-grafana -o jsonpath=\"{.data.admin-password}\" | base64 --decode ; echo\n\n\n2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:\n\n   kube-prometheus-stack-grafana.monitoring.svc.cluster.local\n\n   If you bind grafana to 80, please update values in values.yaml and reinstall:\n   ```\n   securityContext:\n     runAsUser: 0\n     runAsGroup: 0\n     fsGroup: 0\n\n   command:\n   - \"setcap\"\n   - \"'cap_net_bind_service=+ep'\"\n   - \"/usr/sbin/grafana-server \u0026\u0026\"\n   - \"sh\"\n   - \"/run.sh\"\n   ```\n   Details refer to https://grafana.com/docs/installation/configuration/#http-port.\n   Or grafana would always crash.\n\n   From outside the cluster, the server URL(s) are:\n     http://\n\n3. Login with the password from step 1 and the username: admin\n#################################################################################\n######   WARNING: Persistence is disabled!!! You will lose your data when   #####\n######            the Grafana pod is terminated.                            #####\n#################################################################################\n\nkube-prometheus-stack has been installed. Check its status by running:\n  kubectl --namespace monitoring get pods -l \"release=kube-prometheus-stack\"\n\nGet Grafana 'admin' user password by running:\n\n  kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath=\"{.data.admin-password}\" | base64 -d ; echo\n\nAccess Grafana local instance:\n\n  export POD_NAME=$(kubectl --namespace monitoring get pod -l \"app.kubernetes.io/name=grafana,app.kubernetes.io/instance=kube-prometheus-stack\" -oname)\n  kubectl --namespace monitoring port-forward $POD_NAME 3000\n\nGet your grafana admin user password by running:\n\n  kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath=\"{.items[0].data.admin-password}\" | base64 --decode ; echo\n\n\nVisit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create \u0026 configure Alertmanager and Prometheus instances using the Operator.\n",
+                "revision": 2,
+                "values": "{\"grafana\":{\"additionalDataSources\":[{\"access\":\"proxy\",\"isDefault\":true,\"jsonData\":{\"timeInterval\":\"15s\"},\"name\":\"Prometheus\",\"type\":\"prometheus\",\"uid\":\"prometheus\",\"url\":\"http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090\"},{\"access\":\"proxy\",\"jsonData\":{\"derivedFields\":[{\"datasourceUid\":\"tempo\",\"matcherRegex\":\"\\\"trace_id\\\":\\\"(\\\\w+)\\\"\",\"name\":\"TraceID\",\"url\":\"$${__value.raw}\"}]},\"name\":\"Loki\",\"type\":\"loki\",\"uid\":\"loki\",\"url\":\"http://loki-gateway.monitoring.svc.cluster.local\"},{\"access\":\"proxy\",\"jsonData\":{\"lokiSearch\":{\"datasourceUid\":\"loki\"},\"nodeGraph\":{\"enabled\":true},\"serviceMap\":{\"datasourceUid\":\"prometheus\"},\"tracesToLogsV2\":{\"datasourceUid\":\"loki\",\"filterBySpanID\":false,\"filterByTraceID\":true,\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]},\"tracesToMetrics\":{\"datasourceUid\":\"prometheus\",\"queries\":[{\"name\":\"Request rate\",\"query\":\"rate(http_server_requests_seconds_count{app=\\\"$${__tags.app}\\\"}[5m])\"},{\"name\":\"Error rate\",\"query\":\"rate(http_server_requests_seconds_count{app=\\\"$${__tags.app}\\\",status=~\\\"5..\\\"}[5m])\"}],\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]}},\"name\":\"Tempo\",\"type\":\"tempo\",\"uid\":\"tempo\",\"url\":\"http://tempo.monitoring.svc.cluster.local:3200\"},{\"access\":\"proxy\",\"jsonData\":{\"tracesToLogsV2\":{\"datasourceUid\":\"loki\",\"filterByTraceID\":true,\"tags\":[{\"key\":\"service.name\",\"value\":\"app\"}]}},\"name\":\"Jaeger\",\"type\":\"jaeger\",\"uid\":\"jaeger\",\"url\":\"http://jaeger-all-in-one-query.monitoring.svc.cluster.local:16686\"}],\"adminPassword\":\"admin\",\"grafana.ini\":{\"server\":{\"root_url\":\"%(protocol)s://%(domain)s/grafana/\",\"serve_from_sub_path\":true}},\"ingress\":{\"annotations\":{\"nginx.ingress.kubernetes.io/proxy-read-timeout\":\"3600\",\"nginx.ingress.kubernetes.io/proxy-send-timeout\":\"3600\",\"nginx.ingress.kubernetes.io/rewrite-target\":\"/$2\",\"nginx.ingress.kubernetes.io/ssl-redirect\":\"false\",\"nginx.ingress.kubernetes.io/use-regex\":\"true\"},\"enabled\":true,\"hosts\":[\"\"],\"ingressClassName\":\"nginx\",\"path\":\"/grafana(/|$)(.*)\",\"pathType\":\"ImplementationSpecific\"},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"512Mi\"},\"requests\":{\"cpu\":\"100m\",\"memory\":\"128Mi\"}}},\"prometheus\":{\"prometheusSpec\":{\"additionalScrapeConfigs\":{\"prometheus\":{\"prometheusSpec\":{\"additionalScrapeConfigs\":[{\"job_name\":\"otel-collector-kind\",\"relabel_configs\":[{\"replacement\":\"otel-collector-kind\",\"target_label\":\"app\"},{\"replacement\":\"kind\",\"target_label\":\"cluster\"}],\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"otel-collector.monitoring.svc.cluster.local:8888\"]}]},{\"job_name\":\"jaeger\",\"relabel_configs\":[{\"replacement\":\"jaeger\",\"target_label\":\"app\"},{\"replacement\":\"kind\",\"target_label\":\"cluster\"}],\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"jaeger-all-in-one.monitoring.svc.cluster.local:14269\"]}]},{\"bearer_token_file\":\"/var/run/secrets/kubernetes.io/serviceaccount/token\",\"job_name\":\"kubernetes-cadvisor\",\"kubernetes_sd_configs\":[{\"role\":\"node\"}],\"relabel_configs\":[{\"action\":\"labelmap\",\"regex\":\"__meta_kubernetes_node_label_(.+)\"},{\"replacement\":\"kubernetes.default.svc:443\",\"target_label\":\"__address__\"},{\"regex\":\"(.+)\",\"replacement\":\"/api/v1/nodes/$1/proxy/metrics/cadvisor\",\"source_labels\":[\"__meta_kubernetes_node_name\"],\"target_label\":\"__metrics_path__\"}],\"scheme\":\"https\",\"scrape_interval\":\"30s\",\"tls_config\":{\"ca_file\":\"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\",\"insecure_skip_verify\":true}}]}}},\"enableRemoteWriteReceiver\":true,\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"2Gi\"},\"requests\":{\"cpu\":\"200m\",\"memory\":\"512Mi\"}}}}}",
                 "version": "86.0.0"
               }
             ],
@@ -4024,213 +4012,7 @@
             "recreate_pods": false,
             "render_subchart_notes": true,
             "replace": false,
-            "repository": "https://prometheus-community.github.io/helm-charts",
-            "repository_ca_file": null,
-            "repository_cert_file": null,
-            "repository_key_file": null,
-            "repository_password": null,
-            "repository_username": null,
-            "reset_values": false,
-            "reuse_values": true,
-            "set": [],
-            "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "grafana_sha",
-                "type": "",
-                "value": "nSzHE/KGmkSHiUqiT5ur3RiZxfLHBvR7r1dT+xAs3K8="
-              },
-              {
-                "name": "prometheus_sha",
-                "type": "",
-                "value": "GWAbLA2ClK21zRf6iVYTtLcrLTCF4jzAHSkdUoNSba4="
-              }
-            ],
-            "skip_crds": false,
-            "status": "deployed",
-            "timeout": 600,
-            "upgrade_install": null,
-            "values": [
-              "\nprometheus:\n  prometheusSpec:\n    additionalScrapeConfigs:\n      # ── 1. Kind-side OTEL Collector self-metrics ─────────────\n      - job_name: otel-collector-kind\n        scrape_interval: 15s\n        static_configs:\n          - targets: [\"otel-collector.monitoring.svc.cluster.local:8888\"]\n        relabel_configs:\n          - target_label: app\n            replacement: otel-collector-kind\n          - target_label: cluster\n            replacement: kind\n\n      # ── 2. Jaeger self-metrics ───────────────────────────────\n      - job_name: jaeger\n        scrape_interval: 15s\n        static_configs:\n          - targets: [\"jaeger-all-in-one.monitoring.svc.cluster.local:14269\"]\n        relabel_configs:\n          - target_label: app\n            replacement: jaeger\n          - target_label: cluster\n            replacement: kind\n\n      # ── 3. Kubernetes cAdvisor ───────────────────────────────\n      - job_name: kubernetes-cadvisor\n        scrape_interval: 30s\n        scheme: https\n        tls_config:\n          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n          insecure_skip_verify: true\n        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n        kubernetes_sd_configs:\n          - role: node\n        relabel_configs:\n          - action: labelmap\n            regex: __meta_kubernetes_node_label_(.+)\n          - target_label: __address__\n            replacement: kubernetes.default.svc:443\n          - source_labels: [__meta_kubernetes_node_name]\n            regex: (.+)\n            target_label: __metrics_path__\n            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor\n",
-              "grafana:\n  adminPassword: \"admin\"\n\n  grafana.ini:\n    server:\n      root_url: \"%(protocol)s://%(domain)s/grafana/\"\n      serve_from_sub_path: true\n\n  securityContext:\n    runAsUser: 472\n    runAsGroup: 472\n    fsGroup: 472\n\n  # The sidecar containers (sc-dashboard, sc-datasources) also inherit\n  # the broken securityContext — they need their own non-root override.\n  sidecar:\n    securityContext:\n      runAsUser: 472\n      runAsGroup: 472\n\n  ingress:\n    enabled: true\n    ingressClassName: nginx\n    annotations:\n      nginx.ingress.kubernetes.io/rewrite-target: /$2\n      nginx.ingress.kubernetes.io/use-regex: \"true\"\n      nginx.ingress.kubernetes.io/ssl-redirect: \"false\"\n      nginx.ingress.kubernetes.io/proxy-read-timeout: \"3600\"\n      nginx.ingress.kubernetes.io/proxy-send-timeout: \"3600\"\n    hosts:\n      - \"*.local\"\n      - \"*.qzz.io\"\n    path: /grafana(/|$)(.*)\n    pathType: ImplementationSpecific\n\n  additionalDataSources:\n    - name: Prometheus\n      type: prometheus\n      uid: prometheus\n      url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090\n      access: proxy\n      jsonData:\n        timeInterval: 15s\n\n    - name: Loki\n      type: loki\n      uid: loki\n      url: http://loki-gateway.monitoring.svc.cluster.local\n      access: proxy\n      jsonData:\n        derivedFields:\n          - name: TraceID\n            matcherRegex: '\"trace_id\":\"(\\w+)\"'\n            url: \"$${__value.raw}\"\n            datasourceUid: tempo\n\n    - name: Tempo\n      type: tempo\n      uid: tempo\n      url: http://tempo.monitoring.svc.cluster.local:3200\n      access: proxy\n      jsonData:\n        tracesToLogsV2:\n          datasourceUid: loki\n          tags:\n            - key: service.name\n              value: app\n          filterByTraceID: true\n          filterBySpanID: false\n        tracesToMetrics:\n          datasourceUid: prometheus\n          tags:\n            - key: service.name\n              value: app\n          queries:\n            - name: Request rate\n              query: 'rate(http_server_requests_seconds_count{app=\"$${__tags.app}\"}[5m])'\n            - name: Error rate\n              query: 'rate(http_server_requests_seconds_count{app=\"$${__tags.app}\",status=~\"5..\"}[5m])'\n        serviceMap:\n          datasourceUid: prometheus\n        nodeGraph:\n          enabled: true\n        lokiSearch:\n          datasourceUid: loki\n\n    - name: Jaeger\n      type: jaeger\n      uid: jaeger\n      url: http://jaeger-all-in-one-query.monitoring.svc.cluster.local:16686\n      access: proxy\n      jsonData:\n        tracesToLogsV2:\n          datasourceUid: loki\n          tags:\n            - key: service.name\n              value: app\n          filterByTraceID: true\n\n  resources:\n    requests:\n      cpu: 100m\n      memory: 128Mi\n    limits:\n      cpu: 500m\n      memory: 512Mi",
-              "\"prometheus\":\n  \"prometheusSpec\":\n    \"enableRemoteWriteReceiver\": true\n    \"resources\":\n      \"limits\":\n        \"cpu\": \"1000m\"\n        \"memory\": \"2Gi\"\n      \"requests\":\n        \"cpu\": \"200m\"\n        \"memory\": \"512Mi\"\n"
-            ],
-            "verify": false,
-            "version": "86.0.0",
-            "wait": true,
-            "wait_for_jobs": false
-          },
-          "sensitive_attributes": [
-            [
-              {
-                "type": "get_attr",
-                "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
-              }
-            ]
-          ],
-          "identity_schema_version": 0,
-          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
-          "dependencies": [
-            "helm_release.cassandra",
-            "helm_release.redis",
-            "null_resource.kind_cluster"
-          ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
-      "type": "helm_release",
-      "name": "loki",
-      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
-      "instances": [
-        {
-          "schema_version": 1,
-          "attributes": {
-            "atomic": false,
-            "chart": "loki",
-            "cleanup_on_fail": false,
-            "create_namespace": true,
-            "dependency_update": false,
-            "description": null,
-            "devel": null,
-            "disable_crd_hooks": false,
-            "disable_openapi_validation": false,
-            "disable_webhooks": false,
-            "force_update": false,
-            "id": "loki",
-            "keyring": null,
-            "lint": false,
-            "manifest": null,
-            "max_history": 0,
-            "metadata": [
-              {
-                "app_version": "3.6.7",
-                "chart": "loki",
-                "first_deployed": 1779946489,
-                "last_deployed": 1779946489,
-                "name": "loki",
-                "namespace": "monitoring",
-                "notes": "***********************************************************************\n Welcome to Grafana Loki\n Chart version: 7.0.0\n Chart Name: loki\n Loki version: 3.6.7\n***********************************************************************\n\n** Please be patient while the chart is being deployed **\n\nTip:\n\n  Watch the deployment status using the command: kubectl get pods -w --namespace monitoring\n\nIf pods are taking too long to schedule make sure pod affinity can be fulfilled in the current cluster.\n\n***********************************************************************\nInstalled components:\n***********************************************************************\n* loki\n\nLoki has been deployed as a single binary.\nThis means a single pod is handling reads and writes. You can scale that pod vertically by adding more CPU and memory resources.\n\n\n***********************************************************************\nSending logs to Loki\n***********************************************************************\n\nLoki has been configured with a gateway (nginx) to support reads and writes from a single component.\n\nYou can send logs from inside the cluster using the cluster DNS:\n\nhttp://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push\n\nYou can test to send data from outside the cluster by port-forwarding the gateway to your local machine:\n\n  kubectl port-forward --namespace monitoring svc/loki-gateway 3100:80 \u0026\n\nAnd then using http://127.0.0.1:3100/loki/api/v1/push URL as shown below:\n\n```\ncurl -H \"Content-Type: application/json\" -XPOST -s \"http://127.0.0.1:3100/loki/api/v1/push\"  \\\n--data-raw \"{\\\"streams\\\": [{\\\"stream\\\": {\\\"job\\\": \\\"test\\\"}, \\\"values\\\": [[\\\"$(date +%s)000000000\\\", \\\"fizzbuzz\\\"]]}]}\"\n```\n\nThen verify that Loki did receive the data using the following command:\n\n```\ncurl \"http://127.0.0.1:3100/loki/api/v1/query_range\" --data-urlencode 'query={job=\"test\"}' | jq .data.result\n```\n\n***********************************************************************\nConnecting Grafana to Loki\n***********************************************************************\n\nIf Grafana operates within the cluster, you'll set up a new Loki datasource by utilizing the following URL:\n\nhttp://loki-gateway.monitoring.svc.cluster.local/\n",
-                "revision": 1,
-                "values": "{\"backend\":{\"replicas\":0},\"chunksCache\":{\"enabled\":false},\"deploymentMode\":\"SingleBinary\",\"gateway\":{\"enabled\":true,\"replicas\":1,\"resources\":{\"limits\":{\"cpu\":\"200m\",\"memory\":\"128Mi\"},\"requests\":{\"cpu\":\"50m\",\"memory\":\"64Mi\"}}},\"loki\":{\"auth_enabled\":false,\"commonConfig\":{\"replication_factor\":1},\"limits_config\":{\"max_cache_freshness_per_query\":\"10m\",\"reject_old_samples\":true,\"reject_old_samples_max_age\":\"168h\",\"split_queries_by_interval\":\"15m\"},\"query_range\":{\"results_cache\":{\"cache\":{\"embedded_cache\":{\"enabled\":true,\"max_size_mb\":100}}}},\"schemaConfig\":{\"configs\":[{\"from\":\"2024-01-01\",\"index\":{\"period\":\"24h\",\"prefix\":\"loki_index_\"},\"object_store\":\"filesystem\",\"schema\":\"v13\",\"store\":\"tsdb\"}]},\"storage\":{\"type\":\"filesystem\"},\"storage_config\":{\"filesystem\":{\"directory\":\"/var/loki/chunks\"},\"tsdb_shipper\":{\"active_index_directory\":\"/var/loki/index\",\"cache_location\":\"/var/loki/index_cache\"}}},\"lokiCanary\":{\"enabled\":false},\"minio\":{\"enabled\":false},\"read\":{\"replicas\":0},\"resultsCache\":{\"enabled\":false},\"serviceMonitor\":{\"enabled\":true,\"labels\":{\"release\":\"kube-prometheus-stack\"}},\"singleBinary\":{\"replicas\":1,\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"512Mi\"},\"requests\":{\"cpu\":\"100m\",\"memory\":\"256Mi\"}}},\"test\":{\"enabled\":false},\"values_sha\":\"(sensitive value)\",\"write\":{\"replicas\":0}}",
-                "version": "7.0.0"
-              }
-            ],
-            "name": "loki",
-            "namespace": "monitoring",
-            "pass_credentials": false,
-            "postrender": [],
-            "recreate_pods": false,
-            "render_subchart_notes": true,
-            "replace": false,
-            "repository": "https://grafana.github.io/helm-charts",
-            "repository_ca_file": null,
-            "repository_cert_file": null,
-            "repository_key_file": null,
-            "repository_password": null,
-            "repository_username": null,
-            "reset_values": false,
-            "reuse_values": false,
-            "set": [],
-            "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "values_sha",
-                "type": "",
-                "value": "en3EsNgU5yJY1/1RpTUt1ekCzl6O7oB4IiIegsyZbwc="
-              }
-            ],
-            "skip_crds": false,
-            "status": "deployed",
-            "timeout": 300,
-            "upgrade_install": null,
-            "values": [
-              "# loki-config.yml — Helm values for grafana/loki\n\ndeploymentMode: SingleBinary\n\nloki:\n  auth_enabled: false\n\n  commonConfig:\n    replication_factor: 1\n\n  # Required since loki chart v3 — must be explicitly provided\n  schemaConfig:\n    configs:\n      - from: \"2024-01-01\"\n        store: tsdb\n        object_store: filesystem\n        schema: v13\n        index:\n          prefix: loki_index_\n          period: 24h\n\n  storage:\n    type: filesystem\n\n  storage_config:\n    tsdb_shipper:\n      active_index_directory: /var/loki/index\n      cache_location: /var/loki/index_cache\n    filesystem:\n      directory: /var/loki/chunks\n\n  limits_config:\n    reject_old_samples: true\n    reject_old_samples_max_age: 168h\n    max_cache_freshness_per_query: 10m\n    split_queries_by_interval: 15m\n\n  query_range:\n    results_cache:\n      cache:\n        embedded_cache:\n          enabled: true\n          max_size_mb: 100\n\nsingleBinary:\n  replicas: 1\n  resources:\n    requests:\n      cpu: 100m\n      memory: 256Mi\n    limits:\n      cpu: 500m\n      memory: 512Mi\n\n# Gateway gives promtail/otel a stable push endpoint\ngateway:\n  enabled: true\n  replicas: 1\n  resources:\n    requests:\n      cpu: 50m\n      memory: 64Mi\n    limits:\n      cpu: 200m\n      memory: 128Mi\n\n# Disable components not needed for single-binary mode\nbackend:\n  replicas: 0\nread:\n  replicas: 0\nwrite:\n  replicas: 0\n\nchunksCache:\n  enabled: false\nresultsCache:\n  enabled: false\n\n# Disable minio (use local filesystem instead)\nminio:\n  enabled: false\n\nserviceMonitor:\n  enabled: true\n  labels:\n    release: kube-prometheus-stack\n\ntest:\n  enabled: false\nlokiCanary:\n  enabled: false"
-            ],
-            "verify": false,
-            "version": "7.0.0",
-            "wait": true,
-            "wait_for_jobs": false
-          },
-          "sensitive_attributes": [
-            [
-              {
-                "type": "get_attr",
-                "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
-              }
-            ]
-          ],
-          "identity_schema_version": 0,
-          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
-          "dependencies": [
-            "helm_release.cassandra",
-            "helm_release.kube_prometheus_stack",
-            "helm_release.redis",
-            "null_resource.kind_cluster"
-          ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
-      "type": "helm_release",
-      "name": "otel_collector",
-      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
-      "instances": [
-        {
-          "schema_version": 1,
-          "attributes": {
-            "atomic": false,
-            "chart": "opentelemetry-collector",
-            "cleanup_on_fail": false,
-            "create_namespace": true,
-            "dependency_update": false,
-            "description": null,
-            "devel": null,
-            "disable_crd_hooks": false,
-            "disable_openapi_validation": false,
-            "disable_webhooks": false,
-            "force_update": false,
-            "id": "otel-collector",
-            "keyring": null,
-            "lint": false,
-            "manifest": null,
-            "max_history": 0,
-            "metadata": [
-              {
-                "app_version": "0.152.0",
-                "chart": "opentelemetry-collector",
-                "first_deployed": 1779947060,
-                "last_deployed": 1779947060,
-                "name": "otel-collector",
-                "namespace": "monitoring",
-                "notes": "\n\n\n[WARNING] config.service.telemetry.metrics.address should not be used and will be removed in the future. Use internalTelemetryViaOTLP or config.service.telemetry.metrics.readers  instead\"\n\n",
-                "revision": 1,
-                "values": "{\"clusterRole\":{\"create\":true},\"config\":{\"exporters\":{\"debug\":{\"sampling_initial\":5,\"sampling_thereafter\":200,\"verbosity\":\"basic\"},\"otlp/tempo\":{\"compression\":\"gzip\",\"endpoint\":\"tempo.monitoring.svc:4317\",\"tls\":{\"insecure\":true}},\"otlphttp/loki\":{\"endpoint\":\"http://loki.monitoring.svc:3100/otlp\",\"tls\":{\"insecure\":true}},\"prometheusremotewrite\":{\"endpoint\":\"http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/write\",\"resource_to_telemetry_conversion\":{\"enabled\":true},\"tls\":{\"insecure\":true}}},\"processors\":{\"batch\":{\"send_batch_max_size\":2048,\"send_batch_size\":1024,\"timeout\":\"5s\"},\"filter/drop_health\":{\"error_mode\":\"ignore\",\"metrics\":{\"metric\":[\"name == \\\"up\\\" and IsMatch(resource.attributes[\\\"job\\\"], \\\".*health.*\\\")\"]},\"traces\":{\"span\":[\"attributes[\\\"http.route\\\"] == \\\"/health\\\"\",\"attributes[\\\"http.route\\\"] == \\\"/healthz\\\"\",\"attributes[\\\"http.route\\\"] == \\\"/actuator/health\\\"\",\"attributes[\\\"http.route\\\"] == \\\"/metrics\\\"\"]}},\"k8sattributes\":{\"auth_type\":\"serviceAccount\",\"passthrough\":false},\"memory_limiter\":{\"check_interval\":\"5s\",\"limit_mib\":400,\"spike_limit_mib\":100},\"resource\":{\"attributes\":[{\"action\":\"insert\",\"key\":\"cluster\",\"value\":\"kind-social-media\"},{\"action\":\"insert\",\"key\":\"environment\",\"value\":\"local\"}]}},\"receivers\":{\"hostmetrics\":{\"collection_interval\":\"30s\",\"scrapers\":{\"cpu\":{},\"disk\":{},\"filesystem\":{},\"load\":{},\"memory\":{},\"network\":{},\"processes\":{}}},\"k8s_cluster\":{\"collection_interval\":\"30s\"},\"otlp\":{\"protocols\":{\"grpc\":{\"endpoint\":\"0.0.0.0:4317\"},\"http\":{\"cors\":{\"allowed_origins\":[\"*\"]},\"endpoint\":\"0.0.0.0:4318\"}}},\"prometheus\":{\"config\":{\"scrape_configs\":[{\"job_name\":\"docker-django-services\",\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"notes-backend:8000\",\"blog-website:8000\",\"hospital-management:8000\",\"api-service-backend:8000\",\"doc-backend:8000\"]}]},{\"job_name\":\"docker-spring-services\",\"metrics_path\":\"/actuator/prometheus\",\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"bank-backend:8080\"]}]},{\"job_name\":\"docker-nginx\",\"scrape_interval\":\"15s\",\"static_configs\":[{\"targets\":[\"gateway:9113\"]}]}]}}},\"service\":{\"pipelines\":{\"logs\":{\"exporters\":[\"otlphttp/loki\"],\"processors\":[\"memory_limiter\",\"k8sattributes\",\"resource\",\"batch\"],\"receivers\":[\"otlp\"]},\"metrics\":{\"exporters\":[\"prometheusremotewrite\"],\"processors\":[\"memory_limiter\",\"k8sattributes\",\"resource\",\"batch\"],\"receivers\":[\"otlp\",\"prometheus\",\"hostmetrics\",\"k8s_cluster\"]},\"traces\":{\"exporters\":[\"otlp/tempo\"],\"processors\":[\"memory_limiter\",\"k8sattributes\",\"resource\",\"filter/drop_health\",\"batch\"],\"receivers\":[\"otlp\"]}},\"telemetry\":{\"logs\":{\"level\":\"info\"},\"metrics\":{\"address\":\"0.0.0.0:8888\",\"level\":\"detailed\"}}}},\"extraEnvs\":[{\"name\":\"KUBE_NODE_NAME\",\"valueFrom\":{\"fieldRef\":{\"fieldPath\":\"spec.nodeName\"}}}],\"image\":{\"repository\":\"otel/opentelemetry-collector-contrib\",\"tag\":\"\"},\"mode\":\"deployment\",\"ports\":{\"metrics\":{\"containerPort\":8888,\"enabled\":true,\"protocol\":\"TCP\",\"servicePort\":8888},\"otlp\":{\"containerPort\":4317,\"enabled\":true,\"protocol\":\"TCP\",\"servicePort\":4317},\"otlp-http\":{\"containerPort\":4318,\"enabled\":true,\"protocol\":\"TCP\",\"servicePort\":4318},\"prometheus\":{\"containerPort\":8889,\"enabled\":true,\"protocol\":\"TCP\",\"servicePort\":8889},\"zipkin\":{\"containerPort\":9411,\"enabled\":true,\"protocol\":\"TCP\",\"servicePort\":9411}},\"replicaCount\":1,\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"512Mi\"},\"requests\":{\"cpu\":\"100m\",\"memory\":\"256Mi\"}},\"serviceAccount\":{\"create\":true},\"serviceMonitor\":{\"enabled\":true,\"extraLabels\":{\"release\":\"kube-prometheus-stack\"},\"metricsEndpoints\":[{\"interval\":\"30s\",\"port\":\"metrics\"}]}}",
-                "version": "0.157.0"
-              }
-            ],
-            "name": "otel-collector",
-            "namespace": "monitoring",
-            "pass_credentials": false,
-            "postrender": [],
-            "recreate_pods": false,
-            "render_subchart_notes": true,
-            "replace": false,
-            "repository": "https://open-telemetry.github.io/opentelemetry-helm-charts",
+            "repository": null,
             "repository_ca_file": null,
             "repository_cert_file": null,
             "repository_key_file": null,
@@ -4242,14 +4024,12 @@
             "set_list": [],
             "set_sensitive": [],
             "skip_crds": false,
-            "status": "deployed",
+            "status": "pending-upgrade",
             "timeout": 300,
             "upgrade_install": null,
-            "values": [
-              "mode: deployment\n\nreplicaCount: 1\n\nimage:\n  repository: otel/opentelemetry-collector-contrib\n  tag: \"\"          # inherits chart default\n\nresources:\n  requests:\n    cpu: 100m\n    memory: 256Mi\n  limits:\n    cpu: 500m\n    memory: 512Mi\n\nports:\n  otlp:\n    enabled: true\n    containerPort: 4317\n    servicePort: 4317\n    protocol: TCP\n  otlp-http:\n    enabled: true\n    containerPort: 4318\n    servicePort: 4318\n    protocol: TCP\n  metrics:\n    enabled: true\n    containerPort: 8888\n    servicePort: 8888\n    protocol: TCP\n  zipkin:\n    enabled: true\n    containerPort: 9411\n    servicePort: 9411\n    protocol: TCP\n  prometheus:\n    enabled: true\n    containerPort: 8889\n    servicePort: 8889\n    protocol: TCP\n\nconfig:\n  receivers:\n    otlp:\n      protocols:\n        grpc:\n          endpoint: \"0.0.0.0:4317\"\n        http:\n          endpoint: \"0.0.0.0:4318\"\n          cors:\n            allowed_origins: [\"*\"]\n\n    prometheus:\n      config:\n        scrape_configs:\n          - job_name: docker-django-services\n            scrape_interval: 15s\n            static_configs:\n              - targets:\n                  - notes-backend:8000\n                  - blog-website:8000\n                  - hospital-management:8000\n                  - api-service-backend:8000\n                  - doc-backend:8000\n          - job_name: docker-spring-services\n            scrape_interval: 15s\n            metrics_path: /actuator/prometheus\n            static_configs:\n              - targets:\n                  - bank-backend:8080\n          - job_name: docker-nginx\n            scrape_interval: 15s\n            static_configs:\n              - targets:\n                  - gateway:9113\n\n    hostmetrics:\n      collection_interval: 30s\n      scrapers:\n        cpu: {}\n        memory: {}\n        disk: {}\n        filesystem: {}\n        network: {}\n        load: {}\n        processes: {}\n\n    k8s_cluster:\n      collection_interval: 30s\n\n  processors:\n    batch:\n      timeout: 5s\n      send_batch_size: 1024\n      send_batch_max_size: 2048\n\n    filter/drop_health:\n      error_mode: ignore\n      traces:\n        span:\n          - 'attributes[\"http.route\"] == \"/health\"'\n          - 'attributes[\"http.route\"] == \"/healthz\"'\n          - 'attributes[\"http.route\"] == \"/actuator/health\"'\n          - 'attributes[\"http.route\"] == \"/metrics\"'\n      metrics:\n        metric:\n          - 'name == \"up\" and IsMatch(resource.attributes[\"job\"], \".*health.*\")'\n\n    k8sattributes:\n      auth_type: serviceAccount\n      passthrough: false\n\n    resource:\n      attributes:\n        - key: cluster\n          value: kind-social-media\n          action: insert\n        - key: environment\n          value: local\n          action: insert\n\n    memory_limiter:\n      check_interval: 5s\n      limit_mib: 400\n      spike_limit_mib: 100\n\n  exporters:\n    prometheusremotewrite:\n      endpoint: http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/write\n      tls:\n        insecure: true\n      resource_to_telemetry_conversion:\n        enabled: true\n\n    # FIX: \"loki\" is not a valid exporter type in otel-collector-contrib.\n    # Loki ingests logs via its OTLP endpoint — use otlphttp exporter.\n    # FIX: loki-gateway only exists in distributed mode; use loki directly\n    # for standalone/local deployments.\n    otlphttp/loki:\n      endpoint: http://loki.monitoring.svc:3100/otlp\n      tls:\n        insecure: true\n\n    otlp/tempo:\n      endpoint: tempo.monitoring.svc:4317\n      tls:\n        insecure: true\n      compression: gzip\n\n    debug:\n      verbosity: basic\n      sampling_initial: 5\n      sampling_thereafter: 200\n\n  service:\n    telemetry:\n      logs:\n        level: info\n      metrics:\n        level: detailed\n        address: \"0.0.0.0:8888\"\n\n    pipelines:\n      traces:\n        receivers: [otlp]\n        processors: [memory_limiter, k8sattributes, resource, filter/drop_health, batch]\n        exporters: [otlp/tempo]\n\n      metrics:\n        receivers: [otlp, prometheus, hostmetrics, k8s_cluster]\n        processors: [memory_limiter, k8sattributes, resource, batch]\n        exporters: [prometheusremotewrite]\n\n      logs:\n        receivers: [otlp]\n        processors: [memory_limiter, k8sattributes, resource, batch]\n        exporters: [otlphttp/loki]   # ← must match the exporter key above\n\n# REMOVED: grafana: block does not belong in otel-collector values.\n#           Move those settings to grafana-values.yml used by kube-prometheus-stack.\n\nclusterRole:\n  create: true\n\nserviceAccount:\n  create: true\n\nextraEnvs:\n  - name: KUBE_NODE_NAME\n    valueFrom:\n      fieldRef:\n        fieldPath: spec.nodeName\n\nserviceMonitor:\n  enabled: true\n  metricsEndpoints:\n    - port: metrics\n      interval: 30s\n  extraLabels:\n    release: kube-prometheus-stack"
-            ],
+            "values": null,
             "verify": false,
-            "version": "0.157.0",
+            "version": "86.0.0",
             "wait": true,
             "wait_for_jobs": false
           },
@@ -4265,11 +4045,7 @@
           "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
           "dependencies": [
             "helm_release.cassandra",
-            "helm_release.kube_prometheus_stack",
-            "helm_release.loki",
             "helm_release.redis",
-            "helm_release.tempo",
-            "kubectl_manifest.minio_service",
             "null_resource.kind_cluster"
           ]
         }
@@ -4287,7 +4063,7 @@
             "atomic": false,
             "chart": "promtail",
             "cleanup_on_fail": false,
-            "create_namespace": true,
+            "create_namespace": false,
             "dependency_update": false,
             "description": "Upgrade \"promtail\" failed: failed to create resource: failed to create typed patch object (monitoring/promtail; apps/v1, Kind=DaemonSet): .spec.template.spec.containers[name=\"promtail\"].volumeMounts: duplicate entries for key [mountPath=\"/var/lib/docker/containers\"]",
             "devel": null,
@@ -4305,12 +4081,12 @@
                 "app_version": "3.5.1",
                 "chart": "promtail",
                 "first_deployed": 1779938516,
-                "last_deployed": 1779946577,
+                "last_deployed": 1779938956,
                 "name": "promtail",
                 "namespace": "monitoring",
                 "notes": "***********************************************************************\n Welcome to Grafana Promtail\n Chart version: 6.17.1\n Promtail version: 3.5.1\n***********************************************************************\n\nVerify the application is working by running these commands:\n* kubectl --namespace monitoring port-forward daemonset/promtail 3101\n* curl http://127.0.0.1:3101/metrics\n",
-                "revision": 6,
-                "values": "{\"config\":{\"clients\":[{\"backoff_config\":{\"max_period\":\"5m\",\"max_retries\":10,\"min_period\":\"500ms\"},\"batchsize\":1048576,\"batchwait\":\"1s\",\"tenant_id\":\"\",\"timeout\":\"10s\",\"url\":\"http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push\"}],\"positions\":{\"filename\":\"/run/promtail/positions.yaml\"},\"server\":{\"grpc_listen_port\":0,\"http_listen_port\":3101,\"log_level\":\"info\"},\"snippets\":{\"scrapeConfigs\":\"- job_name: kubernetes-pods\\n  kubernetes_sd_configs:\\n    - role: pod\\n  pipeline_stages:\\n    - json:\\n        expressions:\\n          timestamp: time\\n          level: level\\n          message: msg\\n          trace_id: trace_id\\n          span_id: span_id\\n          service_name: service\\n          logger: logger\\n    - labels:\\n        trace_id: \\\"\\\"\\n        span_id: \\\"\\\"\\n        level: \\\"\\\"\\n    - match:\\n        selector: '{app=\\\"gateway\\\"}'\\n        stages:\\n          - regex:\\n              expression: \\u003e-\\n                ^(?P\\u003cremote_addr\\u003e\\\\S+) - (?P\\u003cremote_user\\u003e\\\\S+)\\n                \\\\[(?P\\u003ctime_local\\u003e[^\\\\]]+)\\\\]\\n                \\\"(?P\\u003cmethod\\u003e\\\\S+) (?P\\u003cpath\\u003e\\\\S+) (?P\\u003cprotocol\\u003e[^\\\"]+)\\\"\\n                (?P\\u003cstatus\\u003e\\\\d+) (?P\\u003cbody_bytes_sent\\u003e\\\\d+)\\n                \\\"(?P\\u003chttp_referer\\u003e[^\\\"]*)\\\" \\\"(?P\\u003chttp_user_agent\\u003e[^\\\"]*)\\\"\\n          - labels:\\n              method: \\\"\\\"\\n              status: \\\"\\\"\\n              path: \\\"\\\"\\n    - match:\\n        selector: '{app=~\\\"bank-backend|social-java\\\"}'\\n        stages:\\n          - multiline:\\n              firstline: '^\\\\d{4}-\\\\d{2}-\\\\d{2}'\\n              max_wait_time: 3s\\n          - regex:\\n              expression: \\u003e-\\n                ^(?P\\u003ctimestamp\\u003e\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d+)\\n                \\\\s+(?P\\u003clevel\\u003e\\\\w+)\\\\s+(?P\\u003cpid\\u003e\\\\d+)\\\\s+---\\\\s+\\n                \\\\[(?P\\u003cthread\\u003e[^\\\\]]+)\\\\]\\\\s+(?P\\u003clogger\\u003e\\\\S+)\\\\s*:\\\\s+(?P\\u003cmessage\\u003e.*)\\n          - labels:\\n              level: \\\"\\\"\\n              logger: \\\"\\\"\\n    - drop:\\n        expression: '(GET /health|GET /actuator/health|GET /metrics)'\\n        drop_counter_reason: healthcheck\\n  relabel_configs:\\n    - source_labels: [__meta_kubernetes_pod_annotation_promtail_io_scrape]\\n      action: drop\\n      regex: \\\"false\\\"\\n    - source_labels: [__meta_kubernetes_namespace]\\n      target_label: namespace\\n    - source_labels: [__meta_kubernetes_pod_name]\\n      target_label: pod\\n    - source_labels: [__meta_kubernetes_pod_container_name]\\n      target_label: container\\n    - source_labels: [__meta_kubernetes_pod_label_app]\\n      target_label: app\\n    - source_labels: [__meta_kubernetes_pod_node_name]\\n      target_label: node\\n    - source_labels:\\n        - __meta_kubernetes_pod_uid\\n        - __meta_kubernetes_pod_container_name\\n      target_label: __path__\\n      separator: /\\n      replacement: /var/log/pods/*$1/*.log\\n    - source_labels: [__meta_kubernetes_pod_container_runtime]\\n      action: replace\\n      regex: (containerd|cri-o)\\n      target_label: __path__\\n      replacement: /var/log/pods/*${1}*/${2}/*.log\\n\\n- job_name: node-syslog\\n  static_configs:\\n    - targets: [localhost]\\n      labels:\\n        job: syslog\\n        __path__: /var/log/syslog\\n\\n- job_name: kind-control-plane\\n  static_configs:\\n    - targets: [localhost]\\n      labels:\\n        job: kind-control-plane\\n        node: kind-control-plane\\n        __path__: /var/log/containers/*kube-system*.log\\n  pipeline_stages:\\n    - json:\\n        expressions:\\n          log: log\\n    - output:\\n        source: log\\n\"}},\"resources\":{\"limits\":{\"cpu\":\"200m\",\"memory\":\"256Mi\"},\"requests\":{\"cpu\":\"50m\",\"memory\":\"64Mi\"}},\"serviceMonitor\":{\"enabled\":true,\"labels\":{\"release\":\"kube-prometheus-stack\"}},\"tolerations\":[{\"effect\":\"NoSchedule\",\"key\":\"node-role.kubernetes.io/control-plane\",\"operator\":\"Exists\"},{\"effect\":\"NoSchedule\",\"key\":\"node-role.kubernetes.io/master\",\"operator\":\"Exists\"}],\"values_sha\":\"(sensitive value)\"}",
+                "revision": 5,
+                "values": "{\"config\":{\"clients\":[{\"backoff_config\":{\"max_period\":\"5m\",\"max_retries\":10,\"min_period\":\"500ms\"},\"batchsize\":1048576,\"batchwait\":\"1s\",\"tenant_id\":\"\",\"timeout\":\"10s\",\"url\":\"http://loki-gateway/loki/api/v1/push\"}],\"positions\":{\"filename\":\"/run/promtail/positions.yaml\"},\"server\":{\"grpc_listen_port\":0,\"http_listen_port\":3101,\"log_level\":\"info\"},\"snippets\":{\"scrapeConfigs\":\"# ── Kubernetes pods — automatic discovery ─────────────\\n- job_name: kubernetes-pods\\n  kubernetes_sd_configs:\\n    - role: pod\\n  pipeline_stages:\\n    # 1. Parse JSON logs (Django/Spring/Go all emit JSON)\\n    - json:\\n        expressions:\\n          timestamp:    time\\n          level:        level\\n          message:      msg\\n          trace_id:     trace_id\\n          span_id:      span_id\\n          service_name: service\\n          logger:       logger\\n\\n    # 2. Promote trace_id into a Loki label so Grafana\\n    #    can link directly to Tempo\\n    - labels:\\n        trace_id:\\n        span_id:\\n        level:\\n\\n    # 3. Fall back to plain-text parsing for services\\n    #    that don't emit JSON (nginx access log format)\\n    - match:\\n        selector: '{app=\\\"gateway\\\"}'\\n        stages:\\n          - regex:\\n              expression: \\u003e-\\n                ^(?P\\u003cremote_addr\\u003e\\\\S+) - (?P\\u003cremote_user\\u003e\\\\S+)\\n                \\\\[(?P\\u003ctime_local\\u003e[^\\\\]]+)\\\\]\\n                \\\"(?P\\u003cmethod\\u003e\\\\S+) (?P\\u003cpath\\u003e\\\\S+) (?P\\u003cprotocol\\u003e[^\\\"]+)\\\"\\n                (?P\\u003cstatus\\u003e\\\\d+) (?P\\u003cbody_bytes_sent\\u003e\\\\d+)\\n                \\\"(?P\\u003chttp_referer\\u003e[^\\\"]*)\\\" \\\"(?P\\u003chttp_user_agent\\u003e[^\\\"]*)\\\"\\n          - labels:\\n              method:\\n              status:\\n              path:\\n\\n    # 4. Spring Boot plain-text fallback\\n    - match:\\n        selector: '{app=~\\\"bank-backend|social-java\\\"}'\\n        stages:\\n          - multiline:\\n              firstline: '^\\\\d{4}-\\\\d{2}-\\\\d{2}'\\n              max_wait_time: 3s\\n          - regex:\\n              expression: \\u003e-\\n                ^(?P\\u003ctimestamp\\u003e\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d+)\\n                \\\\s+(?P\\u003clevel\\u003e\\\\w+)\\\\s+(?P\\u003cpid\\u003e\\\\d+)\\\\s+---\\\\s+\\n                \\\\[(?P\\u003cthread\\u003e[^\\\\]]+)\\\\]\\\\s+(?P\\u003clogger\\u003e\\\\S+)\\\\s*:\\\\s+(?P\\u003cmessage\\u003e.*)\\n          - labels:\\n              level:\\n              logger:\\n\\n    # 5. Drop noisy health-check lines to save storage\\n    - drop:\\n        expression: '(GET /health|GET /actuator/health|GET /metrics)'\\n        drop_counter_reason: healthcheck\\n\\n  relabel_configs:\\n    # Only scrape pods that haven't opted out\\n    - source_labels: [__meta_kubernetes_pod_annotation_promtail_io_scrape]\\n      action: drop\\n      regex: \\\"false\\\"\\n    # Standard k8s labels\\n    - source_labels: [__meta_kubernetes_namespace]\\n      target_label: namespace\\n    - source_labels: [__meta_kubernetes_pod_name]\\n      target_label: pod\\n    - source_labels: [__meta_kubernetes_pod_container_name]\\n      target_label: container\\n    - source_labels: [__meta_kubernetes_pod_label_app]\\n      target_label: app\\n    - source_labels: [__meta_kubernetes_pod_node_name]\\n      target_label: node\\n    # Use pod UID to identify the log file on the node\\n    - source_labels:\\n        - __meta_kubernetes_pod_uid\\n        - __meta_kubernetes_pod_container_name\\n      target_label: __path__\\n      separator: /\\n      replacement: /var/log/pods/*$1/*.log\\n    # Multiline container runtime prefix (containerd / docker)\\n    - source_labels: [__meta_kubernetes_pod_container_runtime]\\n      action: replace\\n      regex: (containerd|cri-o)\\n      target_label: __path__\\n      replacement: /var/log/pods/*${1}*/${2}/*.log\\n\\n# ── System / node logs ─────────────────────────────────\\n- job_name: node-syslog\\n  static_configs:\\n    - targets: [localhost]\\n      labels:\\n        job: syslog\\n        __path__: /var/log/syslog\\n\\n# ── Kind control-plane logs ───────────────────────────\\n- job_name: kind-control-plane\\n  static_configs:\\n    - targets: [localhost]\\n      labels:\\n        job: kind-control-plane\\n        node: kind-control-plane\\n        __path__: /var/log/containers/*kube-system*.log\\n  pipeline_stages:\\n    - json:\\n        expressions:\\n          log: log\\n    - output:\\n        source: log\\n\"}},\"extraVolumeMounts\":[{\"mountPath\":\"/var/log\",\"name\":\"varlog\",\"readOnly\":true},{\"mountPath\":\"/var/lib/docker/containers\",\"name\":\"varlibdockercontainers\",\"readOnly\":true}],\"extraVolumes\":[{\"hostPath\":{\"path\":\"/var/log\"},\"name\":\"varlog\"},{\"hostPath\":{\"path\":\"/var/lib/docker/containers\"},\"name\":\"varlibdockercontainers\"}],\"resources\":{\"limits\":{\"cpu\":\"200m\",\"memory\":\"256Mi\"},\"requests\":{\"cpu\":\"50m\",\"memory\":\"64Mi\"}},\"serviceMonitor\":{\"enabled\":true,\"labels\":{\"release\":\"kube-prometheus-stack\"}},\"tolerations\":[{\"effect\":\"NoSchedule\",\"key\":\"node-role.kubernetes.io/control-plane\",\"operator\":\"Exists\"},{\"effect\":\"NoSchedule\",\"key\":\"node-role.kubernetes.io/master\",\"operator\":\"Exists\"}]}",
                 "version": "6.17.1"
               }
             ],
@@ -4321,7 +4097,7 @@
             "recreate_pods": false,
             "render_subchart_notes": true,
             "replace": false,
-            "repository": "https://grafana.github.io/helm-charts",
+            "repository": null,
             "repository_ca_file": null,
             "repository_cert_file": null,
             "repository_key_file": null,
@@ -4331,20 +4107,12 @@
             "reuse_values": false,
             "set": [],
             "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "values_sha",
-                "type": "",
-                "value": "DtHFv9PI9vH9aPq80peQa+a6JaKmrzxPvBYBcg53vvA="
-              }
-            ],
+            "set_sensitive": [],
             "skip_crds": false,
-            "status": "deployed",
-            "timeout": 180,
+            "status": "failed",
+            "timeout": 300,
             "upgrade_install": null,
-            "values": [
-              "# promtail-config.yml — Helm values for grafana/promtail\n\nconfig:\n  clients:\n    - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push\n      tenant_id: \"\"\n      batchwait: 1s\n      batchsize: 1048576\n      timeout: 10s\n      backoff_config:\n        min_period: 500ms\n        max_period: 5m\n        max_retries: 10\n\n  server:\n    http_listen_port: 3101\n    grpc_listen_port: 0\n    log_level: info\n\n  positions:\n    filename: /run/promtail/positions.yaml\n\n  snippets:\n    scrapeConfigs: |\n      - job_name: kubernetes-pods\n        kubernetes_sd_configs:\n          - role: pod\n        pipeline_stages:\n          - json:\n              expressions:\n                timestamp: time\n                level: level\n                message: msg\n                trace_id: trace_id\n                span_id: span_id\n                service_name: service\n                logger: logger\n          - labels:\n              trace_id: \"\"\n              span_id: \"\"\n              level: \"\"\n          - match:\n              selector: '{app=\"gateway\"}'\n              stages:\n                - regex:\n                    expression: \u003e-\n                      ^(?P\u003cremote_addr\u003e\\S+) - (?P\u003cremote_user\u003e\\S+)\n                      \\[(?P\u003ctime_local\u003e[^\\]]+)\\]\n                      \"(?P\u003cmethod\u003e\\S+) (?P\u003cpath\u003e\\S+) (?P\u003cprotocol\u003e[^\"]+)\"\n                      (?P\u003cstatus\u003e\\d+) (?P\u003cbody_bytes_sent\u003e\\d+)\n                      \"(?P\u003chttp_referer\u003e[^\"]*)\" \"(?P\u003chttp_user_agent\u003e[^\"]*)\"\n                - labels:\n                    method: \"\"\n                    status: \"\"\n                    path: \"\"\n          - match:\n              selector: '{app=~\"bank-backend|social-java\"}'\n              stages:\n                - multiline:\n                    firstline: '^\\d{4}-\\d{2}-\\d{2}'\n                    max_wait_time: 3s\n                - regex:\n                    expression: \u003e-\n                      ^(?P\u003ctimestamp\u003e\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+)\n                      \\s+(?P\u003clevel\u003e\\w+)\\s+(?P\u003cpid\u003e\\d+)\\s+---\\s+\n                      \\[(?P\u003cthread\u003e[^\\]]+)\\]\\s+(?P\u003clogger\u003e\\S+)\\s*:\\s+(?P\u003cmessage\u003e.*)\n                - labels:\n                    level: \"\"\n                    logger: \"\"\n          - drop:\n              expression: '(GET /health|GET /actuator/health|GET /metrics)'\n              drop_counter_reason: healthcheck\n        relabel_configs:\n          - source_labels: [__meta_kubernetes_pod_annotation_promtail_io_scrape]\n            action: drop\n            regex: \"false\"\n          - source_labels: [__meta_kubernetes_namespace]\n            target_label: namespace\n          - source_labels: [__meta_kubernetes_pod_name]\n            target_label: pod\n          - source_labels: [__meta_kubernetes_pod_container_name]\n            target_label: container\n          - source_labels: [__meta_kubernetes_pod_label_app]\n            target_label: app\n          - source_labels: [__meta_kubernetes_pod_node_name]\n            target_label: node\n          - source_labels:\n              - __meta_kubernetes_pod_uid\n              - __meta_kubernetes_pod_container_name\n            target_label: __path__\n            separator: /\n            replacement: /var/log/pods/*$1/*.log\n          - source_labels: [__meta_kubernetes_pod_container_runtime]\n            action: replace\n            regex: (containerd|cri-o)\n            target_label: __path__\n            replacement: /var/log/pods/*${1}*/${2}/*.log\n\n      - job_name: node-syslog\n        static_configs:\n          - targets: [localhost]\n            labels:\n              job: syslog\n              __path__: /var/log/syslog\n\n      - job_name: kind-control-plane\n        static_configs:\n          - targets: [localhost]\n            labels:\n              job: kind-control-plane\n              node: kind-control-plane\n              __path__: /var/log/containers/*kube-system*.log\n        pipeline_stages:\n          - json:\n              expressions:\n                log: log\n          - output:\n              source: log\n\nresources:\n  requests:\n    cpu: 50m\n    memory: 64Mi\n  limits:\n    cpu: 200m\n    memory: 256Mi\n\ntolerations:\n  - key: node-role.kubernetes.io/control-plane\n    operator: Exists\n    effect: NoSchedule\n  - key: node-role.kubernetes.io/master\n    operator: Exists\n    effect: NoSchedule\n\n# REMOVED: extraVolumes and extraVolumeMounts blocks.\n# The promtail chart already mounts these by default:\n#   /var/log                    → for pod/container logs\n#   /var/lib/docker/containers  → for docker container metadata\n# Adding them again caused: duplicate entries for mountPath\n\nserviceMonitor:\n  enabled: true\n  labels:\n    release: kube-prometheus-stack"
-            ],
+            "values": null,
             "verify": false,
             "version": "6.17.1",
             "wait": true,
@@ -4355,12 +4123,6 @@
               {
                 "type": "get_attr",
                 "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
               }
             ]
           ],
@@ -4406,12 +4168,12 @@
                 "app_version": "8.6.3",
                 "chart": "redis",
                 "first_deployed": 1779936300,
-                "last_deployed": 1779943608,
+                "last_deployed": 1779940692,
                 "name": "redis",
                 "namespace": "default",
                 "notes": "CHART NAME: redis\nCHART VERSION: 25.5.3\nAPP VERSION: 8.6.3\n\n⚠ WARNING: Since August 28th, 2025, only a limited subset of images/charts are available for free.\n    Subscribe to Bitnami Secure Images to receive continued support and security updates.\n    More info at https://bitnami.com and https://github.com/bitnami/containers/issues/83267\n\n** Please be patient while the chart is being deployed **\n\nRedis(R) can be accessed via port 6379 on the following DNS name from within your cluster:\n\n    redis-master.default.svc.cluster.local\n\nTo get your password run:\n\n    export REDIS_PASSWORD=$(kubectl get secret --namespace default redis -o jsonpath=\"{.data.redis-password}\" | base64 -d)\n\nTo connect to your Redis(R) server:\n\n1. Run a Redis(R) pod that you can use as a client:\n\n   kubectl run --namespace default redis-client --restart='Never'  --env REDIS_PASSWORD=$REDIS_PASSWORD  --image registry-1.docker.io/bitnami/redis:latest --command -- sleep infinity\n\n   Use the following command to attach to the pod:\n\n   kubectl exec --tty -i redis-client \\\n   --namespace default -- bash\n\n2. Connect using the Redis(R) CLI:\n   REDISCLI_AUTH=\"$REDIS_PASSWORD\" redis-cli -h redis-master\n\nTo connect to your database from outside the cluster execute the following commands:\n\n    kubectl port-forward --namespace default svc/redis-master 6379:6379 \u0026\n    REDISCLI_AUTH=\"$REDIS_PASSWORD\" redis-cli -h 127.0.0.1 -p 6379\nWARNING: Rolling tag detected (bitnami/redis:latest), please note that it is strongly recommended to avoid using rolling tags in a production environment.\n+info https://techdocs.broadcom.com/us/en/vmware-tanzu/bitnami-secure-images/bitnami-secure-images/services/bsi-doc/apps-tutorials-understand-rolling-tags-containers-index.html\nWARNING: Rolling tag detected (bitnami/redis-sentinel:latest), please note that it is strongly recommended to avoid using rolling tags in a production environment.\n+info https://techdocs.broadcom.com/us/en/vmware-tanzu/bitnami-secure-images/bitnami-secure-images/services/bsi-doc/apps-tutorials-understand-rolling-tags-containers-index.html\nWARNING: Rolling tag detected (bitnami/redis-exporter:latest), please note that it is strongly recommended to avoid using rolling tags in a production environment.\n+info https://techdocs.broadcom.com/us/en/vmware-tanzu/bitnami-secure-images/bitnami-secure-images/services/bsi-doc/apps-tutorials-understand-rolling-tags-containers-index.html\nWARNING: Rolling tag detected (bitnami/os-shell:latest), please note that it is strongly recommended to avoid using rolling tags in a production environment.\n+info https://techdocs.broadcom.com/us/en/vmware-tanzu/bitnami-secure-images/bitnami-secure-images/services/bsi-doc/apps-tutorials-understand-rolling-tags-containers-index.html\nWARNING: Rolling tag detected (bitnami/os-shell:latest), please note that it is strongly recommended to avoid using rolling tags in a production environment.\n+info https://techdocs.broadcom.com/us/en/vmware-tanzu/bitnami-secure-images/bitnami-secure-images/services/bsi-doc/apps-tutorials-understand-rolling-tags-containers-index.html\n\nWARNING: There are \"resources\" sections in the chart not set. Using \"resourcesPreset\" is not recommended for production. For production installations, please set the following values according to your workload needs:\n  - replica.resources\n  - master.resources\n+info https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/\n",
-                "revision": 6,
-                "values": "{\"architecture\":\"standalone\",\"auth\":{\"password\":\"redis-password\"},\"values_sha\":\"(sensitive value)\"}",
+                "revision": 5,
+                "values": "{\"architecture\":\"standalone\",\"auth\":{\"password\":\"redis-password\"}}",
                 "version": "25.5.3"
               }
             ],
@@ -4443,13 +4205,7 @@
               }
             ],
             "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "values_sha",
-                "type": "",
-                "value": "3oOIGbFYfWrO0E/PgfOdxjEcusxoD3QFiPlVEFJQZcs="
-              }
-            ],
+            "set_sensitive": [],
             "skip_crds": false,
             "status": "deployed",
             "timeout": 120,
@@ -4465,12 +4221,6 @@
               {
                 "type": "get_attr",
                 "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
               }
             ]
           ],
@@ -4495,7 +4245,7 @@
             "atomic": false,
             "chart": "tempo",
             "cleanup_on_fail": false,
-            "create_namespace": true,
+            "create_namespace": false,
             "dependency_update": false,
             "description": "Upgrade complete",
             "devel": null,
@@ -4513,12 +4263,12 @@
                 "app_version": "2.9.0",
                 "chart": "tempo",
                 "first_deployed": 1779938515,
-                "last_deployed": 1779946585,
+                "last_deployed": 1779938920,
                 "name": "tempo",
                 "namespace": "monitoring",
                 "notes": "",
-                "revision": 5,
-                "values": "{\"persistence\":{\"enabled\":true,\"size\":\"5Gi\",\"storageClassName\":\"standard\"},\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"1Gi\"},\"requests\":{\"cpu\":\"200m\",\"memory\":\"256Mi\"}},\"service\":{\"port\":3200,\"type\":\"ClusterIP\"},\"serviceAccount\":{\"create\":true},\"serviceMonitor\":{\"enabled\":true,\"interval\":\"30s\",\"labels\":{\"release\":\"kube-prometheus-stack\"}},\"tempo\":{\"compactor\":{\"compaction\":{\"block_retention\":\"336h\"}},\"distributor\":{\"receivers\":{\"jaeger\":{\"protocols\":{\"grpc\":{\"endpoint\":\"0.0.0.0:14250\"},\"thrift_http\":{\"endpoint\":\"0.0.0.0:14268\"}}},\"otlp\":{\"protocols\":{\"grpc\":{\"endpoint\":\"0.0.0.0:4317\"},\"http\":{\"endpoint\":\"0.0.0.0:4318\"}}},\"zipkin\":{\"endpoint\":\"0.0.0.0:9411\"}}},\"global_overrides\":{\"metrics_generator_processors\":[\"service-graphs\",\"span-metrics\"]},\"ingester\":{\"max_block_duration\":\"5m\"},\"metrics_generator\":{\"processor\":{\"service_graphs\":{\"dimensions\":[\"http.method\",\"http.status_code\",\"service.name\"],\"enable_messaging_system_latency_histogram\":true},\"span_metrics\":{\"dimensions\":[\"http.method\",\"http.status_code\",\"http.route\",\"service.name\"]}},\"registry\":{\"external_labels\":{\"cluster\":\"kind-social-media\",\"source\":\"tempo\"}},\"storage\":{\"path\":\"/var/tempo/generator/wal\"},\"traces_storage\":{\"path\":\"/var/tempo/generator/traces\"}},\"querier\":{\"max_concurrent_queries\":10},\"server\":{\"grpc_listen_port\":9095,\"http_listen_port\":3200,\"log_level\":\"info\"},\"storage\":{\"trace\":{\"backend\":\"local\",\"local\":{\"path\":\"/var/tempo/traces\"},\"wal\":{\"path\":\"/var/tempo/wal\"}}}},\"values_sha\":\"(sensitive value)\"}",
+                "revision": 4,
+                "values": "{\"persistence\":{\"enabled\":true,\"size\":\"5Gi\",\"storageClassName\":\"standard\"},\"resources\":{\"limits\":{\"cpu\":\"1000m\",\"memory\":\"1Gi\"},\"requests\":{\"cpu\":\"200m\",\"memory\":\"256Mi\"}},\"service\":{\"port\":3200,\"type\":\"ClusterIP\"},\"serviceAccount\":{\"create\":true},\"serviceMonitor\":{\"enabled\":true,\"interval\":\"30s\",\"labels\":{\"release\":\"kube-prometheus-stack\"}},\"tempo\":{\"compactor\":{\"compaction\":{\"block_retention\":\"336h\"}},\"distributor\":{\"receivers\":{\"jaeger\":{\"protocols\":{\"grpc\":{\"endpoint\":\"0.0.0.0:14250\"},\"thrift_http\":{\"endpoint\":\"0.0.0.0:14268\"}}},\"otlp\":{\"protocols\":{\"grpc\":{\"endpoint\":\"0.0.0.0:4317\"},\"http\":{\"endpoint\":\"0.0.0.0:4318\"}}},\"zipkin\":{\"endpoint\":\"0.0.0.0:9411\"}}},\"global_overrides\":{\"metrics_generator_processors\":[\"service-graphs\",\"span-metrics\"]},\"ingester\":{\"max_block_duration\":\"5m\"},\"metrics_generator\":{\"processor\":{\"service_graphs\":{\"dimensions\":[\"http.method\",\"http.status_code\",\"service.name\"],\"enable_messaging_system_latency_histogram\":true},\"span_metrics\":{\"dimensions\":[\"http.method\",\"http.status_code\",\"http.route\",\"service.name\"]}},\"registry\":{\"external_labels\":{\"cluster\":\"kind-social-media\",\"source\":\"tempo\"}},\"storage\":{\"path\":\"/var/tempo/generator/wal\"},\"traces_storage\":{\"path\":\"/var/tempo/generator/traces\"}},\"querier\":{\"max_concurrent_queries\":10},\"server\":{\"grpc_listen_port\":9095,\"http_listen_port\":3200,\"log_level\":\"info\"},\"storage\":{\"trace\":{\"backend\":\"local\",\"local\":{\"path\":\"/var/tempo/traces\"},\"wal\":{\"path\":\"/var/tempo/wal\"}}}}}",
                 "version": "1.24.4"
               }
             ],
@@ -4529,7 +4279,7 @@
             "recreate_pods": false,
             "render_subchart_notes": true,
             "replace": false,
-            "repository": "https://grafana.github.io/helm-charts",
+            "repository": null,
             "repository_ca_file": null,
             "repository_cert_file": null,
             "repository_key_file": null,
@@ -4539,20 +4289,12 @@
             "reuse_values": false,
             "set": [],
             "set_list": [],
-            "set_sensitive": [
-              {
-                "name": "values_sha",
-                "type": "",
-                "value": "MjNqEoQm3f7CXARnfim8F/i4EpEq7h4MNtmdCr1fJ6k="
-              }
-            ],
+            "set_sensitive": [],
             "skip_crds": false,
             "status": "deployed",
             "timeout": 300,
             "upgrade_install": null,
-            "values": [
-              "# ─────────────────────────────────────────────────────────────\n# tempo-config.yml  — Helm values for grafana/tempo\n#\n# Deployed via:\n#   helm_release \"tempo\" { values = [file(\"…/tempo-config.yml\")] }\n#\n# Receives traces from the OTel Collector via OTLP/gRPC (4317)\n# and OTLP/HTTP (4318).  Stores on local filesystem for the\n# kind cluster.  Grafana reads traces and correlates with logs\n# via trace_id labels injected by Promtail/OTel.\n# ─────────────────────────────────────────────────────────────\n\ntempo:\n  # ── Server ────────────────────────────────────────────────\n  server:\n    http_listen_port: 3200\n    grpc_listen_port: 9095\n    log_level: info\n\n  # ── Distributor: which ingest endpoints to enable ─────────\n  distributor:\n    receivers:\n      otlp:\n        protocols:\n          grpc:\n            endpoint: \"0.0.0.0:4317\"\n          http:\n            endpoint: \"0.0.0.0:4318\"\n      # Also accept Zipkin spans from legacy services\n      zipkin:\n        endpoint: \"0.0.0.0:9411\"\n      # Jaeger for anything using the Jaeger client library\n      jaeger:\n        protocols:\n          thrift_http:\n            endpoint: \"0.0.0.0:14268\"\n          grpc:\n            endpoint: \"0.0.0.0:14250\"\n\n  # ── Ingester ──────────────────────────────────────────────\n  ingester:\n    max_block_duration: 5m    # flush frequently for low-latency local dev\n\n  # ── Storage (filesystem for kind) ─────────────────────────\n  storage:\n    trace:\n      backend: local\n      local:\n        path: /var/tempo/traces\n      wal:\n        path: /var/tempo/wal\n\n  # ── Compactor ─────────────────────────────────────────────\n  compactor:\n    compaction:\n      block_retention: 336h   # 14 days of traces\n\n  # ── Query-frontend ────────────────────────────────────────\n  querier:\n    max_concurrent_queries: 10\n\n  # ── Metrics-generator: derive RED metrics from traces ─────\n  # These land in Prometheus via remote_write and let you build\n  # service graphs and span metrics dashboards in Grafana.\n  metrics_generator:\n    registry:\n      external_labels:\n        source: tempo\n        cluster: kind-social-media\n    storage:\n      path: /var/tempo/generator/wal\n    traces_storage:\n      path: /var/tempo/generator/traces\n    processor:\n      # Service graph: request rate, error rate, latency between services\n      service_graphs:\n        dimensions:\n          - http.method\n          - http.status_code\n          - service.name\n        enable_messaging_system_latency_histogram: true\n      # Span metrics: per-span RED metrics\n      span_metrics:\n        dimensions:\n          - http.method\n          - http.status_code\n          - http.route\n          - service.name\n\n  global_overrides:\n    metrics_generator_processors:\n      - service-graphs\n      - span-metrics\n\n# ── Persistence ───────────────────────────────────────────────\npersistence:\n  enabled: true\n  storageClassName: standard\n  size: 5Gi\n\n# ── Resources ────────────────────────────────────────────────\nresources:\n  requests:\n    cpu: 200m\n    memory: 256Mi\n  limits:\n    cpu: 1000m\n    memory: 1Gi\n\n# ── Service ports (expose all receivers inside the cluster) ──\nservice:\n  type: ClusterIP\n  port: 3200\n\nserviceAccount:\n  create: true\n\n# ── Self-monitoring ───────────────────────────────────────────\nserviceMonitor:\n  enabled: true\n  labels:\n    release: kube-prometheus-stack\n  interval: 30s\n\n# ── Grafana datasource (added automatically if tempo-grafana\n#    sub-chart is not used; configure manually in Grafana) ────\n# Grafana → Settings → Data Sources → Tempo\n#   URL:  http://tempo:3200\n#   Trace to logs:\n#     Data source: Loki\n#     Tags:  service.name → app\n#   Trace to metrics:\n#     Data source: Prometheus"
-            ],
+            "values": null,
             "verify": false,
             "version": "1.24.4",
             "wait": true,
@@ -4563,12 +4305,6 @@
               {
                 "type": "get_attr",
                 "value": "repository_password"
-              }
-            ],
-            [
-              {
-                "type": "get_attr",
-                "value": "set_sensitive"
               }
             ]
           ],
@@ -5709,9 +5445,9 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "6236626640358686121",
+            "id": "4055608378582675261",
             "triggers": {
-              "always_run": "2026-05-28T05:18:13Z",
+              "always_run": "2026-05-28T04:05:35Z",
               "cluster_id": "6063989301105609125"
             }
           },
@@ -5742,9 +5478,9 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "3903359734095454596",
+            "id": "6850891954266932",
             "triggers": {
-              "always_run": "2026-05-28T05:18:13Z",
+              "always_run": "2026-05-28T04:05:35Z",
               "file_sha": "866a11a85130a4680df6a9ceb7c95d60a0f9ac86563a391da934fecb637b1864"
             }
           },
@@ -5824,9 +5560,9 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "1008811814117726568",
+            "id": "3918245353321204089",
             "triggers": {
-              "always_run": "2026-05-28T05:18:13Z",
+              "always_run": "2026-05-28T04:05:35Z",
               "file_sha": "9574d2cecc10609700fb006d9d82c24f0c48fe3cebf21572848784fb7f846b20"
             }
           },
@@ -6042,7 +5778,7 @@
                 "ip_address": "172.19.0.11",
                 "ip_prefix_length": 16,
                 "ipv6_gateway": "",
-                "mac_address": "46:19:3c:51:ce:92",
+                "mac_address": "b6:c3:28:05:02:ea",
                 "network_name": "gateway-net"
               }
             ],
@@ -6547,7 +6283,7 @@
                 "ip_address": "172.18.0.5",
                 "ip_prefix_length": 16,
                 "ipv6_gateway": "fc00:f853:ccd:e793::1",
-                "mac_address": "aa:1a:09:4e:26:66",
+                "mac_address": "ee:a2:10:6e:f5:fd",
                 "network_name": "kind"
               }
             ],
