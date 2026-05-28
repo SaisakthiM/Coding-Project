@@ -16,7 +16,7 @@ echo "📦 Collecting static files..."
 python manage.py collectstatic --noinput
 echo "🚀 Starting Gunicorn..."
 exec opentelemetry-instrument \
-    --service_name=hospital-management \
+    --service_name=document-backend \
     --exporter_otlp_endpoint=http://otel-gateway:4318 \
     --exporter_otlp_protocol=http/protobuf \
     --traces_exporter=otlp \

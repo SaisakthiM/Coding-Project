@@ -5,6 +5,7 @@ google-genai
 minio
 django-cors-headers
 pymysql
+mysqlclient
 numpy
 scikit-learn
 djangorestframework
@@ -15,4 +16,4 @@ sentence-transformers
 torch
 opentelemetry-distro
 opentelemetry-exporter-otlp
-opentelemetry-bootstrap
+

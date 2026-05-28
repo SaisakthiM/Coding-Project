@@ -2,9 +2,22 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# System deps for mysqlclient + build tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    pkg-config \
+    default-libmysqlclient-dev \
+    libssl-dev \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt --config MYSQLCLIENT_LDFLAGS='pkg-config mysqlclient --libs' --config MYSQLCLIENT_CFLAGS='pkg-config mysqlclient --cflags'
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    # Auto-installs instrumentation libs for django, requests, gunicorn, etc.
+    opentelemetry-bootstrap -a install
 
 COPY . .
 

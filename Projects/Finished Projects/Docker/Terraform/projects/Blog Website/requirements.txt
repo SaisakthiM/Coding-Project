@@ -11,4 +11,3 @@ minio
 django-ratelimit
 opentelemetry-distro
 opentelemetry-exporter-otlp
-opentelemetry-bootstrap
