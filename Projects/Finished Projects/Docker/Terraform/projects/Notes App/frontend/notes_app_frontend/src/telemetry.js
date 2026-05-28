@@ -4,18 +4,17 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web'
 import { registerInstrumentations } from '@opentelemetry/instrumentation'
 import { Resource } from '@opentelemetry/resources'
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions'
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions' // FIX: SEMRESATTRS_SERVICE_NAME is deprecated in v1.25.0
 
 const provider = new WebTracerProvider({
   resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'notes-frontend', // change per app
+    [ATTR_SERVICE_NAME]: 'notes-frontend',
   }),
 })
 
 provider.addSpanProcessor(
   new BatchSpanProcessor(
     new OTLPTraceExporter({
-      // goes through nginx → kind ingress → otel collector
       url: '/otel/v1/traces',
     })
   )

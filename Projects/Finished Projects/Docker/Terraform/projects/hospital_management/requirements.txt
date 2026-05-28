@@ -2,5 +2,6 @@ django
 whitenoise
 gunicorn
 pillow 
-opentelemetry-distro 
+opentelemetry-distro
 opentelemetry-exporter-otlp
+opentelemetry-bootstrap

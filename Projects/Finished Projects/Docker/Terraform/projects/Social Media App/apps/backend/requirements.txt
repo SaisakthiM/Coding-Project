@@ -16,6 +16,9 @@ environ
 django-environ
 django-prometheus
 django-ratelimit
+opentelemetry-distro
+opentelemetry-exporter-otlp
+opentelemetry-bootstrap
 
 
 
