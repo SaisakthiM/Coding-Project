@@ -16,4 +16,5 @@ sentence-transformers
 torch
 opentelemetry-distro
 opentelemetry-exporter-otlp
+django-prometheus
 

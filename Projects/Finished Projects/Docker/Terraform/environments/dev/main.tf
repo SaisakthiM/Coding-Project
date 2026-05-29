@@ -836,7 +836,9 @@ resource "null_resource" "kind_cluster" {
 }
 
 resource "null_resource" "kind_pull_image" {
-  
+  triggers = {
+    always_run = false
+  }
   provisioner "local-exec" {
     command = <<-EOT
       skopeo copy --override-arch amd64 --override-os linux \
@@ -844,6 +846,8 @@ resource "null_resource" "kind_pull_image" {
       docker-archive:strimzi-kafka-clean.tar:strimzi-kafka-local:latest
 
       docker load -i strimzi-kafka-clean.tar  
+
+      kind load docker-image quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 --name social-media
     EOT
     
   }
@@ -872,7 +876,6 @@ resource "null_resource" "kind_load_images" {
       kind load docker-image socialmediaapp-microservice-go:latest --name social-media
       kind load docker-image socialmediaapp-microservice-java:latest --name social-media
       kind load docker-image socialmediaapp-minio:latest --name social-media
-      kind load docker-image quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 --name social-media
     EOT
   }
 }

@@ -1,39 +1,5 @@
-# tempo-config.yml — grafana/tempo (SINGLE BINARY chart)
-# Use: helm upgrade tempo grafana/tempo -n monitoring -f tempo-config.yml
-
 tempo:
-  reportingEnabled: false
-
-  # ── All Tempo config goes under tempo.config (rendered as tempo.yaml) ──
-  config: |
-    multitenancy_enabled: false
-
-    server:
-      http_listen_port: 3200
-      log_level: info
-
-    distributor:
-      receivers:
-        otlp:
-          protocols:
-            grpc:
-              endpoint: "0.0.0.0:4317"
-            http:
-              endpoint: "0.0.0.0:4318"
-        jaeger:
-          protocols:
-            thrift_http:
-              endpoint: "0.0.0.0:14268"
-            grpc:
-              endpoint: "0.0.0.0:14250"
-
-    ingester:
-      max_block_duration: 5m
-
-    compactor:
-      compaction:
-        block_retention: 336h
-
+  structuredConfig:
     metrics_generator:
       registry:
         external_labels:
@@ -42,21 +8,25 @@ tempo:
       storage:
         path: /var/tempo/generator/wal
         remote_write:
-          - url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/write
+          - url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
             send_exemplars: true
       processor:
         service_graphs:
-          dimensions:
-            - http.method
-            - http.status_code
-            - service.name
+          dimensions: [http.method, http.status_code, service.name]
         span_metrics:
-          dimensions:
-            - http.method
-            - http.status_code
-            - http.route
-            - service.name
-
+          dimensions: [http.method, http.status_code, http.route, service.name]
+    overrides:
+      defaults:
+        metrics_generator:
+          processors: [service-graphs, span-metrics]
+      per_tenant_override_config: /conf/overrides.yaml
+    compactor:
+      compaction:
+        block_retention: 336h
+    ingester:
+      max_block_duration: 5m
+    querier:
+      max_concurrent_queries: 10
     storage:
       trace:
         backend: local
@@ -64,14 +34,20 @@ tempo:
           path: /var/tempo/traces
         wal:
           path: /var/tempo/wal
-
-    querier:
-      max_concurrent_queries: 10
-
-    overrides:
-      metrics_generator_processors:
-        - service-graphs
-        - span-metrics
+    distributor:
+      receivers:
+        jaeger:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:14250
+            thrift_http:
+              endpoint: 0.0.0.0:14268
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
 
 persistence:
   enabled: true

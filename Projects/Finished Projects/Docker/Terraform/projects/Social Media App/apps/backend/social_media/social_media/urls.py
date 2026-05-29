@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
+from django_prometheus import exports   
 
 
 def health_check(request):
@@ -20,6 +21,6 @@ urlpatterns = [
     path("api/stories/", include("apps.stories.urls")),
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/messages/", include("apps.messages.urls")),
-    path("", include("django_prometheus.urls")),
+    path('metrics', exports.ExportToDjangoView, name='prometheus-django-metrics'),  # ← add
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -7,7 +7,7 @@ spring:
     username: bankmanagement
     password: bankmanagement@2008
     driver-class-name: org.postgresql.Driver
-  
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,9 +16,18 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-  
+
   application:
     name: bank-management
 
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health
+  endpoint:
+    prometheus:
+      enabled: true

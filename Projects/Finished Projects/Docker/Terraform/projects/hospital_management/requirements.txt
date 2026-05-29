@@ -4,3 +4,4 @@ gunicorn
 pillow 
 opentelemetry-distro
 opentelemetry-exporter-otlp
+django-prometheus
