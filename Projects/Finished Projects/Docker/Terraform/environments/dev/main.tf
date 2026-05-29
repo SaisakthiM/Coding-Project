@@ -836,9 +836,7 @@ resource "null_resource" "kind_cluster" {
 }
 
 resource "null_resource" "kind_pull_image" {
-  triggers = {
-    always_run = timestamp()
-  }
+  
   provisioner "local-exec" {
     command = <<-EOT
       skopeo copy --override-arch amd64 --override-os linux \
