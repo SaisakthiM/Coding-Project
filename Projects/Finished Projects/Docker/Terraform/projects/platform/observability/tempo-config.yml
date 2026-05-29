@@ -1,104 +1,83 @@
-# ─────────────────────────────────────────────────────────────
-# tempo-config.yml  — Helm values for grafana/tempo
-#
-# Deployed via:
-#   helm_release "tempo" { values = [file("…/tempo-config.yml")] }
-#
-# Receives traces from the OTel Collector via OTLP/gRPC (4317)
-# and OTLP/HTTP (4318).  Stores on local filesystem for the
-# kind cluster.  Grafana reads traces and correlates with logs
-# via trace_id labels injected by Promtail/OTel.
-# ─────────────────────────────────────────────────────────────
+# tempo-config.yml — grafana/tempo (SINGLE BINARY chart)
+# Use: helm upgrade tempo grafana/tempo -n monitoring -f tempo-config.yml
 
 tempo:
-  # ── Server ────────────────────────────────────────────────
-  server:
-    http_listen_port: 3200
-    grpc_listen_port: 9095
-    log_level: info
+  reportingEnabled: false
 
-  # ── Distributor: which ingest endpoints to enable ─────────
-  distributor:
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: "0.0.0.0:4317"
-          http:
-            endpoint: "0.0.0.0:4318"
-      # Also accept Zipkin spans from legacy services
-      zipkin:
-        endpoint: "0.0.0.0:9411"
-      # Jaeger for anything using the Jaeger client library
-      jaeger:
-        protocols:
-          thrift_http:
-            endpoint: "0.0.0.0:14268"
-          grpc:
-            endpoint: "0.0.0.0:14250"
+  # ── All Tempo config goes under tempo.config (rendered as tempo.yaml) ──
+  config: |
+    multitenancy_enabled: false
 
-  # ── Ingester ──────────────────────────────────────────────
-  ingester:
-    max_block_duration: 5m    # flush frequently for low-latency local dev
+    server:
+      http_listen_port: 3200
+      log_level: info
 
-  # ── Storage (filesystem for kind) ─────────────────────────
-  storage:
-    trace:
-      backend: local
-      local:
-        path: /var/tempo/traces
-      wal:
-        path: /var/tempo/wal
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+            http:
+              endpoint: "0.0.0.0:4318"
+        jaeger:
+          protocols:
+            thrift_http:
+              endpoint: "0.0.0.0:14268"
+            grpc:
+              endpoint: "0.0.0.0:14250"
 
-  # ── Compactor ─────────────────────────────────────────────
-  compactor:
-    compaction:
-      block_retention: 336h   # 14 days of traces
+    ingester:
+      max_block_duration: 5m
 
-  # ── Query-frontend ────────────────────────────────────────
-  querier:
-    max_concurrent_queries: 10
+    compactor:
+      compaction:
+        block_retention: 336h
 
-  # ── Metrics-generator: derive RED metrics from traces ─────
-  # These land in Prometheus via remote_write and let you build
-  # service graphs and span metrics dashboards in Grafana.
-  metrics_generator:
-    registry:
-      external_labels:
-        source: tempo
-        cluster: kind-social-media
+    metrics_generator:
+      registry:
+        external_labels:
+          source: tempo
+          cluster: kind-social-media
+      storage:
+        path: /var/tempo/generator/wal
+        remote_write:
+          - url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/write
+            send_exemplars: true
+      processor:
+        service_graphs:
+          dimensions:
+            - http.method
+            - http.status_code
+            - service.name
+        span_metrics:
+          dimensions:
+            - http.method
+            - http.status_code
+            - http.route
+            - service.name
+
     storage:
-      path: /var/tempo/generator/wal
-    traces_storage:
-      path: /var/tempo/generator/traces
-    processor:
-      # Service graph: request rate, error rate, latency between services
-      service_graphs:
-        dimensions:
-          - http.method
-          - http.status_code
-          - service.name
-        enable_messaging_system_latency_histogram: true
-      # Span metrics: per-span RED metrics
-      span_metrics:
-        dimensions:
-          - http.method
-          - http.status_code
-          - http.route
-          - service.name
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/traces
+        wal:
+          path: /var/tempo/wal
 
-  global_overrides:
-    metrics_generator_processors:
-      - service-graphs
-      - span-metrics
+    querier:
+      max_concurrent_queries: 10
 
-# ── Persistence ───────────────────────────────────────────────
+    overrides:
+      metrics_generator_processors:
+        - service-graphs
+        - span-metrics
+
 persistence:
   enabled: true
   storageClassName: standard
   size: 5Gi
 
-# ── Resources ────────────────────────────────────────────────
 resources:
   requests:
     cpu: 200m
@@ -107,27 +86,8 @@ resources:
     cpu: 1000m
     memory: 1Gi
 
-# ── Service ports (expose all receivers inside the cluster) ──
-service:
-  type: ClusterIP
-  port: 3200
-
-serviceAccount:
-  create: true
-
-# ── Self-monitoring ───────────────────────────────────────────
 serviceMonitor:
   enabled: true
-  labels:
+  additionalLabels:
     release: kube-prometheus-stack
   interval: 30s
-
-# ── Grafana datasource (added automatically if tempo-grafana
-#    sub-chart is not used; configure manually in Grafana) ────
-# Grafana → Settings → Data Sources → Tempo
-#   URL:  http://tempo:3200
-#   Trace to logs:
-#     Data source: Loki
-#     Tags:  service.name → app
-#   Trace to metrics:
-#     Data source: Prometheus

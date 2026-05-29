@@ -1,14 +1,9 @@
 # otel-collector-values.yml — kind-side OTEL Collector
-# Receives OTLP from apps/gateway, enriches with k8s metadata,
-# forwards to Prometheus, Loki, and Tempo.
-
 mode: deployment
 replicaCount: 1
 
 image:
   repository: otel/opentelemetry-collector-contrib
-  # FIX: Pinned to a specific stable version instead of floating on latest.
-  # Update this intentionally when you want to upgrade.
   tag: "0.127.0"
 
 resources:
@@ -64,6 +59,17 @@ config:
             scrape_interval: 15s
             static_configs:
               - targets: ["localhost:8888"]
+
+          - job_name: ingress-nginx
+            scrape_interval: 15s
+            metrics_path: /metrics
+            static_configs:
+              - targets: ["ingress-nginx-controller.ingress-nginx.svc.cluster.local:10254"]
+            relabel_configs:
+              - target_label: cluster
+                replacement: kind-social-media
+              - target_label: app
+                replacement: ingress-nginx
 
     hostmetrics:
       collection_interval: 30s
@@ -128,28 +134,21 @@ config:
       tls:
         insecure: true
 
-    # FIX: Added explicit http:// scheme — bare host:port is ambiguous and
-    # causes connection failures in newer collector versions.
     otlp/tempo:
       endpoint: http://tempo.monitoring.svc:4317
       tls:
         insecure: true
       compression: gzip
 
-    # FIX: Renamed sampling_initial → sampling_initial_rate and
-    # sampling_thereafter → sampling_thereafter_rate (changed in v0.96+).
     debug:
       verbosity: basic
-      sampling_initial_rate: 5
-      sampling_thereafter_rate: 200
+      sampling_initial: 5
+      sampling_thereafter: 200
 
   service:
     telemetry:
       logs:
         level: info
-      # FIX: Replaced unsupported `readers` block (requires v0.103+, unreliable
-      # with a floating image tag) with the stable `address` field that works
-      # across all recent collector versions.
       metrics:
         level: detailed
         address: "0.0.0.0:8888"

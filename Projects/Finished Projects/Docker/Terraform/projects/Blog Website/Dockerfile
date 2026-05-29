@@ -24,6 +24,8 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+ENV DJANGO_SETTINGS_MODULE=blogsite.settings
+
 EXPOSE 8000
 
 WORKDIR /app/blogsite

@@ -16,4 +16,4 @@ exec opentelemetry-instrument \
     --traces_exporter=otlp \
     --metrics_exporter=otlp \
     --logs_exporter=otlp \
-    gunicorn blog_website.wsgi:application --bind 0.0.0.0:8000
+    gunicorn blogsite.wsgi:application --bind 0.0.0.0:8000

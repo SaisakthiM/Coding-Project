@@ -139,6 +139,14 @@ receivers:
               replacement: video-uploader-backend
             - target_label: cluster
               replacement: docker
+              
+        - job_name: node-exporter
+          scrape_interval: 15s
+          static_configs:
+            - targets: ["node-exporter:9100"]
+          relabel_configs:
+            - target_label: cluster
+              replacement: docker
 
 processors:
   # Drop if this collector is under memory pressure

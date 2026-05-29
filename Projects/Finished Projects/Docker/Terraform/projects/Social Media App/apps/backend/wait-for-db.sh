@@ -68,11 +68,13 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn server..."
+# Also switch to env vars — flags are deprecated in newer versions
+export OTEL_SERVICE_NAME="social-media-backend"
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-gateway:4318"
+export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
+export OTEL_TRACES_EXPORTER="otlp"
+export OTEL_METRICS_EXPORTER="otlp"
+export OTEL_LOGS_EXPORTER="otlp"
+
 exec opentelemetry-instrument \
-    --service_name=hospital-management \
-    --exporter_otlp_endpoint=http://otel-gateway:4318 \
-    --exporter_otlp_protocol=http/protobuf \
-    --traces_exporter=otlp \
-    --metrics_exporter=otlp \
-    --logs_exporter=otlp \
     gunicorn social_media.wsgi:application --bind 0.0.0.0:8000

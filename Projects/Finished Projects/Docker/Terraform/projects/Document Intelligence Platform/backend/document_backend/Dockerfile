@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     gcc \
   && rm -rf /var/lib/apt/lists/*
 
+
+
 # Combine pip installs and clean up cache in one layer
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
@@ -19,6 +21,8 @@ RUN pip install --upgrade pip && \
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+ENV DJANGO_SETTINGS_MODULE=document_backend.settings
 
 COPY . .
 

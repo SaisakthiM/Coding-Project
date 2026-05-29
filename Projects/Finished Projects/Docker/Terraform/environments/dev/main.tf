@@ -299,6 +299,44 @@ module "gateway" {
   ]
 }
 
+# ─── NGINX EXPORTER ───────────────────────────────────────────
+module "nginx_exporter" {
+  source        = "../../modules/docker_app"
+  name          = "nginx-exporter"
+  image         = "nginx/nginx-prometheus-exporter:latest"
+  internal_port = 9113
+  external_port = 9113
+  network       = docker_network.gateway_net.name
+
+  command = [
+  "--nginx.scrape-uri=http://gateway:8080/nginx_status",
+]
+
+  depends_on = [module.gateway]
+}
+
+module "node_exporter" {
+  source        = "../../modules/docker_app"
+  name          = "node-exporter"
+  image         = "prom/node-exporter:latest"
+  internal_port = 9100
+  external_port = 9100
+  network       = docker_network.gateway_net.name
+
+  volumes = [
+    { host_path = "/proc",     container_path = "/host/proc",    read_only = true },
+    { host_path = "/sys",      container_path = "/host/sys",     read_only = true },
+    { host_path = "/",         container_path = "/rootfs",       read_only = true },
+  ]
+
+  command = [
+    "--path.procfs=/host/proc",
+    "--path.rootfs=/rootfs",
+    "--path.sysfs=/host/sys",
+    "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)",
+  ]
+}
+
 # ─── NOTES APP ────────────────────────────────────────────────
 resource "docker_container" "notes_postgres" {
   name                  = "notes-postgres"
@@ -797,6 +835,22 @@ resource "null_resource" "kind_cluster" {
   }
 }
 
+resource "null_resource" "kind_pull_image" {
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = <<-EOT
+      skopeo copy --override-arch amd64 --override-os linux \
+      docker://quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 \
+      docker-archive:strimzi-kafka-clean.tar:strimzi-kafka-local:latest
+
+      docker load -i strimzi-kafka-clean.tar  
+    EOT
+    
+  }
+}
+
 resource "null_resource" "kind_load_images" {
   depends_on = [
     null_resource.kind_cluster,
@@ -820,6 +874,7 @@ resource "null_resource" "kind_load_images" {
       kind load docker-image socialmediaapp-microservice-go:latest --name social-media
       kind load docker-image socialmediaapp-microservice-java:latest --name social-media
       kind load docker-image socialmediaapp-minio:latest --name social-media
+      kind load docker-image quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 --name social-media
     EOT
   }
 }
@@ -1101,7 +1156,7 @@ resource "kubectl_manifest" "microservice_go_deployment" {
 }
 
 resource "kubectl_manifest" "microservice_java_service" {
-  depends_on = [null_resource.kind_cluster]
+  depends_on = [null_resource.kind_cluster, kubectl_manifest.kafka_service]
   yaml_body  = <<-YAML
     apiVersion: v1
     kind: Service
@@ -1119,7 +1174,7 @@ resource "kubectl_manifest" "microservice_java_service" {
 }
 
 resource "kubectl_manifest" "microservice_java_deployment" {
-  depends_on = [null_resource.kind_load_images]
+  depends_on = [null_resource.kind_load_images, kubectl_manifest.kafka_service]
   yaml_body  = <<-YAML
     apiVersion: apps/v1
     kind: Deployment
@@ -1150,6 +1205,79 @@ resource "kubectl_manifest" "microservice_java_deployment" {
                   value: "9042"
                 - name: SPRING_CASSANDRA_LOCAL-DATACENTER
                   value: datacenter1
+  YAML
+}
+resource "kubectl_manifest" "kafka_statefulset" {
+  depends_on = [null_resource.kind_cluster]
+  yaml_body  = <<-YAML
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: kafka
+      namespace: default
+    spec:
+      serviceName: kafka
+      replicas: 1
+      selector:
+        matchLabels:
+          app: kafka
+      template:
+        metadata:
+          labels:
+            app: kafka
+        spec:
+          containers:
+            - name: kafka
+              image: strimzi-kafka-local:latest
+              imagePullPolicy: Never
+              env:
+                - name: KAFKA_LOG_DIR
+                  value: "/tmp/kafka-logs"
+                - name: LOG_DIR
+                  value: "/tmp/kafka-logs"
+                - name: KAFKA_GC_LOG_OPTS
+                  value: "-Xlog:gc*:file=/tmp/kafka-logs/kafkaServer-gc.log:time,tags:filecount=10,filesize=100M"
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  mkdir -p /tmp/kafka-logs
+                  cp /opt/kafka/config/server.properties /tmp/server.properties
+                  sed -i 's|advertised.listeners=.*|advertised.listeners=PLAINTEXT://kafka:9092|' /tmp/server.properties
+                  sed -i 's|controller.quorum.bootstrap.servers=.*|controller.quorum.bootstrap.servers=kafka:9093|' /tmp/server.properties
+                  echo "controller.quorum.voters=1@kafka:9093" >> /tmp/server.properties
+                  /opt/kafka/bin/kafka-storage.sh format -t $$(cat /proc/sys/kernel/random/uuid) -c /tmp/server.properties &&
+                  /opt/kafka/bin/kafka-server-start.sh /tmp/server.properties
+              ports:
+                - containerPort: 9092
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "1Gi"
+                  cpu: "1000m"
+  YAML
+}
+resource "kubectl_manifest" "kafka_service" {
+  depends_on = [kubectl_manifest.kafka_statefulset]
+  yaml_body  = <<-YAML
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: kafka
+      namespace: default
+    spec:
+      clusterIP: None
+      selector:
+        app: kafka
+      ports:
+        - name: plaintext
+          port: 9092
+          targetPort: 9092
+        - name: controller
+          port: 9093
+          targetPort: 9093
   YAML
 }
 
@@ -1371,78 +1499,86 @@ resource "kubectl_manifest" "redis_service" {
 #   30318 — OTLP HTTP  (browser SDKs → kind collector)
 #   30080 — ingress-nginx (grafana, jaeger, otel HTTP UI)
 # ═══════════════════════════════════════════════════════════════
-resource "helm_release" "cassandra" {
+resource "kubectl_manifest" "cassandra_statefulset" {
   depends_on = [null_resource.kind_cluster]
-  name       = "cassandra"
-  namespace  = "default"
+  yaml_body = <<-YAML
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: cassandra
+      namespace: default
+    spec:
+      serviceName: cassandra
+      replicas: 1
+      selector:
+        matchLabels:
+          app: cassandra
+      template:
+        metadata:
+          labels:
+            app: cassandra
+        spec:
+          initContainers:
+            - name: increase-vm-max-map-count
+              image: busybox
+              imagePullPolicy: IfNotPresent
+              command: ["sysctl", "-w", "vm.max_map_count=1048575"]
+              securityContext:
+                privileged: true
+          containers:
+            - name: cassandra
+              image: cassandra:5.0
+              imagePullPolicy: Never
+              ports:
+                - containerPort: 9042
+              env:
+                - name: MAX_HEAP_SIZE
+                  value: "256M"
+                - name: CASSANDRA_CLUSTER_NAME
+                  value: "cassandra-cluster"
+              resources:
+                requests:
+                  memory: "1536Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "2Gi"
+                  cpu: "1000m"
+              readinessProbe:
+                exec:
+                  command: ["cqlsh", "-e", "describe keyspaces"]
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                failureThreshold: 10
+              livenessProbe:
+                exec:
+                  command: ["nodetool", "status"]
+                initialDelaySeconds: 90
+                periodSeconds: 30
+                failureThreshold: 5
+  YAML
+}
 
-  repository = "https://charts.helm.sh/incubator"
-  chart      = "cassandra"
-  version    = "0.13.0"
-
-  set {
-    name  = "image.repository"
-    value = "cassandra"
-  }
-  set {
-    name  = "image.tag"
-    value = "5.0"
-  }
-  set {
-    name  = "replicaCount"
-    value = "1"
-  }
-
-  # ── Memory: bumped up for Cassandra 5.0 ──
-  set {
-    name  = "resources.requests.memory"
-    value = "1536Mi"
-  }
-  set {
-    name  = "resources.limits.memory"
-    value = "2Gi"
-  }
-  set {
-    name  = "resources.requests.cpu"
-    value = "250m"
-  }
-  set {
-    name  = "resources.limits.cpu"
-    value = "1000m"
-  }
-
-  # ── Fix G1GC crash: override heap env vars ──
-  set {
-    name  = "env[0].name"
-    value = "MAX_HEAP_SIZE"
-  }
-  set {
-    name  = "env[0].value"
-    value = "512M"
-  }
-  set {
-    name  = "env[1].name"
-    value = "HEAP_NEWSIZE"
-  }
-  set {
-    name  = "env[1].value"
-    value = ""            # empty string disables it
-  }
-
-  set {
-    name  = "persistence.enabled"
-    value = "false"
-  }
-
-  set_sensitive {
-    name  = "values_sha"
-    value = filebase64sha256("${local.obs_path}/cassandra-values.yml")
-  }
+resource "kubectl_manifest" "cassandra_service" {
+  depends_on = [kubectl_manifest.cassandra_statefulset]
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: cassandra
+      namespace: default
+    spec:
+      clusterIP: None
+      selector:
+        app: cassandra
+      ports:
+        - port: 9042
+          targetPort: 9042
+  YAML
 }
 
 # ─── REDIS ────────────────────────────────────────────────────
 resource "helm_release" "redis" {
-  depends_on = [null_resource.kind_cluster, helm_release.cassandra]
+  depends_on = [null_resource.kind_cluster, kubectl_manifest.cassandra_service, kubectl_manifest.cassandra_statefulset]
   name       = "redis"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "redis"
@@ -1641,23 +1777,19 @@ resource "docker_container" "otel_gateway" {
   image   = docker_image.otel_gateway.image_id
   restart = "unless-stopped"
 
-  # OTLP gRPC — Docker apps push spans here
   ports {
     internal = 4317
     external = 4317
   }
-  # OTLP HTTP — alternative for apps that prefer HTTP
   ports {
     internal = 4318
     external = 4318
   }
-  # Health check endpoint
   ports {
     internal = 13133
     external = 13133
   }
 
-  # Mount the gateway collector config
   mounts {
     type      = "bind"
     source    = abspath("${local.obs_path}/otel-gateway-config.yml")
@@ -1667,8 +1799,17 @@ resource "docker_container" "otel_gateway" {
 
   command = ["--config=/etc/otelcol-contrib/config.yaml"]
 
+  # FIX: Removed duplicate gateway-net block — it was declared twice,
+  # once as a Terraform reference and again as a hardcoded string.
+  # Only use the Terraform reference so destroy/recreate works correctly.
   networks_advanced {
     name = docker_network.gateway_net.name
+  }
+
+  # Connects gateway to KIND's Docker network so it can resolve
+  # social-media-control-plane hostname and reach NodePort 30317
+  networks_advanced {
+    name = "kind"
   }
 
   healthcheck {
@@ -1679,7 +1820,6 @@ resource "docker_container" "otel_gateway" {
     start_period = "10s"
   }
 
-  # Must start after kind collector NodePort is ready
   depends_on = [kubectl_manifest.otel_nodeport]
 }
 
