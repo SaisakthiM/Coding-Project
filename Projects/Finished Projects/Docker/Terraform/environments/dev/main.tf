@@ -835,6 +835,8 @@ resource "null_resource" "kind_cluster" {
   }
 }
 
+/* 
+
 resource "null_resource" "kind_pull_image" {
   triggers = {
     always_run = false
@@ -852,6 +854,7 @@ resource "null_resource" "kind_pull_image" {
     
   }
 }
+*/
 
 resource "null_resource" "kind_load_images" {
   depends_on = [
@@ -1830,6 +1833,8 @@ resource "docker_container" "otel_gateway" {
 # and exposes Prometheus metrics on :9113.
 # The gateway OTEL collector scrapes this.
 #
+/* 
+
 resource "docker_container" "nginx_exporter" {
   name    = "nginx-exporter"
   image   = "nginx/nginx-prometheus-exporter:1.1"
@@ -1850,6 +1855,7 @@ resource "docker_container" "nginx_exporter" {
 
   depends_on = [module.gateway]
 }
+*/
 
 # ─── JAEGER ───────────────────────────────────────────────────
 #

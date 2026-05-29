@@ -8,7 +8,7 @@ echo "MySQL is ready!"
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
-python manage.py test blog.tests -v 2
+python manage.py test blog.tests -v 2 --keepdb
 exec opentelemetry-instrument \
     --service_name=blog-website \
     --exporter_otlp_endpoint=http://otel-gateway:4318 \

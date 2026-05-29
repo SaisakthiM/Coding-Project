@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-y^ge)(4btd#-69=dkxkv!g%o1^a1015lxcg!tuh@^!=w%cxh+_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'saisakthi.qzz.io']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'saisakthi.qzz.io', "doc-backend"]
 
 
 # Application definition
