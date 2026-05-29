@@ -1371,8 +1371,6 @@ resource "kubectl_manifest" "redis_service" {
 #   30318 — OTLP HTTP  (browser SDKs → kind collector)
 #   30080 — ingress-nginx (grafana, jaeger, otel HTTP UI)
 # ═══════════════════════════════════════════════════════════════
-
-# ─── CASSANDRA ────────────────────────────────────────────────
 resource "helm_release" "cassandra" {
   depends_on = [null_resource.kind_cluster]
   name       = "cassandra"
@@ -1394,22 +1392,43 @@ resource "helm_release" "cassandra" {
     name  = "replicaCount"
     value = "1"
   }
+
+  # ── Memory: bumped up for Cassandra 5.0 ──
+  set {
+    name  = "resources.requests.memory"
+    value = "1536Mi"
+  }
+  set {
+    name  = "resources.limits.memory"
+    value = "2Gi"
+  }
   set {
     name  = "resources.requests.cpu"
     value = "250m"
   }
   set {
-    name  = "resources.requests.memory"
-    value = "768Mi"
-  }
-  set {
     name  = "resources.limits.cpu"
     value = "1000m"
   }
+
+  # ── Fix G1GC crash: override heap env vars ──
   set {
-    name  = "resources.limits.memory"
-    value = "1Gi"
+    name  = "env[0].name"
+    value = "MAX_HEAP_SIZE"
   }
+  set {
+    name  = "env[0].value"
+    value = "512M"
+  }
+  set {
+    name  = "env[1].name"
+    value = "HEAP_NEWSIZE"
+  }
+  set {
+    name  = "env[1].value"
+    value = ""            # empty string disables it
+  }
+
   set {
     name  = "persistence.enabled"
     value = "false"
