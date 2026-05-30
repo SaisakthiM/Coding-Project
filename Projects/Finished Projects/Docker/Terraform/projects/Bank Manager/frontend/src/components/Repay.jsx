@@ -18,9 +18,14 @@ export default function Repay() {
         setError("");
         try {
             const response = await bankService.repayLoan(user.accountId, parseInt(amount));
-            if (response.data) {
+            if (response) {                          // ✅ was response.data
                 setMessage(`Successfully repaid ₹${amount}! Remaining loan: ₹${response.data.loanBalance}`);
-                login({ ...user, balance: response.data.balance, creditScore: response.data.creditScore, loanBalance: response.data.loanBalance });
+                login({ 
+                    ...user, 
+                    balance: response.data.balance, 
+                    creditScore: response.data.creditScore,  // ✅ updates credit score in context
+                    loanBalance: response.data.loanBalance 
+                });
                 setAmount("");
             }
         } catch (err) {

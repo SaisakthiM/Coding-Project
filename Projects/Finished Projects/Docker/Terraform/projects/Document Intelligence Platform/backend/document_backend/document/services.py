@@ -43,7 +43,7 @@ def summarize_ollama(prompt: str, model: str = "phi3"):
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=5)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
         response.raise_for_status()
         data = response.json()
         return data.get("response")

@@ -68,7 +68,7 @@ const bankService = {
           const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/loan`, {
               amount, months,
           });
-          return response;
+          return response.data;  // ✅ was: return response
       } catch (error) {
           throw error.response?.data || error.message;
       }
@@ -79,7 +79,7 @@ const bankService = {
           const response = await axios.post(`${API_BASE_URL}/accounts/${accountId}/repay`, {
               amount,
           });
-          return response;
+          return response.data;  // ✅ was: return response
       } catch (error) {
           throw error.response?.data || error.message;
       }

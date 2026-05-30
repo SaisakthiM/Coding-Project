@@ -19,9 +19,14 @@ export default function Loan() {
         setError("");
         try {
             const response = await bankService.takeLoan(user.accountId, parseInt(amount), parseInt(months));
-            if (response.data) {
+            if (response) {                          // ← match deposit pattern
                 setMessage(`Loan of ₹${amount} approved! New balance: ₹${response.data.balance}`);
-                login({ ...user, balance: response.data.balance, creditScore: response.data.creditScore, loanBalance: response.data.loanBalance });
+                login({ 
+                    ...user, 
+                    balance: response.data.balance, 
+                    creditScore: response.data.creditScore, 
+                    loanBalance: response.data.loanBalance 
+                });
                 setAmount("");
                 setMonths("");
             }
