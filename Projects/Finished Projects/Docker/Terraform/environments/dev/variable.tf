@@ -33,4 +33,9 @@ variable "social_db_password"  { sensitive = true }
 variable "social_db_name"      {}
 variable "social_minio_user"   {}
 variable "social_minio_password" { sensitive = true }
+variable "load_images" {
+  type    = bool
+  default = false
+}
+
 

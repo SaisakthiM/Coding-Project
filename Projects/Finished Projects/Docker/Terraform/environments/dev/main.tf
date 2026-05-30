@@ -835,26 +835,35 @@ resource "null_resource" "kind_cluster" {
   }
 }
 
-/* 
-
-resource "null_resource" "kind_pull_image" {
+resource "null_resource" "kind_images" {
+  # Manual trigger — only runs when you set load_images = true
   triggers = {
-    always_run = false
+    manual = var.load_images
   }
+
   provisioner "local-exec" {
-    command = <<-EOT
-      skopeo copy --override-arch amd64 --override-os linux \
-      docker://quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 \
-      docker-archive:strimzi-kafka-clean.tar:strimzi-kafka-local:latest
+    command = <<EOT
+      # Cassandra
+      docker save cassandra:5.0-amd64 -o cassandra.tar
+      docker cp cassandra.tar social-media-control-plane:/cassandra.tar
+      docker cp cassandra.tar social-media-worker:/cassandra.tar
+      docker cp cassandra.tar social-media-worker2:/cassandra.tar
+      docker exec -i social-media-control-plane ctr -n k8s.io images import /cassandra.tar
+      docker exec -i social-media-worker ctr -n k8s.io images import /cassandra.tar
+      docker exec -i social-media-worker2 ctr -n k8s.io images import /cassandra.tar
 
-      docker load -i strimzi-kafka-clean.tar  
-
-      kind load docker-image quay.io/strimzi/kafka:1.0.0-kafka-4.2.0 --name social-media
+      # Kafka
+      docker save confluentinc/cp-kafka:7.6.0 -o kafka.tar
+      docker cp kafka.tar social-media-control-plane:/kafka.tar
+      docker cp kafka.tar social-media-worker:/kafka.tar
+      docker cp kafka.tar social-media-worker2:/kafka.tar
+      docker exec -i social-media-control-plane ctr -n k8s.io images import /kafka.tar
+      docker exec -i social-media-worker ctr -n k8s.io images import /kafka.tar
+      docker exec -i social-media-worker2 ctr -n k8s.io images import /kafka.tar
     EOT
-    
   }
 }
-*/
+
 
 resource "null_resource" "kind_load_images" {
   depends_on = [
@@ -1233,7 +1242,7 @@ resource "kubectl_manifest" "kafka_statefulset" {
           containers:
             - name: kafka
               image: strimzi-kafka-local:latest
-              imagePullPolicy: Never
+              imagePullPolicy: IfNotPresent
               env:
                 - name: KAFKA_LOG_DIR
                   value: "/tmp/kafka-logs"
@@ -1532,7 +1541,7 @@ resource "kubectl_manifest" "cassandra_statefulset" {
           containers:
             - name: cassandra
               image: cassandra:5.0
-              imagePullPolicy: Never
+              imagePullPolicy: IfNotPresent
               ports:
                 - containerPort: 9042
               env:
