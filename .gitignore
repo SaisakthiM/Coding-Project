@@ -15,6 +15,7 @@ $RECYCLE.BIN/
 # Linux
 *~
 .nfs*
+*.tar
 
 # -------------------------------
 # IDE / Editor files
