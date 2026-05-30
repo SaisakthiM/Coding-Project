@@ -180,6 +180,9 @@ clusterRole:
         - services
         - endpoints
         - replicationcontrollers
+        - resourcequotas
+        - persistentvolumes
+        - persistentvolumeclaims
       verbs: ["get", "list", "watch"]
     - apiGroups: ["apps"]
       resources:
@@ -187,6 +190,10 @@ clusterRole:
         - replicasets
         - statefulsets
         - daemonsets
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["autoscaling"]
+      resources:
+        - horizontalpodautoscalers
       verbs: ["get", "list", "watch"]
     - apiGroups: ["batch"]
       resources:

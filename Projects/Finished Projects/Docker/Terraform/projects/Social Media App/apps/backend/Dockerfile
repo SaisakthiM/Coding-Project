@@ -25,6 +25,8 @@ COPY . .
 COPY wait-for-db.sh /wait-for-db.sh
 RUN dos2unix /wait-for-db.sh && chmod +x /wait-for-db.sh
 
+ENV DJANGO_SETTINGS_MODULE=social_media.settings 
+
 # Set working directory to Django project root
 WORKDIR /app/social_media
 

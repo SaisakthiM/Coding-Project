@@ -1727,6 +1727,8 @@ resource "helm_release" "otel_collector" {
 }
 
 
+
+
 # ─── OTEL NODEPORT SERVICE ────────────────────────────────────
 #
 # The Helm chart creates a NodePort service when service.type=NodePort,
