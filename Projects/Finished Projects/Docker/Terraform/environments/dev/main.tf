@@ -843,6 +843,7 @@ resource "null_resource" "kind_images" {
 
   provisioner "local-exec" {
     command = <<EOT
+      cd ~/.cache/
       # Cassandra
       docker save cassandra:5.0-amd64 -o cassandra.tar
       docker cp cassandra.tar social-media-control-plane:/cassandra.tar
