@@ -1,7 +1,9 @@
 // Score.test.jsx
 import { render, screen } from '@testing-library/react';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import Score from '../components/Score';
+vi.mock('*.css', () => ({}));
+vi.mock('**/*.css', () => ({}));
 
 describe('Score Component', () => {
 

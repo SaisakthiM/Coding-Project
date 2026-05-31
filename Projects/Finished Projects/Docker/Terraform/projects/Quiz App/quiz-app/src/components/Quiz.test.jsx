@@ -2,6 +2,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import Quiz from '../components/Quiz';
+vi.mock('*.css', () => ({}));
+vi.mock('**/*.css', () => ({}));
 
 const mockProps = {
     Questions: "What is 2 + 2?",

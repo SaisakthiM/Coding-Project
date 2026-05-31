@@ -1,7 +1,9 @@
 // App.test.jsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import App from '../App';
+import App from './App';
+vi.mock('*.css', () => ({}));
+vi.mock('**/*.css', () => ({}));
 
 // Mock alert since jsdom doesn't support it
 global.alert = vi.fn();
@@ -40,31 +42,33 @@ describe('App Component', () => {
         expect(screen.getByText(/5 \/ 5/i)).toBeInTheDocument();
     });
 
-    test('shows score page after all questions answered', () => {
+    test('shows score page after all questions answered', async () => {
         render(<App />);
         fireEvent.click(screen.getByText('Start'));
 
-        // Go through all 5 questions
-        for(let i = 0; i < 5; i++) {
+        for (let i = 0; i < 5; i++) {
+            const options = screen.getAllByRole('listitem');
+            fireEvent.click(options[0]);          // select any option
             fireEvent.click(screen.getByText('Next'));
-            vi.clearAllMocks(); // clear alert mock between questions
         }
 
-        // Score component should be visible
-        expect(screen.getByText(/score/i)).toBeInTheDocument();
+        expect(screen.getByText('Quiz Completed!')).toBeInTheDocument();
     });
 
     test('wrong answers result in score 0', () => {
         render(<App />);
         fireEvent.click(screen.getByText('Start'));
 
-        // Always pick first option (wrong for all questions)
-        for(let i = 0; i < 5; i++) {
+        // Pick last option — wrong for all 5 questions (answers are 3,1,1,0,0)
+        for (let i = 0; i < 5; i++) {
             const options = screen.getAllByRole('listitem');
-            fireEvent.click(options[0]);
+            fireEvent.click(options[options.length - 1]);
             fireEvent.click(screen.getByText('Next'));
         }
 
-        expect(screen.getByText(/0 \/ 5/i)).toBeInTheDocument();
+        // Score is split across elements: "Your Score: ", "0", " / ", "5"
+        expect(screen.getByText((_, el) =>
+            el?.tagName === 'H2' && el.textContent.replace(/\s+/g, ' ').trim() === 'Your Score: 0 / 5'
+        )).toBeInTheDocument();
     });
 });
