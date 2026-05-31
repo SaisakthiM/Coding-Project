@@ -1,8 +1,9 @@
 pipeline {
-    agent any
+    agent { label 'Worker' }
 
     environment {
-        PROJECTS_ROOT = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/projects"
+        PROJECTS_ROOT = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/projects"
+        TERRAFORM_DIR = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/environments/dev"
         REGISTRY      = "saisakthi.qzz.io"
     }
 
@@ -19,7 +20,6 @@ pipeline {
         stage('Detect Changes') {
             steps {
                 script {
-                    // Get the commit range — works for both PR and push
                     def base = env.GIT_PREVIOUS_SUCCESSFUL_COMMIT ?: 'HEAD~1'
                     def diff = sh(
                         script: "git diff --name-only ${base} HEAD",
@@ -28,28 +28,35 @@ pipeline {
 
                     echo "Changed files:\n${diff}"
 
-                    // Map: env var name → path fragment to watch
-                    def watchMap = [
-                        BUILD_SOCIAL_FRONTEND  : 'Social Media App/apps/frontend',
-                        BUILD_SOCIAL_BACKEND   : 'Social Media App/apps/backend',
-                        BUILD_BANK_FRONTEND    : 'Bank Manager/frontend',
-                        BUILD_BANK_BACKEND     : 'Bank Manager/backend',
-                        BUILD_QUIZ             : 'Quiz App',
-                        BUILD_NOTES_FRONTEND   : 'Notes App/frontend',
-                        BUILD_NOTES_BACKEND    : 'Notes App/backend',
-                        BUILD_BLOG             : 'Blog Website',
-                        BUILD_HOSPITAL         : 'hospital_management',
-                        BUILD_API_BACKEND      : 'API Service/backend',
-                        BUILD_API_FRONTEND     : 'API Service/frontend',
-                        BUILD_DOC_BACKEND      : 'Document Intelligence Platform',
-                        BUILD_VIDEO_BACKEND    : 'Video Uploader',
-                    ]
+                    env.BUILD_SOCIAL_FRONTEND = diff.contains('Social Media App/apps/frontend') ? 'true' : 'false'
+                    env.BUILD_SOCIAL_BACKEND  = diff.contains('Social Media App/apps/backend')  ? 'true' : 'false'
+                    env.BUILD_BANK_FRONTEND   = diff.contains('Bank Manager/frontend')           ? 'true' : 'false'
+                    env.BUILD_BANK_BACKEND    = diff.contains('Bank Manager/backend')            ? 'true' : 'false'
+                    env.BUILD_QUIZ            = diff.contains('Quiz App')                        ? 'true' : 'false'
+                    env.BUILD_NOTES_FRONTEND  = diff.contains('Notes App/frontend')              ? 'true' : 'false'
+                    env.BUILD_NOTES_BACKEND   = diff.contains('Notes App/backend')               ? 'true' : 'false'
+                    env.BUILD_BLOG            = diff.contains('Blog Website')                    ? 'true' : 'false'
+                    env.BUILD_HOSPITAL        = diff.contains('hospital_management')             ? 'true' : 'false'
+                    env.BUILD_API_BACKEND     = diff.contains('API Service/backend')             ? 'true' : 'false'
+                    env.BUILD_API_FRONTEND    = diff.contains('API Service/frontend')            ? 'true' : 'false'
+                    env.BUILD_DOC_BACKEND     = diff.contains('Document Intelligence Platform')  ? 'true' : 'false'
+                    env.BUILD_VIDEO_BACKEND   = diff.contains('Video Uploader')                  ? 'true' : 'false'
 
-                    watchMap.each { envVar, pathFragment ->
-                        def changed = diff.contains(pathFragment)
-                        env[envVar] = changed ? 'true' : 'false'
-                        echo "${envVar} = ${env[envVar]}"
-                    }
+                    echo """
+                        BUILD_SOCIAL_FRONTEND  = ${env.BUILD_SOCIAL_FRONTEND}
+                        BUILD_SOCIAL_BACKEND   = ${env.BUILD_SOCIAL_BACKEND}
+                        BUILD_BANK_FRONTEND    = ${env.BUILD_BANK_FRONTEND}
+                        BUILD_BANK_BACKEND     = ${env.BUILD_BANK_BACKEND}
+                        BUILD_QUIZ             = ${env.BUILD_QUIZ}
+                        BUILD_NOTES_FRONTEND   = ${env.BUILD_NOTES_FRONTEND}
+                        BUILD_NOTES_BACKEND    = ${env.BUILD_NOTES_BACKEND}
+                        BUILD_BLOG             = ${env.BUILD_BLOG}
+                        BUILD_HOSPITAL         = ${env.BUILD_HOSPITAL}
+                        BUILD_API_BACKEND      = ${env.BUILD_API_BACKEND}
+                        BUILD_API_FRONTEND     = ${env.BUILD_API_FRONTEND}
+                        BUILD_DOC_BACKEND      = ${env.BUILD_DOC_BACKEND}
+                        BUILD_VIDEO_BACKEND    = ${env.BUILD_VIDEO_BACKEND}
+                    """
                 }
             }
         }
@@ -249,209 +256,28 @@ pipeline {
             }
         }
 
-        // ── 4. Build (only changed apps) ──────────────────────────
-        stage('Build') {
-            parallel {
-
-                stage('Social Media App - Frontend') {
-                    when { expression { env.BUILD_SOCIAL_FRONTEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.prod" \
-                                -t ${REGISTRY}/social-frontend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Social Media App/apps/frontend"
-                        """
-                    }
-                }
-
-                stage('Social Media App - Backend') {
-                    when { expression { env.BUILD_SOCIAL_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/social-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Social Media App/apps/backend"
-                        """
-                    }
-                }
-
-                stage('Bank Manager - Frontend') {
-                    when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.prod" \
-                                -t ${REGISTRY}/bank-frontend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Bank Manager/frontend"
-                        """
-                    }
-                }
-
-                stage('Bank Manager - Backend') {
-                    when { expression { env.BUILD_BANK_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/bank-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
-                        """
-                    }
-                }
-
-                stage('Quiz App') {
-                    when { expression { env.BUILD_QUIZ == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Quiz App/quiz-app/Dockerfile.prod" \
-                                -t ${REGISTRY}/quiz-app:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Quiz App/quiz-app"
-                        """
-                    }
-                }
-
-                stage('Notes App - Frontend') {
-                    when { expression { env.BUILD_NOTES_FRONTEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend/Dockerfile.prod" \
-                                -t ${REGISTRY}/notes-frontend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
-                        """
-                    }
-                }
-
-                stage('Notes App - Backend') {
-                    when { expression { env.BUILD_NOTES_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/notes-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Notes App/backend"
-                        """
-                    }
-                }
-
-                stage('Blog Website') {
-                    when { expression { env.BUILD_BLOG == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/blog:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Blog Website"
-                        """
-                    }
-                }
-
-                stage('Hospital Management') {
-                    when { expression { env.BUILD_HOSPITAL == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/hospital:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/hospital_management"
-                        """
-                    }
-                }
-
-                stage('API Service - Backend') {
-                    when { expression { env.BUILD_API_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/api-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/API Service/backend"
-                        """
-                    }
-                }
-
-                stage('API Service - Frontend') {
-                    when { expression { env.BUILD_API_FRONTEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/api-frontend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/API Service/frontend/api-service"
-                        """
-                    }
-                }
-
-                stage('Document Intelligence - Backend') {
-                    when { expression { env.BUILD_DOC_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/doc-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
-                        """
-                    }
-                }
-
-                stage('Video Uploader - Backend') {
-                    when { expression { env.BUILD_VIDEO_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -t ${REGISTRY}/video-backend:${BUILD_NUMBER} \
-                                "${PROJECTS_ROOT}/Video Uploader/Main/backend"
-                        """
-                    }
-                }
-
-            }
-        }
-
-        // ── 5. Push (only changed apps, only on main) ─────────────
-        stage('Push') {
-            when { branch 'main' }
+        // ── 4. Deploy via Terraform (only on Coding-Project branch) ──
+        stage('Deploy') {
+            when { branch 'Coding-Project' }
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'registry-credentials',
-                    usernameVariable: 'REG_USER',
-                    passwordVariable: 'REG_PASS'
-                )]) {
-                    sh "echo $REG_PASS | docker login ${REGISTRY} -u $REG_USER --password-stdin"
-                    script {
-                        def pushMap = [
-                            BUILD_SOCIAL_FRONTEND : "${REGISTRY}/social-frontend:${BUILD_NUMBER}",
-                            BUILD_SOCIAL_BACKEND  : "${REGISTRY}/social-backend:${BUILD_NUMBER}",
-                            BUILD_BANK_FRONTEND   : "${REGISTRY}/bank-frontend:${BUILD_NUMBER}",
-                            BUILD_BANK_BACKEND    : "${REGISTRY}/bank-backend:${BUILD_NUMBER}",
-                            BUILD_QUIZ            : "${REGISTRY}/quiz-app:${BUILD_NUMBER}",
-                            BUILD_NOTES_FRONTEND  : "${REGISTRY}/notes-frontend:${BUILD_NUMBER}",
-                            BUILD_NOTES_BACKEND   : "${REGISTRY}/notes-backend:${BUILD_NUMBER}",
-                            BUILD_BLOG            : "${REGISTRY}/blog:${BUILD_NUMBER}",
-                            BUILD_HOSPITAL        : "${REGISTRY}/hospital:${BUILD_NUMBER}",
-                            BUILD_API_BACKEND     : "${REGISTRY}/api-backend:${BUILD_NUMBER}",
-                            BUILD_API_FRONTEND    : "${REGISTRY}/api-frontend:${BUILD_NUMBER}",
-                            BUILD_DOC_BACKEND     : "${REGISTRY}/doc-backend:${BUILD_NUMBER}",
-                            BUILD_VIDEO_BACKEND   : "${REGISTRY}/video-backend:${BUILD_NUMBER}",
-                        ]
-                        pushMap.each { envVar, image ->
-                            if (env[envVar] == 'true') {
-                                sh "docker push ${image}"
-                            } else {
-                                echo "Skipping push for ${image} — no changes detected."
-                            }
-                        }
-                    }
-                }
-            }
-            post {
-                always { sh "docker logout ${REGISTRY} || true" }
+                sh """
+                    cd "${TERRAFORM_DIR}"
+                    terraform apply -auto-approve
+                """
             }
         }
 
     }
 
     post {
+        success {
+            echo '✅ All changed projects tested and deployed successfully!'
+        }
         failure {
-            echo "Pipeline failed — check the Test or Build stage."
+            echo '❌ Pipeline failed — check the logs above. Terraform was NOT touched.'
         }
         cleanup {
-            sh "docker image prune -f || true"
+            sh 'docker image prune -f || true'
         }
     }
 }
