@@ -1,19 +1,17 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+# Install system deps needed for mysqlclient
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    default-libmysqlclient-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
 
-ENV DJANGO_SETTINGS_MODULE=document_backend.settings \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DATABASE_NAME=test_db \
-    DATABASE_USER=test \
-    DATABASE_PASSWORD=test \
-    DATABASE_HOST=localhost
+ENV DJANGO_SETTINGS_MODULE=document_backend.settings
 
-# Run migrate + tests together at runtime not build time
 CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]

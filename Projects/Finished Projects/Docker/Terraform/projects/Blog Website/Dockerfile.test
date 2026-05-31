@@ -9,11 +9,7 @@ COPY . .
 
 ENV DJANGO_SETTINGS_MODULE=blogsite.settings \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DATABASE_NAME=test_db \
-    DATABASE_USER=test \
-    DATABASE_PASSWORD=test \
-    DATABASE_HOST=localhost
+    PYTHONUNBUFFERED=1
 
-# Run migrate + tests together at runtime not build time
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]
+# manage.py is inside blogsite/ subfolder
+CMD ["sh", "-c", "cd blogsite && python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]
