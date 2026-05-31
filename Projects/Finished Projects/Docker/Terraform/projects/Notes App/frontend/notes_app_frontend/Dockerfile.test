@@ -1,0 +1,14 @@
+# Dockerfile.test — only for running tests, never deployed
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install deps first (cached layer — only rebuilds if package.json changes)
+COPY package*.json ./
+RUN npm ci
+
+# Copy source
+COPY . .
+
+# Run tests — container exits with code 1 if any test fails
+CMD ["npm", "test"]

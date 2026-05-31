@@ -837,7 +837,7 @@ resource "docker_container" "jenkins_agent" {
   env = [
     "JENKINS_URL=http://jenkins:8080/jenkins/",
     "JENKINS_AGENT_NAME=Worker",
-    "JENKINS_SECRET=196ebbec8e9ed0066271cbe6685a24cfc03a0f0a49337abfae70c87105c6a428",
+    "JENKINS_SECRET=af8a382676b767a8d8a33aaf1824256892d08a8f1fb6ff98ec0070fbbf689c66",
     "JENKINS_AGENT_WORKDIR=/home/jenkins/agent",
   ]
 

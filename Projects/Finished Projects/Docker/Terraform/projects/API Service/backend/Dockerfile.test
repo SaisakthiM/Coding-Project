@@ -1,0 +1,17 @@
+# Dockerfile.test — API Service backend, never deployed
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install deps (cached layer)
+COPY package*.json ./
+RUN npm ci
+
+# Install test deps if not already in package.json
+RUN npm install --save-dev jest supertest
+
+# Copy source
+COPY . .
+
+# Run tests
+CMD ["npx", "jest", "--forceExit", "--verbose"]

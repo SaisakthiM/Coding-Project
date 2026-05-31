@@ -1,0 +1,14 @@
+# Dockerfile.test — Java/Spring Boot, only for running tests, never deployed
+FROM maven:3.9-eclipse-temurin-21-alpine AS test
+
+WORKDIR /app
+
+# Copy pom.xml first (cached layer — only rebuilds if dependencies change)
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+# Copy source
+COPY src ./src
+
+# Run tests — exits with code 1 if any test fails
+CMD ["mvn", "test"]
