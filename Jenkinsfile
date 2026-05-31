@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'Worker' }
 
+    options {
+        timeout(time: 45, unit: 'MINUTES')
+    }
+
     environment {
         PROJECTS_ROOT = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/projects"
         TERRAFORM_DIR = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/environments/dev"
@@ -115,7 +119,9 @@ pipeline {
                                 -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
                                 -t bank-backend:test \
                                 "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
-                            docker run --rm bank-backend:test
+                            docker run --rm \
+                                -v /home/saisakthi/.m2:/root/.m2 \
+                                bank-backend:test
                         """
                     }
                     post { always { sh 'docker rmi bank-backend:test || true' } }
@@ -247,12 +253,13 @@ pipeline {
                                 -f "${PROJECTS_ROOT}/Video Uploader/Main/backend/Dockerfile.test" \
                                 -t video-backend:test \
                                 "${PROJECTS_ROOT}/Video Uploader/Main/backend"
-                            docker run --rm video-backend:test
+                            docker run --rm \
+                                -v /home/saisakthi/.m2:/root/.m2 \
+                                video-backend:test
                         """
                     }
                     post { always { sh 'docker rmi video-backend:test || true' } }
                 }
-
             }
         }
 

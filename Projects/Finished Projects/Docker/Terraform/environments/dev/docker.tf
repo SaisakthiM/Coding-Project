@@ -846,6 +846,11 @@ resource "docker_container" "jenkins_agent" {
     container_path = "/var/run/docker.sock"
   }
 
+  volumes {
+    host_path      = "/home/saisakthi/.m2"
+    container_path = "/root/.m2"
+  }
+
   networks_advanced {
     name = docker_network.gateway_net.name  # replace with your actual network resource
   }
