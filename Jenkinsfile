@@ -2,7 +2,7 @@ pipeline {
     agent { label 'Worker' }
 
     options {
-        timeout(time: 45, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
     }
 
     environment {
@@ -65,22 +65,56 @@ pipeline {
             }
         }
 
-        // ── 3. Test (only changed apps) ───────────────────────────
-        stage('Test') {
+        // ── 3a. Test Group 1: Django/Python (lightweight, fast) ───
+        stage('Test - Django Apps') {
             parallel {
 
-                stage('Social Media App - Frontend') {
-                    when { expression { env.BUILD_SOCIAL_FRONTEND == 'true' } }
+                stage('Hospital Management') {
+                    when { expression { env.BUILD_HOSPITAL == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
-                                -t social-frontend:test \
-                                "${PROJECTS_ROOT}/Social Media App/apps/frontend"
-                            docker run --rm social-frontend:test
+                                -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
+                                -t hospital:test \
+                                "${PROJECTS_ROOT}/hospital_management"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=hospital_management.settings \
+                                hospital:test
                         """
                     }
-                    post { always { sh 'docker rmi social-frontend:test || true' } }
+                    post { always { sh 'docker rmi hospital:test || true' } }
+                }
+
+                stage('Blog Website') {
+                    when { expression { env.BUILD_BLOG == 'true' } }
+                    steps {
+                        sh """
+                            docker build \
+                                -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
+                                -t blog:test \
+                                "${PROJECTS_ROOT}/Blog Website"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=blogsite.settings \
+                                blog:test
+                        """
+                    }
+                    post { always { sh 'docker rmi blog:test || true' } }
+                }
+
+                stage('Notes App - Backend') {
+                    when { expression { env.BUILD_NOTES_BACKEND == 'true' } }
+                    steps {
+                        sh """
+                            docker build \
+                                -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
+                                -t notes-backend:test \
+                                "${PROJECTS_ROOT}/Notes App/backend"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=notes_app.settings \
+                                notes-backend:test
+                        """
+                    }
+                    post { always { sh 'docker rmi notes-backend:test || true' } }
                 }
 
                 stage('Social Media App - Backend') {
@@ -91,41 +125,36 @@ pipeline {
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/backend/Dockerfile.test" \
                                 -t social-backend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/backend"
-                            docker run --rm social-backend:test
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=social_media.settings \
+                                -e SECRET_KEY=test-secret-key-for-ci \
+                                -e DEBUG=True \
+                                social-backend:test
                         """
                     }
                     post { always { sh 'docker rmi social-backend:test || true' } }
                 }
 
-                stage('Bank Manager - Frontend') {
-                    when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
+                stage('Document Intelligence - Backend') {
+                    when { expression { env.BUILD_DOC_BACKEND == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
-                                -t bank-frontend:test \
-                                "${PROJECTS_ROOT}/Bank Manager/frontend"
-                            docker run --rm bank-frontend:test
+                                -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
+                                -t doc-backend:test \
+                                "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
+                            docker run --rm doc-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi bank-frontend:test || true' } }
+                    post { always { sh 'docker rmi doc-backend:test || true' } }
                 }
 
-                stage('Bank Manager - Backend') {
-                    when { expression { env.BUILD_BANK_BACKEND == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
-                                -t bank-backend:test \
-                                "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
-                            docker run --rm \
-                                -v /home/saisakthi/.m2:/root/.m2 \
-                                bank-backend:test
-                        """
-                    }
-                    post { always { sh 'docker rmi bank-backend:test || true' } }
-                }
+            }
+        }
+
+        // ── 3b. Test Group 2: Node/React (medium) ─────────────────
+        stage('Test - Frontend & Node Apps') {
+            parallel {
 
                 stage('Quiz App') {
                     when { expression { env.BUILD_QUIZ == 'true' } }
@@ -155,52 +184,18 @@ pipeline {
                     post { always { sh 'docker rmi notes-frontend:test || true' } }
                 }
 
-                stage('Notes App - Backend') {
-                    when { expression { env.BUILD_NOTES_BACKEND == 'true' } }
+                stage('API Service - Frontend') {
+                    when { expression { env.BUILD_API_FRONTEND == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
-                                -t notes-backend:test \
-                                "${PROJECTS_ROOT}/Notes App/backend"
-                            docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=notes_app.settings \
-                                notes-backend:test
+                                -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
+                                -t api-frontend:test \
+                                "${PROJECTS_ROOT}/API Service/frontend/api-service"
+                            docker run --rm api-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi notes-backend:test || true' } }
-                }
-
-                stage('Blog Website') {
-                    when { expression { env.BUILD_BLOG == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
-                                -t blog:test \
-                                "${PROJECTS_ROOT}/Blog Website"
-                            docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=blogsite.settings \
-                                blog:test
-                        """
-                    }
-                    post { always { sh 'docker rmi blog:test || true' } }
-                }
-
-                stage('Hospital Management') {
-                    when { expression { env.BUILD_HOSPITAL == 'true' } }
-                    steps {
-                        sh """
-                            docker build \
-                                -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
-                                -t hospital:test \
-                                "${PROJECTS_ROOT}/hospital_management"
-                            docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=hospital_management.settings \
-                                hospital:test
-                        """
-                    }
-                    post { always { sh 'docker rmi hospital:test || true' } }
+                    post { always { sh 'docker rmi api-frontend:test || true' } }
                 }
 
                 stage('API Service - Backend') {
@@ -217,32 +212,55 @@ pipeline {
                     post { always { sh 'docker rmi api-backend:test || true' } }
                 }
 
-                stage('API Service - Frontend') {
-                    when { expression { env.BUILD_API_FRONTEND == 'true' } }
+                stage('Bank Manager - Frontend') {
+                    when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
-                                -t api-frontend:test \
-                                "${PROJECTS_ROOT}/API Service/frontend/api-service"
-                            docker run --rm api-frontend:test
+                                -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
+                                -t bank-frontend:test \
+                                "${PROJECTS_ROOT}/Bank Manager/frontend"
+                            docker run --rm bank-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi api-frontend:test || true' } }
+                    post { always { sh 'docker rmi bank-frontend:test || true' } }
                 }
 
-                stage('Document Intelligence - Backend') {
-                    when { expression { env.BUILD_DOC_BACKEND == 'true' } }
+                stage('Social Media App - Frontend') {
+                    when { expression { env.BUILD_SOCIAL_FRONTEND == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
-                                -t doc-backend:test \
-                                "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
-                            docker run --rm doc-backend:test
+                                -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
+                                -t social-frontend:test \
+                                "${PROJECTS_ROOT}/Social Media App/apps/frontend"
+                            docker run --rm social-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi doc-backend:test || true' } }
+                    post { always { sh 'docker rmi social-frontend:test || true' } }
+                }
+
+            }
+        }
+
+        // ── 3c. Test Group 3: Java/Maven (heavy, last) ────────────
+        stage('Test - Java Apps') {
+            parallel {
+
+                stage('Bank Manager - Backend') {
+                    when { expression { env.BUILD_BANK_BACKEND == 'true' } }
+                    steps {
+                        sh """
+                            docker build \
+                                -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
+                                -t bank-backend:test \
+                                "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
+                            docker run --rm \
+                                -v /home/saisakthi/.m2:/root/.m2 \
+                                bank-backend:test
+                        """
+                    }
+                    post { always { sh 'docker rmi bank-backend:test || true' } }
                 }
 
                 stage('Video Uploader - Backend') {
@@ -260,10 +278,11 @@ pipeline {
                     }
                     post { always { sh 'docker rmi video-backend:test || true' } }
                 }
+
             }
         }
 
-        // ── 4. Deploy via Terraform (only on Coding-Project branch) ──
+        // ── 4. Deploy via Terraform ───────────────────────────────
         stage('Deploy') {
             when { branch 'Coding-Project' }
             steps {
@@ -278,10 +297,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ All changed projects tested and deployed successfully!'
+            echo 'All changed projects tested and deployed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed — check the logs above. Terraform was NOT touched.'
+            echo 'Pipeline failed — Terraform was NOT touched.'
         }
         cleanup {
             sh 'docker image prune -f || true'
