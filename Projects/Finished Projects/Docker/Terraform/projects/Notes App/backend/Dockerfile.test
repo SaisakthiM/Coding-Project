@@ -16,4 +16,4 @@ ENV DJANGO_SETTINGS_MODULE=notes_app.settings \
     DATABASE_HOST=localhost
 
 # manage.py is inside notes_app/ subfolder
-CMD ["sh", "-c", "cd notes_app && python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]
+CMD ["sh", "-c", "cd notes_app && python manage.py migrate --run-syncdb && python manage.py test api.tests --verbosity=2"]

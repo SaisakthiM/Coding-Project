@@ -19,4 +19,4 @@ ENV DJANGO_SETTINGS_MODULE=social_media.settings \
     DEBUG=True
 
 # manage.py is inside social_media/ subfolder
-CMD ["sh", "-c", "cd social_media && python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]
+CMD ["sh", "-c", "cd social_media && python manage.py migrate --run-syncdb && python manage.py test apps.tests --verbosity=2"]
