@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
 
 import java.nio.file.Path;
 
@@ -18,7 +19,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(FileController.class)
+@WebMvcTest(controllers = FileController.class, excludeAutoConfiguration = {
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class
+})
+@TestPropertySource(properties = {
+    "spring.main.allow-bean-definition-overriding=true",
+    "UPLOADS_DIR=/tmp/test-uploads"
+})
 class FileControllerTest {
 
     @Autowired
@@ -31,9 +38,9 @@ class FileControllerTest {
     Path tempDir;
 
     @BeforeEach
-    void setUp() throws Exception {
-        // Point UPLOADS_DIR to temp directory so tests don't touch real filesystem
+    void setUp() {
         System.setProperty("user.dir", tempDir.toString());
+        System.setProperty("UPLOADS_DIR", tempDir.toString());
     }
 
     // ── /upload ───────────────────────────────────────────────
