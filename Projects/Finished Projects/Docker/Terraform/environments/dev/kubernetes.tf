@@ -193,22 +193,33 @@ resource "helm_release" "ingress_nginx" {
   wait             = true
   timeout          = 120
 
-  set {
-    name  = "controller.service.type"
-    value = "NodePort"
-  }
-  set {
-    name  = "controller.hostPort.enabled"
-    value = "true"
-  }
-  set {
-    name  = "controller.hostPort.ports.http"
-    value = "80"
-  }
-  set {
-    name  = "controller.service.nodePorts.http"
-    value = "30080"
-  }
+  values = [<<-EOT
+    controller:
+      service:
+        type: NodePort
+        nodePorts:
+          http: "30080"
+      hostPort:
+        enabled: true
+        ports:
+          http: 80
+      metrics:
+        enabled: true
+        port: 10254
+        service:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "10254"
+        serviceMonitor:
+          enabled: true
+          namespace: monitoring
+          interval: 30s
+          additionalLabels:
+            release: kube-prometheus-stack
+        prometheusRule:
+          enabled: false
+  EOT
+  ]
 }
 
 # ─── POSTGRES ─────────────────────────────────────────────────

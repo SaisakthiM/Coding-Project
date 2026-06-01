@@ -5,6 +5,23 @@ pipeline {
         timeout(time: 60, unit: 'MINUTES')
     }
 
+    parameters {
+        booleanParam(name: 'RUN_ALL',             defaultValue: false, description: 'Run tests for ALL projects regardless of changes')
+        booleanParam(name: 'RUN_HOSPITAL',        defaultValue: false, description: 'Force run Hospital Management tests')
+        booleanParam(name: 'RUN_BLOG',            defaultValue: false, description: 'Force run Blog Website tests')
+        booleanParam(name: 'RUN_NOTES_BACKEND',   defaultValue: false, description: 'Force run Notes App Backend tests')
+        booleanParam(name: 'RUN_NOTES_FRONTEND',  defaultValue: false, description: 'Force run Notes App Frontend tests')
+        booleanParam(name: 'RUN_SOCIAL_BACKEND',  defaultValue: false, description: 'Force run Social Media Backend tests')
+        booleanParam(name: 'RUN_SOCIAL_FRONTEND', defaultValue: false, description: 'Force run Social Media Frontend tests')
+        booleanParam(name: 'RUN_BANK_BACKEND',    defaultValue: false, description: 'Force run Bank Manager Backend tests')
+        booleanParam(name: 'RUN_BANK_FRONTEND',   defaultValue: false, description: 'Force run Bank Manager Frontend tests')
+        booleanParam(name: 'RUN_QUIZ',            defaultValue: false, description: 'Force run Quiz App tests')
+        booleanParam(name: 'RUN_API_BACKEND',     defaultValue: false, description: 'Force run API Service Backend tests')
+        booleanParam(name: 'RUN_API_FRONTEND',    defaultValue: false, description: 'Force run API Service Frontend tests')
+        booleanParam(name: 'RUN_DOC_BACKEND',     defaultValue: false, description: 'Force run Document Intelligence tests')
+        booleanParam(name: 'RUN_VIDEO_BACKEND',   defaultValue: false, description: 'Force run Video Uploader tests')
+    }
+
     environment {
         PROJECTS_ROOT = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/projects"
         TERRAFORM_DIR = "${WORKSPACE}/Projects/Finished Projects/Docker/Terraform/environments/dev"
@@ -32,19 +49,21 @@ pipeline {
 
                     echo "Changed files:\n${diff}"
 
-                    env.BUILD_SOCIAL_FRONTEND = diff.contains('Social Media App/apps/frontend') ? 'true' : 'false'
-                    env.BUILD_SOCIAL_BACKEND  = diff.contains('Social Media App/apps/backend')  ? 'true' : 'false'
-                    env.BUILD_BANK_FRONTEND   = diff.contains('Bank Manager/frontend')           ? 'true' : 'false'
-                    env.BUILD_BANK_BACKEND    = diff.contains('Bank Manager/backend')            ? 'true' : 'false'
-                    env.BUILD_QUIZ            = diff.contains('Quiz App')                        ? 'true' : 'false'
-                    env.BUILD_NOTES_FRONTEND  = diff.contains('Notes App/frontend')              ? 'true' : 'false'
-                    env.BUILD_NOTES_BACKEND   = diff.contains('Notes App/backend')               ? 'true' : 'false'
-                    env.BUILD_BLOG            = diff.contains('Blog Website')                    ? 'true' : 'false'
-                    env.BUILD_HOSPITAL        = diff.contains('hospital_management')             ? 'true' : 'false'
-                    env.BUILD_API_BACKEND     = diff.contains('API Service/backend')             ? 'true' : 'false'
-                    env.BUILD_API_FRONTEND    = diff.contains('API Service/frontend')            ? 'true' : 'false'
-                    env.BUILD_DOC_BACKEND     = diff.contains('Document Intelligence Platform')  ? 'true' : 'false'
-                    env.BUILD_VIDEO_BACKEND   = diff.contains('Video Uploader')                  ? 'true' : 'false'
+                    def runAll = params.RUN_ALL
+
+                    env.BUILD_SOCIAL_FRONTEND = (runAll || params.RUN_SOCIAL_FRONTEND || diff.contains('Social Media App/apps/frontend')) ? 'true' : 'false'
+                    env.BUILD_SOCIAL_BACKEND  = (runAll || params.RUN_SOCIAL_BACKEND  || diff.contains('Social Media App/apps/backend'))  ? 'true' : 'false'
+                    env.BUILD_BANK_FRONTEND   = (runAll || params.RUN_BANK_FRONTEND   || diff.contains('Bank Manager/frontend'))           ? 'true' : 'false'
+                    env.BUILD_BANK_BACKEND    = (runAll || params.RUN_BANK_BACKEND    || diff.contains('Bank Manager/backend'))            ? 'true' : 'false'
+                    env.BUILD_QUIZ            = (runAll || params.RUN_QUIZ            || diff.contains('Quiz App'))                        ? 'true' : 'false'
+                    env.BUILD_NOTES_FRONTEND  = (runAll || params.RUN_NOTES_FRONTEND  || diff.contains('Notes App/frontend'))              ? 'true' : 'false'
+                    env.BUILD_NOTES_BACKEND   = (runAll || params.RUN_NOTES_BACKEND   || diff.contains('Notes App/backend'))               ? 'true' : 'false'
+                    env.BUILD_BLOG            = (runAll || params.RUN_BLOG            || diff.contains('Blog Website'))                    ? 'true' : 'false'
+                    env.BUILD_HOSPITAL        = (runAll || params.RUN_HOSPITAL        || diff.contains('hospital_management'))             ? 'true' : 'false'
+                    env.BUILD_API_BACKEND     = (runAll || params.RUN_API_BACKEND     || diff.contains('API Service/backend'))             ? 'true' : 'false'
+                    env.BUILD_API_FRONTEND    = (runAll || params.RUN_API_FRONTEND    || diff.contains('API Service/frontend'))            ? 'true' : 'false'
+                    env.BUILD_DOC_BACKEND     = (runAll || params.RUN_DOC_BACKEND     || diff.contains('Document Intelligence Platform'))  ? 'true' : 'false'
+                    env.BUILD_VIDEO_BACKEND   = (runAll || params.RUN_VIDEO_BACKEND   || diff.contains('Video Uploader'))                  ? 'true' : 'false'
 
                     echo """
                         BUILD_SOCIAL_FRONTEND  = ${env.BUILD_SOCIAL_FRONTEND}
@@ -94,7 +113,7 @@ pipeline {
                                 -t blog:test \
                                 "${PROJECTS_ROOT}/Blog Website"
                             docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=blogsite.settings \
+                                -e DJANGO_SETTINGS_MODULE=blogsite.test_settings \
                                 blog:test
                         """
                     }
@@ -110,7 +129,7 @@ pipeline {
                                 -t notes-backend:test \
                                 "${PROJECTS_ROOT}/Notes App/backend"
                             docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=notes_app.settings \
+                                -e DJANGO_SETTINGS_MODULE=notes_app.test_settings \
                                 notes-backend:test
                         """
                     }
@@ -126,7 +145,7 @@ pipeline {
                                 -t social-backend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/backend"
                             docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=social_media.settings \
+                                -e DJANGO_SETTINGS_MODULE=social_media.test_settings \
                                 -e SECRET_KEY=test-secret-key-for-ci \
                                 -e DEBUG=True \
                                 social-backend:test
@@ -143,7 +162,11 @@ pipeline {
                                 -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
                                 -t doc-backend:test \
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
-                            docker run --rm doc-backend:test
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=document.test_settings \
+                                -e GEMINI_API_KEY=test-key \
+                                -e OLLAMA_HOST=localhost \
+                                doc-backend:test
                         """
                     }
                     post { always { sh 'docker rmi doc-backend:test || true' } }
@@ -243,7 +266,7 @@ pipeline {
             }
         }
 
-        // ── 3c. Test Group 3: Java/Maven (heavy, last) ────────────
+        // ── 3c. Test Group 3: Java/Maven (heavy, isolated) ────────
         stage('Test - Java Apps') {
             parallel {
 

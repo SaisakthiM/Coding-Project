@@ -291,7 +291,7 @@ resource "kubectl_manifest" "otel_ingress" {
                 pathType: ImplementationSpecific
                 backend:
                   service:
-                    name: otel-collector
+                    name: otel-collector-opentelemetry-collector
                     port:
                       number: 4318
   YAML

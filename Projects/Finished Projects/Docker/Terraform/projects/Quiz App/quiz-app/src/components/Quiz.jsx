@@ -1,4 +1,4 @@
-import './quiz.css';
+import styles from './quiz.module.css';
 import { useState } from "react";
 
 export default function Quiz({ Questions, Options, Answer, onAnswer, onNext }) {
@@ -12,7 +12,7 @@ export default function Quiz({ Questions, Options, Answer, onAnswer, onNext }) {
   };
 
   return (
-    <div className='container'>
+    <div className={styles.container}>
       <h1>Quiz App</h1>
       <hr /> 
       <h2>{Questions}</h2>
@@ -21,13 +21,13 @@ export default function Quiz({ Questions, Options, Answer, onAnswer, onNext }) {
           <li 
             key={index} 
             onClick={() => handleSelect(index)}
-            className={selected === index ? "selected" : ""}
+            className={selected === index ? styles.selected : ""}
           >
             {option}
           </li>
         ))}
       </ul>
-      <div className="button_quiz">
+      <div className={styles.button_quiz}>
         <button onClick={() => onNext(selected)}>Next</button>
       </div>
     </div>
