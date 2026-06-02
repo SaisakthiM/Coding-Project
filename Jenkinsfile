@@ -49,21 +49,34 @@ pipeline {
 
                     echo "Changed files:\n${diff}"
 
+                    // If ANY individual param is ticked, disable auto-detection entirely
+                    // so only the explicitly selected projects run
+                    def anyParamSet = params.RUN_HOSPITAL || params.RUN_BLOG ||
+                                    params.RUN_NOTES_BACKEND || params.RUN_NOTES_FRONTEND ||
+                                    params.RUN_SOCIAL_BACKEND || params.RUN_SOCIAL_FRONTEND ||
+                                    params.RUN_BANK_BACKEND || params.RUN_BANK_FRONTEND ||
+                                    params.RUN_QUIZ || params.RUN_API_BACKEND ||
+                                    params.RUN_API_FRONTEND || params.RUN_DOC_BACKEND ||
+                                    params.RUN_VIDEO_BACKEND
+
                     def runAll = params.RUN_ALL
 
-                    env.BUILD_SOCIAL_FRONTEND = (runAll || params.RUN_SOCIAL_FRONTEND || diff.contains('Social Media App/apps/frontend')) ? 'true' : 'false'
-                    env.BUILD_SOCIAL_BACKEND  = (runAll || params.RUN_SOCIAL_BACKEND  || diff.contains('Social Media App/apps/backend'))  ? 'true' : 'false'
-                    env.BUILD_BANK_FRONTEND   = (runAll || params.RUN_BANK_FRONTEND   || diff.contains('Bank Manager/frontend'))           ? 'true' : 'false'
-                    env.BUILD_BANK_BACKEND    = (runAll || params.RUN_BANK_BACKEND    || diff.contains('Bank Manager/backend'))            ? 'true' : 'false'
-                    env.BUILD_QUIZ            = (runAll || params.RUN_QUIZ            || diff.contains('Quiz App'))                        ? 'true' : 'false'
-                    env.BUILD_NOTES_FRONTEND  = (runAll || params.RUN_NOTES_FRONTEND  || diff.contains('Notes App/frontend'))              ? 'true' : 'false'
-                    env.BUILD_NOTES_BACKEND   = (runAll || params.RUN_NOTES_BACKEND   || diff.contains('Notes App/backend'))               ? 'true' : 'false'
-                    env.BUILD_BLOG            = (runAll || params.RUN_BLOG            || diff.contains('Blog Website'))                    ? 'true' : 'false'
-                    env.BUILD_HOSPITAL        = (runAll || params.RUN_HOSPITAL        || diff.contains('hospital_management'))             ? 'true' : 'false'
-                    env.BUILD_API_BACKEND     = (runAll || params.RUN_API_BACKEND     || diff.contains('API Service/backend'))             ? 'true' : 'false'
-                    env.BUILD_API_FRONTEND    = (runAll || params.RUN_API_FRONTEND    || diff.contains('API Service/frontend'))            ? 'true' : 'false'
-                    env.BUILD_DOC_BACKEND     = (runAll || params.RUN_DOC_BACKEND     || diff.contains('Document Intelligence Platform'))  ? 'true' : 'false'
-                    env.BUILD_VIDEO_BACKEND   = (runAll || params.RUN_VIDEO_BACKEND   || diff.contains('Video Uploader'))                  ? 'true' : 'false'
+                    // useDiff only when no params are manually ticked and RUN_ALL is false
+                    def useDiff = !runAll && !anyParamSet
+
+                    env.BUILD_SOCIAL_FRONTEND = (runAll || params.RUN_SOCIAL_FRONTEND || (useDiff && diff.contains('Social Media App/apps/frontend'))) ? 'true' : 'false'
+                    env.BUILD_SOCIAL_BACKEND  = (runAll || params.RUN_SOCIAL_BACKEND  || (useDiff && diff.contains('Social Media App/apps/backend')))  ? 'true' : 'false'
+                    env.BUILD_BANK_FRONTEND   = (runAll || params.RUN_BANK_FRONTEND   || (useDiff && diff.contains('Bank Manager/frontend')))           ? 'true' : 'false'
+                    env.BUILD_BANK_BACKEND    = (runAll || params.RUN_BANK_BACKEND    || (useDiff && diff.contains('Bank Manager/backend')))            ? 'true' : 'false'
+                    env.BUILD_QUIZ            = (runAll || params.RUN_QUIZ            || (useDiff && diff.contains('Quiz App')))                        ? 'true' : 'false'
+                    env.BUILD_NOTES_FRONTEND  = (runAll || params.RUN_NOTES_FRONTEND  || (useDiff && diff.contains('Notes App/frontend')))              ? 'true' : 'false'
+                    env.BUILD_NOTES_BACKEND   = (runAll || params.RUN_NOTES_BACKEND   || (useDiff && diff.contains('Notes App/backend')))               ? 'true' : 'false'
+                    env.BUILD_BLOG            = (runAll || params.RUN_BLOG            || (useDiff && diff.contains('Blog Website')))                    ? 'true' : 'false'
+                    env.BUILD_HOSPITAL        = (runAll || params.RUN_HOSPITAL        || (useDiff && diff.contains('hospital_management')))             ? 'true' : 'false'
+                    env.BUILD_API_BACKEND     = (runAll || params.RUN_API_BACKEND     || (useDiff && diff.contains('API Service/backend')))             ? 'true' : 'false'
+                    env.BUILD_API_FRONTEND    = (runAll || params.RUN_API_FRONTEND    || (useDiff && diff.contains('API Service/frontend')))            ? 'true' : 'false'
+                    env.BUILD_DOC_BACKEND     = (runAll || params.RUN_DOC_BACKEND     || (useDiff && diff.contains('Document Intelligence Platform')))  ? 'true' : 'false'
+                    env.BUILD_VIDEO_BACKEND   = (runAll || params.RUN_VIDEO_BACKEND   || (useDiff && diff.contains('Video Uploader')))                  ? 'true' : 'false'
 
                     echo """
                         BUILD_SOCIAL_FRONTEND  = ${env.BUILD_SOCIAL_FRONTEND}
