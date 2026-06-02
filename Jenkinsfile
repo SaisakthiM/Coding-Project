@@ -333,6 +333,8 @@ pipeline {
                     cd "${TERRAFORM_DIR}"
                     terraform init
                     terraform apply -auto-approve
+                                    -var-file="/home/jenkins/agent/workspace/Github_Pipeline_Coding-Project_2/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+
                 """
             }
         }
