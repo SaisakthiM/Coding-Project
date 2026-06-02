@@ -76,7 +76,7 @@ class BookListViewTest(TestCase):
         self.assertTrue(response.data["cached"])
         self.assertEqual(response.data["summary"], "Cached summary")
 
-    @patch('document.services.call_gemini', return_value='Summary text here')
+    @patch('document.services.generate_summary', return_value=('Summary text here', 'ollama'))
     def test_summarize_generates_new_summary(self):
         with patch('document.services.generate_summary') as mock_summary:
             mock_summary.return_value = ("Generated summary", "ollama")
