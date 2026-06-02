@@ -5,28 +5,28 @@ import HomePage from './HomePage';
 
 // ── Module mocks ──────────────────────────────────────────────
 
-vi.mock('../../api/index', () => ({
+vi.mock('../api/index', () => ({
   postsAPI: { feed: vi.fn() },
 }));
 
-vi.mock('../../hooks/index', () => ({
+vi.mock('../hooks/index', () => ({
   usePaginatedFeed: vi.fn(),
   useIntersection:  vi.fn(() => ({ current: null })),
 }));
 
-vi.mock('../../components/posts/PostCard', () => ({
+vi.mock('../components/posts/PostCard', () => ({
   default: ({ post }) => <div data-testid="post-card">{post.content}</div>,
 }));
 
-vi.mock('../../components/stories/StoriesBar', () => ({
+vi.mock('../components/stories/StoriesBar', () => ({
   default: () => <div data-testid="stories-bar" />,
 }));
 
-vi.mock('../../components/layout/RightPanel', () => ({
+vi.mock('../components/layout/RightPanel', () => ({
   default: () => <div data-testid="right-panel" />,
 }));
 
-vi.mock('../../components/common/Loaders', () => ({
+vi.mock('../components/common/Loaders', () => ({
   PostSkeleton: () => <div data-testid="post-skeleton" />,
   Spinner:      () => <span data-testid="spinner" />,
 }));
