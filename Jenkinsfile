@@ -342,6 +342,7 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
         success {
