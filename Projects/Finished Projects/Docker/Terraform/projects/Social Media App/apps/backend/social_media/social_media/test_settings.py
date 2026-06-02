@@ -7,6 +7,9 @@ DATABASES = {
     }
 }
 
-# Disable external services
-CELERY_TASK_ALWAYS_EAGER = True
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+# Remove debug toolbar for tests
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'debug_toolbar']
+DEBUG_TOOLBAR_CONFIG = {'IS_RUNNING_TESTS': False}
+
+SECRET_KEY = 'test-secret-key-for-ci'
+DEBUG = True

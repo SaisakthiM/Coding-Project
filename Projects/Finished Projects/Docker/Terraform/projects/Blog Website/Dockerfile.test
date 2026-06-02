@@ -12,5 +12,7 @@ ENV DJANGO_SETTINGS_MODULE=blogsite.settings \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+
+
 # manage.py is inside blogsite/ subfolder
 CMD ["sh", "-c", "cd blogsite && python manage.py migrate && python manage.py test blog.tests --verbosity=2"]
