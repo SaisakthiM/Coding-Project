@@ -93,13 +93,11 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
                                 -t hospital:test \
                                 "${PROJECTS_ROOT}/hospital_management"
-                            docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=hospital_management.settings \
-                                hospital:test
+                            docker run --rm hospital:test
                         """
                     }
                     post { always { sh 'docker rmi hospital:test || true' } }
