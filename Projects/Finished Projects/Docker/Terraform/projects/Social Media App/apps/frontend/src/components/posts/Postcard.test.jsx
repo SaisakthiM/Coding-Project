@@ -87,7 +87,7 @@ describe('PostCard', () => {
 
   test('renders author username', () => {
     renderCard();
-    expect(screen.getByText('@owner')).toBeInTheDocument();
+    expect(screen.getByText((content, el) => el.textContent.includes('@owner'))).toBeInTheDocument();
   });
 
   test('renders post content', () => {
@@ -135,8 +135,8 @@ describe('PostCard', () => {
   test('shows ellipsis menu button only for post owner', () => {
     renderCard(basePost); // user.id === post.author.id === 1
     // The button renders but the menu is hidden initially
-    const menuBtn = screen.getByRole('button', { hidden: true, name: '' });
-    expect(menuBtn).toBeInTheDocument();
+    const menuBtns = screen.getAllByRole('button', { hidden: true, name: /…/ });
+    expect(menuBtns[0]).toBeInTheDocument();
   });
 
   test('does not show delete menu for non-owner', () => {

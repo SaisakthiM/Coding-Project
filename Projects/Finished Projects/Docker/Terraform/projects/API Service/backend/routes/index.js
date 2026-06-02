@@ -11,12 +11,11 @@ router.get("/", (req,res) => {
 router.get('/api/weather/', async function(req, res, next) {
   const { lat, lon } = req.query;
   if (lat < -90 || lat > 90) {
-    setError("Latitude must be between -90 and 90");
-    return; // ← stop here, don't call the API
+    return res.status(400).json({ error: "Longitude must be between -180 and 180" });
   }
   if (lon < -180 || lon > 180) {
-    setError("Longitude must be between -180 and 180");
-    return;
+    return res.status(400).json({ error: "Longitude must be between -180 and 180" });
+  
   }
   try {
     const val = await axios.get(
