@@ -333,12 +333,12 @@ pipeline {
                     credentialsId: 'ssh-deploy-key',
                     keyFileVariable: 'SSH_KEY'
                 )]) {
-                    sh """
+                    sh '''
                         ssh -i $SSH_KEY \
                             -o StrictHostKeyChecking=no \
                             saisakthi@192.168.31.227 \
                             'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
-                    """
+                    '''
                 }
             }
         }

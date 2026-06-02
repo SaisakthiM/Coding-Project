@@ -845,13 +845,10 @@ resource "docker_container" "jenkins_agent" {
     container_path = "/var/run/docker.sock"
   }
 
+  network_mode = "host"
   volumes {
-  host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
-  container_path = "/etc/terraform/terraform.tfvars"
-}
-
-  networks_advanced {
-    name = docker_network.gateway_net.name
+    host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+    container_path = "/etc/terraform/terraform.tfvars"
   }
 
   provisioner "local-exec" {
