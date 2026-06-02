@@ -4,12 +4,16 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import LoginPage from './LoginPage';
 
-const mockLogin = vi.fn();
+const mockLogin = vi.fn().mockRejectedValue({
+    response: { data: { detail: 'Invalid credentials.' } }
+});
 const mockNavigate = vi.fn();
 
 vi.mock('../context/AuthContext', () => ({
     useAuth: () => ({ login: vi.fn() })
 }));
+
+
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
@@ -88,8 +92,8 @@ describe('LoginPage', () => {
     });
 
     test('shows error on invalid credentials', async () => {
-        mockLogin.mockRejectedValue({
-            response: { data: { non_field_errors: ['Invalid credentials.'] } }
+        mockLogin.mockRejectedValueOnce({
+            response: { data: { detail: 'Invalid credentials.' } }
         });
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
@@ -107,7 +111,7 @@ describe('LoginPage', () => {
     });
 
     test('shows generic error when no response data', async () => {
-        mockLogin.mockRejectedValue(new Error('Network error'));
+        mockLogin.mockRejectedValueOnce(new Error('Network error'));
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
         fireEvent.change(screen.getByPlaceholderText('your_username'), {

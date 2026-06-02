@@ -83,8 +83,8 @@ describe('RegisterPage', () => {
   });
 
   test('shows server field errors returned by API', async () => {
-    mockRegister.mockRejectedValue({
-      response: { data: { username: ['A user with that username already exists.'] } },
+    mockRegister.mockRejectedValueOnce({
+        response: { data: { username: ['A user with that username already exists.'] } }
     });
     render(<MemoryRouter><RegisterPage /></MemoryRouter>);
     fillForm();
@@ -98,7 +98,7 @@ describe('RegisterPage', () => {
   // ── Success flow ───────────────────────────────────────────
 
   test('calls register with correct payload and navigates to /', async () => {
-    mockRegister.mockResolvedValue({ id: 42, username: 'testuser' });
+    mockRegister.mockResolvedValueOnce({ id: 1, username: 'testuser' });    
     render(<MemoryRouter><RegisterPage /></MemoryRouter>);
     fillForm();
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
@@ -124,7 +124,8 @@ describe('RegisterPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
+      // Instead of text, check if button is disabled
+      expect(screen.getByRole('button', { name: /create account/i })).toBeDisabled();
     });
   });
 
