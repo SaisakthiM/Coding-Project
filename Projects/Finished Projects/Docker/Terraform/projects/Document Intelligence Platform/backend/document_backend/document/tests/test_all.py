@@ -108,7 +108,7 @@ class BookListViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     # ── AskQuestionView ───────────────────────────────────────
-    @patch('document.services.call_ollama', return_value='This book is about testing')
+    @patch('document.services.summarize_ollama', return_value='This book is about testing')
     def test_ask_question_returns_answer(self):
         with patch('document.services.generate_summary') as mock_summary:
             mock_summary.return_value = ("This book is about testing", "ollama")
