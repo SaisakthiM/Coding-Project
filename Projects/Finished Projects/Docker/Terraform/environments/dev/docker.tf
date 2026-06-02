@@ -847,7 +847,7 @@ resource "docker_container" "jenkins_agent" {
 
   volumes {
   host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
-  container_path = "/home/jenkins/agent/workspace/Github_Pipeline_Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+  container_path = "/home/jenkins/agent/workspace/Github_Pipeline_Coding-Project_2/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
 }
 
   networks_advanced {
@@ -865,7 +865,7 @@ resource "docker_container" "jenkins_agent" {
         unzip terraform_1.9.0_linux_amd64.zip &&
         mv terraform /usr/local/bin/ &&
         rm terraform_1.9.0_linux_amd64.zip &&
-        chown -R jenkins:jenkins /home/jenkins/agent &&
+        chown -R jenkins:jenkins /home/jenkins &&
         echo 'Done!'
       "
     EOT
