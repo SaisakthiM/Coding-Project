@@ -93,6 +93,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
                                 -t hospital:test \
                                 "${PROJECTS_ROOT}/hospital_management"
@@ -109,6 +110,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
                                 -t blog:test \
                                 "${PROJECTS_ROOT}/Blog Website"
@@ -125,6 +127,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
                                 -t notes-backend:test \
                                 "${PROJECTS_ROOT}/Notes App/backend"
@@ -141,6 +144,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/backend/Dockerfile.test" \
                                 -t social-backend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/backend"
@@ -159,6 +163,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
                                 -t doc-backend:test \
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
@@ -184,6 +189,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Quiz App/quiz-app/Dockerfile.test" \
                                 -t quiz-app:test \
                                 "${PROJECTS_ROOT}/Quiz App/quiz-app"
@@ -198,6 +204,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend/Dockerfile.test" \
                                 -t notes-frontend:test \
                                 "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
@@ -212,6 +219,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
                                 -t api-frontend:test \
                                 "${PROJECTS_ROOT}/API Service/frontend/api-service"
@@ -226,6 +234,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/API Service/backend/Dockerfile.test" \
                                 -t api-backend:test \
                                 "${PROJECTS_ROOT}/API Service/backend"
@@ -240,6 +249,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
                                 -t bank-frontend:test \
                                 "${PROJECTS_ROOT}/Bank Manager/frontend"
@@ -254,6 +264,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
                                 -t social-frontend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/frontend"
@@ -275,6 +286,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
                                 -t bank-backend:test \
                                 "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
@@ -291,6 +303,7 @@ pipeline {
                     steps {
                         sh """
                             docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Video Uploader/Main/backend/Dockerfile.test" \
                                 -t video-backend:test \
                                 "${PROJECTS_ROOT}/Video Uploader/Main/backend"

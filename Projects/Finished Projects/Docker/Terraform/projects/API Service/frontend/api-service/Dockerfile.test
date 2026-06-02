@@ -8,6 +8,7 @@ COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
 # Copy source
+ARG CACHE_BUST
 COPY . .
 
 # Run tests — container exits with code 1 if any test fails

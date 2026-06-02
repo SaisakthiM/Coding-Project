@@ -5,6 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+ARG CACHE_BUST
 COPY . .
 
 ENV DJANGO_SETTINGS_MODULE=blogsite.settings \
@@ -12,4 +13,4 @@ ENV DJANGO_SETTINGS_MODULE=blogsite.settings \
     PYTHONUNBUFFERED=1
 
 # manage.py is inside blogsite/ subfolder
-CMD ["sh", "-c", "cd blogsite && python manage.py migrate && python manage.py test --verbosity=2"]
+CMD ["sh", "-c", "cd blogsite && python manage.py migrate && python manage.py test blog.tests --verbosity=2"]

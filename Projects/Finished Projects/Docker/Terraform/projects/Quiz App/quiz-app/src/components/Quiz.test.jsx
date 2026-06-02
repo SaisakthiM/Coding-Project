@@ -53,7 +53,7 @@ describe('Quiz Component', () => {
         render(<Quiz {...mockProps} />);
         const option = screen.getByText('4');
         fireEvent.click(option);
-        expect(option).toHaveClass('selected');
+        expect(option.className).toContain('selected');
     });
 
     test('cannot select another option after selecting one', () => {

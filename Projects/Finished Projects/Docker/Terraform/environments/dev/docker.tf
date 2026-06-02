@@ -831,13 +831,12 @@ resource "docker_image" "jenkins_agent" {
 resource "docker_container" "jenkins_agent" {
   name  = "jenkins-agent"
   image = docker_image.jenkins_agent.image_id
-
   restart = "unless-stopped"
 
   env = [
     "JENKINS_URL=http://jenkins:8080/jenkins/",
     "JENKINS_AGENT_NAME=Worker",
-    "JENKINS_SECRET=af8a382676b767a8d8a33aaf1824256892d08a8f1fb6ff98ec0070fbbf689c66",
+    "JENKINS_SECRET=your-secret-here",
     "JENKINS_AGENT_WORKDIR=/home/jenkins/agent",
   ]
 
@@ -846,23 +845,18 @@ resource "docker_container" "jenkins_agent" {
     container_path = "/var/run/docker.sock"
   }
 
-  volumes {
-    host_path      = "/home/saisakthi/.m2"
-    container_path = "/root/.m2"
-  }
-
   networks_advanced {
-    name = docker_network.gateway_net.name  # replace with your actual network resource
+    name = docker_network.gateway_net.name
   }
 
-  # Install docker.io and fix socket permissions on container start
   provisioner "local-exec" {
     command = <<-EOT
       sleep 5
       docker exec --user root jenkins-agent bash -c "
         apt-get update -qq &&
         apt-get install -y docker.io &&
-        chmod 666 /var/run/docker.sock
+        chmod 666 /var/run/docker.sock &&
+        echo 'Docker ready!'
       "
     EOT
   }

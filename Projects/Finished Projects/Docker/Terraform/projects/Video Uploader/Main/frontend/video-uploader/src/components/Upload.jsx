@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import "./home.css"
 
 export default function Upload() {
   const [status, setStatus] = useState("");

@@ -59,16 +59,15 @@ describe('App Component', () => {
         render(<App />);
         fireEvent.click(screen.getByText('Start'));
 
-        // Pick last option — wrong for all 5 questions (answers are 3,1,1,0,0)
-        for (let i = 0; i < 5; i++) {
-            const options = screen.getAllByRole('listitem');
-            fireEvent.click(options[options.length - 1]);
+        // Go through all 5 questions picking the LAST option (wrong for all)
+        const wrongAnswers = ['1', 'Java', 'Programming Language', 'Framework', 'Computer Style Sheets'];
+        wrongAnswers.forEach(answer => {
+            fireEvent.click(screen.getByText(answer));
             fireEvent.click(screen.getByText('Next'));
-        }
+        });
 
-        // Score is split across elements: "Your Score: ", "0", " / ", "5"
-        expect(screen.getByText((_, el) =>
-            el?.tagName === 'H2' && el.textContent.replace(/\s+/g, ' ').trim() === 'Your Score: 0 / 5'
-        )).toBeInTheDocument();
+        // Use textContent match since score is split across elements
+        const h2 = document.querySelector('h2');
+        expect(h2.textContent.replace(/\s+/g, ' ').trim()).toBe('Your Score: 0 / 5');
     });
 });

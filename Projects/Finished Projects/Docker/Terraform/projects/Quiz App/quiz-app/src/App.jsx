@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "./components/Header";
 import Quiz from "./components/Quiz";
 import Score from "./components/Score";
-
+import "./index.css"
 
 export default function App() {
 	const questions = [

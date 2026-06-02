@@ -18,6 +18,7 @@ django-prometheus
 django-ratelimit
 opentelemetry-distro
 opentelemetry-exporter-otlp
+graphene-django
 
 requests>=2.31.0
 django-storages[s3]>=1.14

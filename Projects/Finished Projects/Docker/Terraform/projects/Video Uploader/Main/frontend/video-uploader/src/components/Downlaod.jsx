@@ -1,5 +1,6 @@
 import { use, Suspense } from "react";
 import getAll from "./Getter";
+import "./home.css"
 
 function FileList({ data }) {
   const result = use(data);

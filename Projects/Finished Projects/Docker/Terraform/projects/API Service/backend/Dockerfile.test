@@ -10,6 +10,7 @@ COPY package*.json ./
 RUN npm install --save-dev jest supertest --legacy-peer-deps
 
 # Copy source
+ARG CACHE_BUST
 COPY . .
 
 # Run tests

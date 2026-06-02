@@ -1,20 +1,22 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';   // ← NOT plugin-react-swc
+import react from '@vitejs/plugin-react';
 
-const cssStubPlugin = {
-  name: 'css-stub',
-  enforce: 'pre',
-  resolveId(id) {
-    if (id.endsWith('.css')) return id;
-  },
-  load(id) {
-    if (id.endsWith('.css')) return 'export default {}';
-  },
-};
-
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: '/quiz/',
-  plugins: [react(), cssStubPlugin],
+  plugins: [
+    react(),
+    // Only stub CSS during tests — never in production build
+    mode === 'test' ? {
+      name: 'css-stub',
+      enforce: 'pre',
+      resolveId(id) {
+        if (id.endsWith('.css')) return id;
+      },
+      load(id) {
+        if (id.endsWith('.css')) return 'export default {}';
+      },
+    } : null,
+  ].filter(Boolean),
   server: {
     host: true,
     port: 5173,
@@ -24,4 +26,4 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/setupTests.js'],
   },
-});
+}));
