@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import RegisterPage from '../components/RegisterPage';
+import RegisterPage from './RegisterPage';
 import { registerUser } from '../api/authServices.js';
 
 vi.mock('../api/authServices.js');

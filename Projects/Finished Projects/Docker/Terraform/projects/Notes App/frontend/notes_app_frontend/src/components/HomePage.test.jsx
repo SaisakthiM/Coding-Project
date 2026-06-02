@@ -2,18 +2,21 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import HomePage from '../components/HomePage';
+import HomePage from './HomePage';
 
 const mockNavigate = vi.fn();
 const mockLogout = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-    ...vi.requireActual('react-router-dom'),
-    useNavigate: () => mockNavigate,
-    Link: ({ children }) => children
-}));
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+        Link: ({ children }) => children
+    };
+});
 
-vi.mock('../components/AuthContext.jsx', () => ({
+vi.mock('./AuthContext.jsx', () => ({
     useAuth: () => ({ logout: mockLogout })
 }));
 

@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import LoginPage from '../components/LoginPage';
+import LoginPage from './LoginPage';
 import { loginUser } from '../api/authServices.js';
 
 // Mock dependencies

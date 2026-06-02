@@ -12,4 +12,4 @@ ARG CACHE_BUST
 COPY . .
 
 # Run tests — container exits with code 1 if any test fails
-CMD ["npm", "run", "test:run"]
+CMD ["npm", "run", "test"]
