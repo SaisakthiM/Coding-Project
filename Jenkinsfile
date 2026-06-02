@@ -41,16 +41,14 @@ pipeline {
         stage('Detect Changes') {
             steps {
                 script {
-                    def base = env.GIT_PREVIOUS_SUCCESSFUL_COMMIT ?: 'HEAD~1'
+                    // Always diff only against the immediate previous commit
                     def diff = sh(
-                        script: "git diff --name-only ${base} HEAD",
+                        script: "git diff --name-only HEAD~1 HEAD",
                         returnStdout: true
                     ).trim()
 
                     echo "Changed files:\n${diff}"
 
-                    // If ANY individual param is ticked, disable auto-detection entirely
-                    // so only the explicitly selected projects run
                     def anyParamSet = params.RUN_HOSPITAL || params.RUN_BLOG ||
                                     params.RUN_NOTES_BACKEND || params.RUN_NOTES_FRONTEND ||
                                     params.RUN_SOCIAL_BACKEND || params.RUN_SOCIAL_FRONTEND ||
@@ -59,9 +57,7 @@ pipeline {
                                     params.RUN_API_FRONTEND || params.RUN_DOC_BACKEND ||
                                     params.RUN_VIDEO_BACKEND
 
-                    def runAll = params.RUN_ALL
-
-                    // useDiff only when no params are manually ticked and RUN_ALL is false
+                    def runAll  = params.RUN_ALL
                     def useDiff = !runAll && !anyParamSet
 
                     env.BUILD_SOCIAL_FRONTEND = (runAll || params.RUN_SOCIAL_FRONTEND || (useDiff && diff.contains('Social Media App/apps/frontend'))) ? 'true' : 'false'
@@ -77,7 +73,7 @@ pipeline {
                     env.BUILD_API_FRONTEND    = (runAll || params.RUN_API_FRONTEND    || (useDiff && diff.contains('API Service/frontend')))            ? 'true' : 'false'
                     env.BUILD_DOC_BACKEND     = (runAll || params.RUN_DOC_BACKEND     || (useDiff && diff.contains('Document Intelligence Platform')))  ? 'true' : 'false'
                     env.BUILD_VIDEO_BACKEND   = (runAll || params.RUN_VIDEO_BACKEND   || (useDiff && diff.contains('Video Uploader')))                  ? 'true' : 'false'
-
+                    
                     echo """
                         BUILD_SOCIAL_FRONTEND  = ${env.BUILD_SOCIAL_FRONTEND}
                         BUILD_SOCIAL_BACKEND   = ${env.BUILD_SOCIAL_BACKEND}
