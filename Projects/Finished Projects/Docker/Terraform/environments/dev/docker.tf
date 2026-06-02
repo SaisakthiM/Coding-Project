@@ -845,6 +845,11 @@ resource "docker_container" "jenkins_agent" {
     container_path = "/var/run/docker.sock"
   }
 
+  volumes {
+  host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+  container_path = "/home/jenkins/agent/workspace/Github_Pipeline_Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+}
+
   networks_advanced {
     name = docker_network.gateway_net.name
   }
