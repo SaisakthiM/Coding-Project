@@ -76,6 +76,7 @@ class BookListViewTest(TestCase):
         self.assertTrue(response.data["cached"])
         self.assertEqual(response.data["summary"], "Cached summary")
 
+    @patch('document.services.call_gemini', return_value='Summary text here')
     def test_summarize_generates_new_summary(self):
         with patch('document.services.generate_summary') as mock_summary:
             mock_summary.return_value = ("Generated summary", "ollama")
@@ -107,6 +108,7 @@ class BookListViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     # ── AskQuestionView ───────────────────────────────────────
+    @patch('document.services.call_ollama', return_value='This book is about testing')
     def test_ask_question_returns_answer(self):
         with patch('document.services.generate_summary') as mock_summary:
             mock_summary.return_value = ("This book is about testing", "ollama")
