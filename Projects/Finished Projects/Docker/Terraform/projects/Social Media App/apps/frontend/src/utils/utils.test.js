@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { formatNumber, getInitials, formatDate } from './utils';
+import { formatNumber, getInitials, formatDate } from './index';
 
 // ── formatNumber ─────────────────────────────────────────────
 

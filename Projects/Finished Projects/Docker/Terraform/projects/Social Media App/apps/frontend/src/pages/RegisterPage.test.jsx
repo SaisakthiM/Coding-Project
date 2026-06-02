@@ -7,7 +7,7 @@ const mockRegister = vi.fn();
 const mockNavigate = vi.fn();
 
 vi.mock('../../context/AuthContext', () => ({
-  useAuth: () => ({ register: mockRegister }),
+    useAuth: () => ({ register: vi.fn() })
 }));
 
 vi.mock('react-router-dom', async () => {

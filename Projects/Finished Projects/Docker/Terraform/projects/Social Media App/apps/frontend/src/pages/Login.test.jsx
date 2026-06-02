@@ -8,7 +8,7 @@ const mockLogin = vi.fn();
 const mockNavigate = vi.fn();
 
 vi.mock('../../context/AuthContext', () => ({
-    useAuth: () => ({ login: mockLogin }),
+    useAuth: () => ({ login: vi.fn() })
 }));
 
 vi.mock('react-router-dom', async () => {
