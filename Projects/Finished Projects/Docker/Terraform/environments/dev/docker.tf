@@ -847,7 +847,7 @@ resource "docker_container" "jenkins_agent" {
 
   volumes {
   host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
-  container_path = "/home/jenkins/agent/workspace/Github_Pipeline_Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
+  container_path = "/etc/terraform/terraform.tfvars"
 }
 
   networks_advanced {
