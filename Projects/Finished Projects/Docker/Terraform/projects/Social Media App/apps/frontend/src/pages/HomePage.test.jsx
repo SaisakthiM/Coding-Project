@@ -31,7 +31,7 @@ vi.mock('../../components/common/Loaders', () => ({
   Spinner:      () => <span data-testid="spinner" />,
 }));
 
-import { usePaginatedFeed } from '../../hooks/index';
+import { usePaginatedFeed } from '../hooks/index';
 
 const defaultFeedState = {
   posts:      [],
