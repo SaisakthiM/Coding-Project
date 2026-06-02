@@ -331,6 +331,7 @@ pipeline {
             steps {
                 sh """
                     cd "${TERRAFORM_DIR}"
+                    terraform init
                     terraform apply -auto-approve
                 """
             }
