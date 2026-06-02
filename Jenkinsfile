@@ -329,16 +329,19 @@ pipeline {
         stage('Deploy') {
             when { branch 'Coding-Project' }
             steps {
-                sh """
-                    cd "${TERRAFORM_DIR}"
-                    terraform init
-                    terraform apply -auto-approve -var-file="/etc/terraform/terraform.tfvars"
-
-                """
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ssh-deploy-key',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
+                    sh """
+                        ssh -i $SSH_KEY \
+                            -o StrictHostKeyChecking=no \
+                            saisakthi@192.168.31.227 \
+                            'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
+                    """
+                }
             }
         }
-
-    }
 
     post {
         success {
