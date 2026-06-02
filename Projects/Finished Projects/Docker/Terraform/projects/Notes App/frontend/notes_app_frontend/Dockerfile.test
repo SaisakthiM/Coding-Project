@@ -1,19 +1,14 @@
-FROM python:3.11-slim
+# Dockerfile.test — only for running tests, never deployed
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install deps first (cached layer — only rebuilds if package.json changes)
+COPY package*.json ./
+RUN npm install --legacy-peer-deps
 
+# Copy source
 COPY . .
 
-ENV DJANGO_SETTINGS_MODULE=notes_app.settings \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DATABASE_NAME=test_db \
-    DATABASE_USER=test \
-    DATABASE_PASSWORD=test \
-    DATABASE_HOST=localhost
-
-# Run migrate + tests together at runtime not build time
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py test --verbosity=2"]
+# Run tests — container exits with code 1 if any test fails
+CMD ["npm", "run", "test:run"]

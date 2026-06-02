@@ -163,7 +163,7 @@ pipeline {
                                 -t doc-backend:test \
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
                             docker run --rm \
-                                -e DJANGO_SETTINGS_MODULE=document.test_settings \
+                                -e DJANGO_SETTINGS_MODULE=document_backend.test_settings \
                                 -e GEMINI_API_KEY=test-key \
                                 -e OLLAMA_HOST=localhost \
                                 doc-backend:test

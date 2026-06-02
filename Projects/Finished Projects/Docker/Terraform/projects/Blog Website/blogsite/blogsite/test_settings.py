@@ -7,6 +7,10 @@ DATABASES = {
     }
 }
 
-# Use local file storage instead of MinIO in tests
+# Disable MinIO completely
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = '/tmp/test-media'
 MINIO_ENDPOINT = None
+MINIO_ACCESS_KEY = 'test'
+MINIO_SECRET_KEY = 'test'
+MINIO_BUCKET = 'test'

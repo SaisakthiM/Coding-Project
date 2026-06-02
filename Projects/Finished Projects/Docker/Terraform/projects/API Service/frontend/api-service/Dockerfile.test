@@ -11,4 +11,4 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Run tests — container exits with code 1 if any test fails
-CMD ["npm", "test"]
+CMD ["npm", "run", "test:run"]
