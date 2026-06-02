@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { postsAPI } from '../api';
-import { usePaginatedFeed, useIntersection } from '../hooks';
+import { usePaginatedFeed, useIntersection } from '../hooks/index';
 import PostCard from '../components/posts/PostCard';
 import StoriesBar from '../components/stories/StoriesBar';
 import RightPanel from '../components/layout/RightPanel';
