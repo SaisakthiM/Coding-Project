@@ -6,7 +6,7 @@ import RegisterPage from './RegisterPage';
 const mockRegister = vi.fn();
 const mockNavigate = vi.fn();
 
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('../context/AuthContext', () => ({
     useAuth: () => ({ register: vi.fn() })
 }));
 

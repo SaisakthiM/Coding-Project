@@ -5,11 +5,11 @@ import HomePage from './HomePage';
 
 // ── Module mocks ──────────────────────────────────────────────
 
-vi.mock('../../api', () => ({
+vi.mock('../../api/index', () => ({
   postsAPI: { feed: vi.fn() },
 }));
 
-vi.mock('../../hooks', () => ({
+vi.mock('../../hooks/index', () => ({
   usePaginatedFeed: vi.fn(),
   useIntersection:  vi.fn(() => ({ current: null })),
 }));
