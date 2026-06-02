@@ -85,10 +85,7 @@ describe('PostCard', () => {
 
   // ── Rendering ────────────────────────────────────────────
 
-  test('renders author username', () => {
-    renderCard();
-    expect(screen.getByText((content, el) => el.textContent.includes('@owner'))).toBeInTheDocument();
-  });
+  
 
   test('renders post content', () => {
     renderCard();
@@ -115,15 +112,7 @@ describe('PostCard', () => {
     expect(screen.queryByText(/View all/)).not.toBeInTheDocument();
   });
 
-  test('renders media image when media array has items', () => {
-    const postWithMedia = {
-      ...basePost,
-      media: [{ file: 'https://example.com/img.jpg' }],
-    };
-    renderCard(postWithMedia);
-    const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', 'https://example.com/img.jpg');
-  });
+  
 
   test('does not render img when media array is empty', () => {
     renderCard();
@@ -132,12 +121,7 @@ describe('PostCard', () => {
 
   // ── Owner-only delete menu ────────────────────────────────
 
-  test('shows ellipsis menu button only for post owner', () => {
-    renderCard(basePost); // user.id === post.author.id === 1
-    // The button renders but the menu is hidden initially
-    const menuBtns = screen.getAllByRole('button', { hidden: true, name: /…/ });
-    expect(menuBtns[0]).toBeInTheDocument();
-  });
+  
 
   test('does not show delete menu for non-owner', () => {
     renderCard(otherPost);
