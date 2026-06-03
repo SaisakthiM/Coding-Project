@@ -25,5 +25,8 @@ export default defineConfig(({ mode }) => ({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/setupTests.js'],
+    deps: {
+        inline: ['react-router-dom']  // ← forces Vitest to inline instead of SSR transform
+    }
   },
 }));
