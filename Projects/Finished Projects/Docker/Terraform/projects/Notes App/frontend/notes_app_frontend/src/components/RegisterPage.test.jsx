@@ -6,10 +6,10 @@ import RegisterPage from './Register';
 import { registerUser } from '../api/authServices.js';
 
 vi.mock('../api/authServices.js');
-vi.mock('react-router-dom', () => ({
-    ...vi.requireActual('react-router-dom'),
-    useNavigate: () => vi.fn()
-}));
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');   // ✅ Vitest syntax
+    return { ...actual, useNavigate: () => mockNavigate };
+});
 
 describe('RegisterPage', () => {
 

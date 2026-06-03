@@ -1,35 +1,44 @@
-import styles from './quiz.module.css';
 import { useState } from "react";
 
 export default function Quiz({ Questions, Options, Answer, onAnswer, onNext }) {
   const [selected, setSelected] = useState(null);
 
   const handleSelect = (index) => {
-    if(selected === null){
+    if (selected === null) {
       setSelected(index);
       onAnswer(index === Answer);
     }
   };
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>Quiz App</h1>
-      <hr /> 
+      <hr />
       <h2>{Questions}</h2>
       <ul>
         {Options.map((option, index) => (
-          <li 
-            key={index} 
+          <li
+            key={index}
             onClick={() => handleSelect(index)}
-            className={selected === index ? styles.selected : ""}
+            className={
+              selected === null
+                ? "option"
+                : index === selected && index === Answer
+                ? "option correct"
+                : index === selected
+                ? "option wrong"
+                : index === Answer && selected !== null
+                ? "option correct"
+                : "option"
+            }
           >
             {option}
           </li>
         ))}
       </ul>
-      <div className={styles.button_quiz}>
+      <div className="button_quiz">
         <button onClick={() => onNext(selected)}>Next</button>
       </div>
     </div>
-  )
+  );
 }

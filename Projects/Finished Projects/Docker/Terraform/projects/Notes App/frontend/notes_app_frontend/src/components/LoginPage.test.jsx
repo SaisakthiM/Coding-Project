@@ -12,10 +12,10 @@ vi.mock('../components/AuthContext.jsx', () => ({
         loginSuccess: vi.fn()
     })
 }));
-vi.mock('react-router-dom', () => ({
-    ...vi.requireActual('react-router-dom'),
-    useNavigate: () => vi.fn()
-}));
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');   // ✅ Vitest syntax
+    return { ...actual, useNavigate: () => mockNavigate };
+});
 
 describe('LoginPage', () => {
 
