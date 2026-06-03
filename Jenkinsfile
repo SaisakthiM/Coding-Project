@@ -41,6 +41,7 @@ pipeline {
         stage('Detect Changes') {
             steps {
                 script {
+                    // Always diff only against the immediate previous commit
                     def diff = sh(
                         script: "git diff --name-only HEAD~1 HEAD",
                         returnStdout: true
@@ -72,7 +73,7 @@ pipeline {
                     env.BUILD_API_FRONTEND    = (runAll || params.RUN_API_FRONTEND    || (useDiff && diff.contains('API Service/frontend')))            ? 'true' : 'false'
                     env.BUILD_DOC_BACKEND     = (runAll || params.RUN_DOC_BACKEND     || (useDiff && diff.contains('Document Intelligence Platform')))  ? 'true' : 'false'
                     env.BUILD_VIDEO_BACKEND   = (runAll || params.RUN_VIDEO_BACKEND   || (useDiff && diff.contains('Video Uploader')))                  ? 'true' : 'false'
-
+                    
                     echo """
                         BUILD_SOCIAL_FRONTEND  = ${env.BUILD_SOCIAL_FRONTEND}
                         BUILD_SOCIAL_BACKEND   = ${env.BUILD_SOCIAL_BACKEND}
@@ -92,23 +93,21 @@ pipeline {
             }
         }
 
-        // ── 3a. Test Group 1: Django/Python ───────────────────────
+        // ── 3a. Test Group 1: Django/Python (lightweight, fast) ───
         stage('Test - Django Apps') {
             parallel {
 
                 stage('Hospital Management') {
                     when { expression { env.BUILD_HOSPITAL == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
-                                    -t hospital:test \
-                                    "${PROJECTS_ROOT}/hospital_management"
-                                docker run --rm hospital:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
+                                -t hospital:test \
+                                "${PROJECTS_ROOT}/hospital_management"
+                            docker run --rm hospital:test
+                        """
                     }
                     post { always { sh 'docker rmi hospital:test || true' } }
                 }
@@ -116,18 +115,16 @@ pipeline {
                 stage('Blog Website') {
                     when { expression { env.BUILD_BLOG == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
-                                    -t blog:test \
-                                    "${PROJECTS_ROOT}/Blog Website"
-                                docker run --rm \
-                                    -e DJANGO_SETTINGS_MODULE=blogsite.test_settings \
-                                    blog:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
+                                -t blog:test \
+                                "${PROJECTS_ROOT}/Blog Website"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=blogsite.test_settings \
+                                blog:test
+                        """
                     }
                     post { always { sh 'docker rmi blog:test || true' } }
                 }
@@ -135,18 +132,16 @@ pipeline {
                 stage('Notes App - Backend') {
                     when { expression { env.BUILD_NOTES_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
-                                    -t notes-backend:test \
-                                    "${PROJECTS_ROOT}/Notes App/backend"
-                                docker run --rm \
-                                    -e DJANGO_SETTINGS_MODULE=notes_app.test_settings \
-                                    notes-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
+                                -t notes-backend:test \
+                                "${PROJECTS_ROOT}/Notes App/backend"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=notes_app.test_settings \
+                                notes-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi notes-backend:test || true' } }
                 }
@@ -154,20 +149,18 @@ pipeline {
                 stage('Social Media App - Backend') {
                     when { expression { env.BUILD_SOCIAL_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Social Media App/apps/backend/Dockerfile.test" \
-                                    -t social-backend:test \
-                                    "${PROJECTS_ROOT}/Social Media App/apps/backend"
-                                docker run --rm \
-                                    -e DJANGO_SETTINGS_MODULE=social_media.test_settings \
-                                    -e SECRET_KEY=test-secret-key-for-ci \
-                                    -e DEBUG=True \
-                                    social-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Social Media App/apps/backend/Dockerfile.test" \
+                                -t social-backend:test \
+                                "${PROJECTS_ROOT}/Social Media App/apps/backend"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=social_media.test_settings \
+                                -e SECRET_KEY=test-secret-key-for-ci \
+                                -e DEBUG=True \
+                                social-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi social-backend:test || true' } }
                 }
@@ -175,20 +168,18 @@ pipeline {
                 stage('Document Intelligence - Backend') {
                     when { expression { env.BUILD_DOC_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
-                                    -t doc-backend:test \
-                                    "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
-                                docker run --rm \
-                                    -e DJANGO_SETTINGS_MODULE=document_backend.test_settings \
-                                    -e GEMINI_API_KEY=test-key \
-                                    -e OLLAMA_HOST=localhost \
-                                    doc-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
+                                -t doc-backend:test \
+                                "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
+                            docker run --rm \
+                                -e DJANGO_SETTINGS_MODULE=document_backend.test_settings \
+                                -e GEMINI_API_KEY=test-key \
+                                -e OLLAMA_HOST=localhost \
+                                doc-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi doc-backend:test || true' } }
                 }
@@ -196,23 +187,21 @@ pipeline {
             }
         }
 
-        // ── 3b. Test Group 2: Node/React ──────────────────────────
+        // ── 3b. Test Group 2: Node/React (medium) ─────────────────
         stage('Test - Frontend & Node Apps') {
             parallel {
 
                 stage('Quiz App') {
                     when { expression { env.BUILD_QUIZ == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Quiz App/quiz-app/Dockerfile.test" \
-                                    -t quiz-app:test \
-                                    "${PROJECTS_ROOT}/Quiz App/quiz-app"
-                                docker run --rm quiz-app:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Quiz App/quiz-app/Dockerfile.test" \
+                                -t quiz-app:test \
+                                "${PROJECTS_ROOT}/Quiz App/quiz-app"
+                            docker run --rm quiz-app:test
+                        """
                     }
                     post { always { sh 'docker rmi quiz-app:test || true' } }
                 }
@@ -220,16 +209,14 @@ pipeline {
                 stage('Notes App - Frontend') {
                     when { expression { env.BUILD_NOTES_FRONTEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend/Dockerfile.test" \
-                                    -t notes-frontend:test \
-                                    "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
-                                docker run --rm notes-frontend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend/Dockerfile.test" \
+                                -t notes-frontend:test \
+                                "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
+                            docker run --rm notes-frontend:test
+                        """
                     }
                     post { always { sh 'docker rmi notes-frontend:test || true' } }
                 }
@@ -237,16 +224,14 @@ pipeline {
                 stage('API Service - Frontend') {
                     when { expression { env.BUILD_API_FRONTEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
-                                    -t api-frontend:test \
-                                    "${PROJECTS_ROOT}/API Service/frontend/api-service"
-                                docker run --rm api-frontend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
+                                -t api-frontend:test \
+                                "${PROJECTS_ROOT}/API Service/frontend/api-service"
+                            docker run --rm api-frontend:test
+                        """
                     }
                     post { always { sh 'docker rmi api-frontend:test || true' } }
                 }
@@ -254,16 +239,14 @@ pipeline {
                 stage('API Service - Backend') {
                     when { expression { env.BUILD_API_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/API Service/backend/Dockerfile.test" \
-                                    -t api-backend:test \
-                                    "${PROJECTS_ROOT}/API Service/backend"
-                                docker run --rm api-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/API Service/backend/Dockerfile.test" \
+                                -t api-backend:test \
+                                "${PROJECTS_ROOT}/API Service/backend"
+                            docker run --rm api-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi api-backend:test || true' } }
                 }
@@ -271,16 +254,14 @@ pipeline {
                 stage('Bank Manager - Frontend') {
                     when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
-                                    -t bank-frontend:test \
-                                    "${PROJECTS_ROOT}/Bank Manager/frontend"
-                                docker run --rm bank-frontend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
+                                -t bank-frontend:test \
+                                "${PROJECTS_ROOT}/Bank Manager/frontend"
+                            docker run --rm bank-frontend:test
+                        """
                     }
                     post { always { sh 'docker rmi bank-frontend:test || true' } }
                 }
@@ -288,16 +269,14 @@ pipeline {
                 stage('Social Media App - Frontend') {
                     when { expression { env.BUILD_SOCIAL_FRONTEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
-                                    -t social-frontend:test \
-                                    "${PROJECTS_ROOT}/Social Media App/apps/frontend"
-                                docker run --rm social-frontend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
+                                -t social-frontend:test \
+                                "${PROJECTS_ROOT}/Social Media App/apps/frontend"
+                            docker run --rm social-frontend:test
+                        """
                     }
                     post { always { sh 'docker rmi social-frontend:test || true' } }
                 }
@@ -305,25 +284,23 @@ pipeline {
             }
         }
 
-        // ── 3c. Test Group 3: Java/Maven ──────────────────────────
+        // ── 3c. Test Group 3: Java/Maven (heavy, isolated) ────────
         stage('Test - Java Apps') {
             parallel {
 
                 stage('Bank Manager - Backend') {
                     when { expression { env.BUILD_BANK_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
-                                    -t bank-backend:test \
-                                    "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
-                                docker run --rm \
-                                    -v /home/saisakthi/.m2:/root/.m2 \
-                                    bank-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
+                                -t bank-backend:test \
+                                "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
+                            docker run --rm \
+                                -v /home/saisakthi/.m2:/root/.m2 \
+                                bank-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi bank-backend:test || true' } }
                 }
@@ -331,50 +308,44 @@ pipeline {
                 stage('Video Uploader - Backend') {
                     when { expression { env.BUILD_VIDEO_BACKEND == 'true' } }
                     steps {
-                        ansiColor('xterm') {
-                            sh """
-                                docker build \
-                                    --build-arg CACHE_BUST=${BUILD_NUMBER} \
-                                    -f "${PROJECTS_ROOT}/Video Uploader/Main/backend/Dockerfile.test" \
-                                    -t video-backend:test \
-                                    "${PROJECTS_ROOT}/Video Uploader/Main/backend"
-                                docker run --rm \
-                                    -v /home/saisakthi/.m2:/root/.m2 \
-                                    video-backend:test
-                            """
-                        }
+                        sh """
+                            docker build \
+                        --build-arg CACHE_BUST=${BUILD_NUMBER} \
+                                -f "${PROJECTS_ROOT}/Video Uploader/Main/backend/Dockerfile.test" \
+                                -t video-backend:test \
+                                "${PROJECTS_ROOT}/Video Uploader/Main/backend"
+                            docker run --rm \
+                                -v /home/saisakthi/.m2:/root/.m2 \
+                                video-backend:test
+                        """
                     }
                     post { always { sh 'docker rmi video-backend:test || true' } }
                 }
-
             }
         }
 
-        // ── 4. Deploy via SSH + Terraform ─────────────────────────
+        // ── 4. Deploy via Terraform ───────────────────────────────
         stage('Deploy') {
             when { branch 'Coding-Project' }
             steps {
-                ansiColor('xterm') {
-                    withCredentials([sshUserPrivateKey(
-                        credentialsId: 'ssh-deploy-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
-                    )]) {
-                        sh '''
-                            cp "$SSH_KEY" /tmp/deploy_key
-                            chmod 600 /tmp/deploy_key
-                            ssh -i /tmp/deploy_key \
-                                -o StrictHostKeyChecking=no \
-                                -o PasswordAuthentication=no \
-                                saisakthi@192.168.31.227 \
-                                'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
-                            rm -f /tmp/deploy_key
-                        '''
-                    }
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ssh-deploy-key',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )]) {
+                    sh '''
+                        cp "$SSH_KEY" /tmp/deploy_key
+                        chmod 600 /tmp/deploy_key
+                        ssh -i /tmp/deploy_key \
+                            -o StrictHostKeyChecking=no \
+                            -o PasswordAuthentication=no \
+                            saisakthi@192.168.31.227 \
+                            'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
+                        rm -f /tmp/deploy_key
+                    '''
                 }
             }
         }
-
     }
 
     post {
