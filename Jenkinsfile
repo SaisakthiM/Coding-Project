@@ -330,17 +330,19 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(
                     credentialsId: 'ssh-deploy-key',
-                    keyFileVariable: 'SSH_KEY'
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
                 )]) {
-                    sh """
-                        cp $SSH_KEY /tmp/deploy_key
+                    sh '''
+                        cp "$SSH_KEY" /tmp/deploy_key
                         chmod 600 /tmp/deploy_key
                         ssh -i /tmp/deploy_key \
                             -o StrictHostKeyChecking=no \
+                            -o PasswordAuthentication=no \
                             saisakthi@192.168.31.227 \
                             'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
                         rm -f /tmp/deploy_key
-                    """
+                    '''
                 }
             }
         }
