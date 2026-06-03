@@ -40,6 +40,7 @@ RUN npm install --legacy-peer-deps
 RUN npm install --legacy-peer-deps --save-dev \
     vitest@2 \
     @vitest/coverage-v8@2 \
+    @testing-library/dom@10 \
     @testing-library/react@16 \
     @testing-library/user-event@14 \
     @testing-library/jest-dom@6 \
