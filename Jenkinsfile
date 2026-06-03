@@ -242,6 +242,7 @@ pipeline {
                     }
                 }
 
+                /* 
                 stage('Bank Manager - Frontend') {
                     when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
                     steps {
@@ -254,6 +255,8 @@ pipeline {
                         """
                     }
                 }
+                
+                */
 
                 stage('Social Media App - Frontend') {
                     when { expression { env.BUILD_SOCIAL_FRONTEND == 'true' } }
