@@ -33,7 +33,7 @@ services:
   frontend_build:
     build:
       context: ./frontend/notes_app_frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     container_name: notes_frontend_build
     volumes:
       - notes-build:/dist
