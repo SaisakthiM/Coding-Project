@@ -91,4 +91,43 @@ public class FileController {
         .contentLength(file.length())
         .body(resource);
   }
+
+  @RequestMapping(value = "/remove/{path:.+}", method = RequestMethod.DELETE)
+  public ResponseEntity<String> removeFile(@PathVariable("path") String filename) {
+    // Prevent path traversal
+    if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+      return ResponseEntity.badRequest().body("Invalid filename.");
+    }
+
+    String[] filenames = this.getFiles();
+    boolean contains = Arrays.asList(filenames).contains(filename);
+
+    if (!contains) {
+      return new ResponseEntity<>("File Not Found", HttpStatus.NOT_FOUND);
+    }
+
+    String filePath = getUploadsPath() + File.separator + filename;
+    File file = new File(filePath);
+
+    if (!file.delete()) {
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Could not delete file: " + filename);
+    }
+
+    // Best-effort OMV removal in background — don't block the response
+    /*
+    new Thread(() -> {
+      try {
+        omvSftpService.removeFromOmv(filename);
+        System.out.println("OMV removal successful: " + filename);
+      } catch (Exception e) {
+        System.out.println("OMV removal failed (non-critical): " + e.getMessage());
+      }
+    }).start();
+    
+    */
+
+    return ResponseEntity.ok("File Removed Successfully!");
+  }
 }

@@ -1,6 +1,6 @@
 module github.com/SaisakthiM/microservice-go
 
-go 1.25
+go 1.22
 
 require github.com/redis/go-redis/v9 v9.14.0
 
