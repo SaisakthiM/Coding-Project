@@ -321,7 +321,6 @@ pipeline {
                     }
                     post { always { sh 'docker rmi video-backend:test || true' } }
                 }
-
             }
         }
 
@@ -333,12 +332,15 @@ pipeline {
                     credentialsId: 'ssh-deploy-key',
                     keyFileVariable: 'SSH_KEY'
                 )]) {
-                    sh '''
-                        ssh -i $SSH_KEY \
+                    sh """
+                        cp $SSH_KEY /tmp/deploy_key
+                        chmod 600 /tmp/deploy_key
+                        ssh -i /tmp/deploy_key \
                             -o StrictHostKeyChecking=no \
                             saisakthi@192.168.31.227 \
                             'cd "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev" && terraform apply -auto-approve'
-                    '''
+                        rm -f /tmp/deploy_key
+                    """
                 }
             }
         }

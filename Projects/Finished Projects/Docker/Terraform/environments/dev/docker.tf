@@ -835,7 +835,7 @@ resource "docker_container" "jenkins_agent" {
 
   env = [
     "JENKINS_URL=http://jenkins:8080/jenkins/",
-    "JENKINS_AGENT_NAME=Github",
+    "JENKINS_AGENT_NAME=Worker",
     "JENKINS_SECRET=af8a382676b767a8d8a33aaf1824256892d08a8f1fb6ff98ec0070fbbf689c66",
     "JENKINS_AGENT_WORKDIR=/home/jenkins/agent",
   ]
@@ -845,7 +845,9 @@ resource "docker_container" "jenkins_agent" {
     container_path = "/var/run/docker.sock"
   }
 
-  network_mode = "host"
+  networks_advanced {
+    name = docker_network.gateway_net.name
+  }
   volumes {
     host_path      = "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/terraform.tfvars"
     container_path = "/etc/terraform/terraform.tfvars"
