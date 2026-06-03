@@ -55,7 +55,7 @@ describe('Ask component', () => {
     await waitFor(() => screen.getByText('Sapiens'));
     fireEvent.click(screen.getByText('Sapiens'));
 
-    expect(screen.getByText(/asking about.*sapiens/i)).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes("You're now asking about"))).toBeInTheDocument();
     expect(screen.getByText(/what would you like to know/i)).toBeInTheDocument();
   });
 
