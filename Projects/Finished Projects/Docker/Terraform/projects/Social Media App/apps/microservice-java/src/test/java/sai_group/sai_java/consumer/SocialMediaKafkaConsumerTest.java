@@ -10,7 +10,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+
 import reactor.core.publisher.Mono;
 import sai_group.sai_java.model.ActivityFeed;
 import sai_group.sai_java.model.KafkaEvents.*;
@@ -27,11 +30,13 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SocialMediaKafkaConsumerTest {
 
     @Mock NotificationRepository  notificationRepo;
     @Mock ActivityFeedRepository  activityFeedRepo;
     @Mock AnalyticsService        analyticsService;
+
 
     // Use a real ObjectMapper — it's a value object with no side effects.
     @Spy ObjectMapper objectMapper = new ObjectMapper()

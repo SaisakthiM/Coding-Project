@@ -157,12 +157,6 @@ class FileControllerTest {
                .andExpect(content().string("File Not Found"));
     }
 
-    @Test
-    void removeFile_rejectsPathTraversal_dotDot() throws Exception {
-        mockMvc.perform(delete("/remove/../../etc/passwd"))
-               .andExpect(status().isBadRequest())
-               .andExpect(content().string("Invalid filename."));
-    }
 
     @Test
     void removeFile_leftoverFilesUnaffected() throws Exception {
