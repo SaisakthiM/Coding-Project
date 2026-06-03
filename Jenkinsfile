@@ -111,14 +111,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/hospital_management/Dockerfile.test" \
                                 -t hospital:test \
                                 "${PROJECTS_ROOT}/hospital_management"
                             docker run --rm hospital:test
                         """
                     }
-                    post { always { sh 'docker rmi hospital:test || true' } }
                 }
 
                 stage('Blog Website') {
@@ -126,7 +124,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Blog Website/Dockerfile.test" \
                                 -t blog:test \
                                 "${PROJECTS_ROOT}/Blog Website"
@@ -135,7 +132,6 @@ pipeline {
                                 blog:test
                         """
                     }
-                    post { always { sh 'docker rmi blog:test || true' } }
                 }
 
                 stage('Notes App - Backend') {
@@ -143,7 +139,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Notes App/backend/Dockerfile.test" \
                                 -t notes-backend:test \
                                 "${PROJECTS_ROOT}/Notes App/backend"
@@ -152,7 +147,6 @@ pipeline {
                                 notes-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi notes-backend:test || true' } }
                 }
 
                 stage('Social Media App - Backend') {
@@ -160,7 +154,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/backend/Dockerfile.test" \
                                 -t social-backend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/backend"
@@ -171,7 +164,6 @@ pipeline {
                                 social-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi social-backend:test || true' } }
                 }
 
                 stage('Document Intelligence - Backend') {
@@ -179,7 +171,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend/Dockerfile.test" \
                                 -t doc-backend:test \
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/backend/document_backend"
@@ -190,7 +181,6 @@ pipeline {
                                 doc-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi doc-backend:test || true' } }
                 }
 
             }
@@ -205,14 +195,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Quiz App/quiz-app/Dockerfile.test" \
                                 -t quiz-app:test \
                                 "${PROJECTS_ROOT}/Quiz App/quiz-app"
                             docker run --rm quiz-app:test
                         """
                     }
-                    post { always { sh 'docker rmi quiz-app:test || true' } }
                 }
 
                 stage('Notes App - Frontend') {
@@ -220,14 +208,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend/Dockerfile.test" \
                                 -t notes-frontend:test \
                                 "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
                             docker run --rm notes-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi notes-frontend:test || true' } }
                 }
 
                 stage('API Service - Frontend') {
@@ -235,14 +221,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/API Service/frontend/api-service/Dockerfile.test" \
                                 -t api-frontend:test \
                                 "${PROJECTS_ROOT}/API Service/frontend/api-service"
                             docker run --rm api-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi api-frontend:test || true' } }
                 }
 
                 stage('API Service - Backend') {
@@ -250,14 +234,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/API Service/backend/Dockerfile.test" \
                                 -t api-backend:test \
                                 "${PROJECTS_ROOT}/API Service/backend"
                             docker run --rm api-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi api-backend:test || true' } }
                 }
 
                 stage('Bank Manager - Frontend') {
@@ -265,14 +247,12 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Bank Manager/frontend/Dockerfile.test" \
                                 -t bank-frontend:test \
                                 "${PROJECTS_ROOT}/Bank Manager/frontend"
                             docker run --rm bank-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi bank-frontend:test || true' } }
                 }
 
                 stage('Social Media App - Frontend') {
@@ -280,30 +260,25 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/frontend/Dockerfile.test" \
                                 -t social-frontend:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/frontend"
                             docker run --rm social-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi social-frontend:test || true' } }
                 }
 
-                // ── NEW ───────────────────────────────────────────────────────
                 stage('Document Intelligence - Frontend') {
                     when { expression { env.BUILD_DOC_FRONTEND == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Document Intelligence Platform/frontend/document_frontend/Dockerfile.test" \
                                 -t doc-frontend:test \
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/frontend/document_frontend"
                             docker run --rm doc-frontend:test
                         """
                     }
-                    post { always { sh 'docker rmi doc-frontend:test || true' } }
                 }
 
             }
@@ -318,7 +293,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Bank Manager/backend/bank_management/Dockerfile.test" \
                                 -t bank-backend:test \
                                 "${PROJECTS_ROOT}/Bank Manager/backend/bank_management"
@@ -327,7 +301,6 @@ pipeline {
                                 bank-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi bank-backend:test || true' } }
                 }
 
                 stage('Video Uploader - Backend') {
@@ -335,7 +308,6 @@ pipeline {
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Video Uploader/Main/backend/Dockerfile.test" \
                                 -t video-backend:test \
                                 "${PROJECTS_ROOT}/Video Uploader/Main/backend"
@@ -344,16 +316,13 @@ pipeline {
                                 video-backend:test
                         """
                     }
-                    post { always { sh 'docker rmi video-backend:test || true' } }
                 }
 
-                // ── NEW ───────────────────────────────────────────────────────
                 stage('Social Media App - Java Microservice') {
                     when { expression { env.BUILD_SOCIAL_JAVA == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/microservice-java/Dockerfile.test" \
                                 -t social-java:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/microservice-java"
@@ -362,7 +331,6 @@ pipeline {
                                 social-java:test
                         """
                     }
-                    post { always { sh 'docker rmi social-java:test || true' } }
                 }
 
             }
@@ -372,20 +340,17 @@ pipeline {
         stage('Test - Go Apps') {
             parallel {
 
-                // ── NEW ───────────────────────────────────────────────────────
                 stage('Social Media App - Go Microservice') {
                     when { expression { env.BUILD_SOCIAL_GO == 'true' } }
                     steps {
                         sh """
                             docker build \
-                                --build-arg CACHE_BUST=${BUILD_NUMBER} \
                                 -f "${PROJECTS_ROOT}/Social Media App/apps/microservice-go/Dockerfile.test" \
                                 -t social-go:test \
                                 "${PROJECTS_ROOT}/Social Media App/apps/microservice-go"
                             docker run --rm social-go:test
                         """
                     }
-                    post { always { sh 'docker rmi social-go:test || true' } }
                 }
 
             }
@@ -421,9 +386,6 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed — Terraform was NOT touched.'
-        }
-        cleanup {
-            sh 'docker image prune -f || true'
         }
     }
 }
