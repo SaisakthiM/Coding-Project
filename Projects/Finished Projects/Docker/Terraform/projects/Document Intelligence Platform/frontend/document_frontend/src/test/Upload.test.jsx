@@ -1,12 +1,13 @@
 // ══════════════════════════════════════════════════════════════════════════════
 // FILE 2  src/test/Upload.test.jsx
 // ══════════════════════════════════════════════════════════════════════════════
+import React from 'react';
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Upload } from '../components/Upload.jsx';
-import React from 'react';
+
 
 // Stub Handler so the component doesn't make real HTTP calls.
 vi.mock('../scripts/Handler.js', () => ({
