@@ -7,10 +7,9 @@ import { registerUser } from '../api/authServices.js';
 
 const mockNavigate = vi.hoisted(() => vi.fn());
 
-
 vi.mock('../api/authServices.js');
 vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');   // ✅ Vitest syntax
+    const actual = await vi.importActual('react-router-dom');
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
@@ -22,11 +21,12 @@ describe('RegisterPage', () => {
 
     test('renders register form correctly', () => {
         render(<MemoryRouter><RegisterPage /></MemoryRouter>);
-        expect(screen.getByText('Register')).toBeInTheDocument();
+        // Use getByRole to avoid ambiguity between <h1> and button
+        expect(screen.getByRole('heading', { name: 'Register' })).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-        expect(screen.getByText('Register', { selector: 'button' })).toBeInTheDocument();
-        expect(screen.getByText('Go To Login')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Register' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Go To Login' })).toBeInTheDocument();
     });
 
     test('typing updates username and password', () => {
@@ -47,7 +47,7 @@ describe('RegisterPage', () => {
         registerUser.mockReturnValue(new Promise(() => {}));
 
         render(<MemoryRouter><RegisterPage /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Register', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Register' }));
 
         expect(screen.getByText('Registering...')).toBeInTheDocument();
         expect(screen.getByText('Registering...')).toBeDisabled();
@@ -64,7 +64,7 @@ describe('RegisterPage', () => {
         fireEvent.change(screen.getByPlaceholderText('Password'), {
             target: { value: 'NewPass123!' }
         });
-        fireEvent.click(screen.getByText('Register', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Register' }));
 
         await waitFor(() => {
             expect(screen.getByText('Registration successful!')).toBeInTheDocument();
@@ -77,9 +77,10 @@ describe('RegisterPage', () => {
         });
 
         render(<MemoryRouter><RegisterPage /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Register', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Register' }));
 
         await waitFor(() => {
+            // Component calls JSON.stringify on the error object
             expect(screen.getByText(/Username already exists/)).toBeInTheDocument();
         });
     });

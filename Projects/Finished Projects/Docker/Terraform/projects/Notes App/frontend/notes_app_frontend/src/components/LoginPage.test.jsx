@@ -7,7 +7,6 @@ import { loginUser } from '../api/authServices.js';
 
 const mockNavigate = vi.hoisted(() => vi.fn());
 
-// Mock dependencies
 vi.mock('../api/authServices.js');
 vi.mock('../components/AuthContext.jsx', () => ({
     default: () => ({
@@ -15,7 +14,7 @@ vi.mock('../components/AuthContext.jsx', () => ({
     })
 }));
 vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');   // ✅ Vitest syntax
+    const actual = await vi.importActual('react-router-dom');
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
@@ -27,11 +26,11 @@ describe('LoginPage', () => {
 
     test('renders login form correctly', () => {
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
-        expect(screen.getByText('Login')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-        expect(screen.getByText('Login', { selector: 'button' })).toBeInTheDocument();
-        expect(screen.getByText('Go to Register')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Go to Register' })).toBeInTheDocument();
     });
 
     test('typing updates username and password fields', () => {
@@ -49,11 +48,10 @@ describe('LoginPage', () => {
     });
 
     test('shows loading state while logging in', async () => {
-        loginUser.mockReturnValue(new Promise(() => {})); // never resolves
+        loginUser.mockReturnValue(new Promise(() => {}));
 
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
-
-        fireEvent.click(screen.getByText('Login', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Login' }));
 
         expect(screen.getByText('Logging in...')).toBeInTheDocument();
         expect(screen.getByText('Logging in...')).toBeDisabled();
@@ -70,7 +68,7 @@ describe('LoginPage', () => {
         fireEvent.change(screen.getByPlaceholderText('Password'), {
             target: { value: 'TestPass123!' }
         });
-        fireEvent.click(screen.getByText('Login', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Login' }));
 
         await waitFor(() => {
             expect(screen.getByText('Login successful!')).toBeInTheDocument();
@@ -83,11 +81,11 @@ describe('LoginPage', () => {
         });
 
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
-
-        fireEvent.click(screen.getByText('Login', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Login' }));
 
         await waitFor(() => {
-            expect(screen.getByText(/"Invalid credentials"/)).toBeInTheDocument();
+            // Component calls JSON.stringify so string gets wrapped in quotes
+            expect(screen.getByText('"Invalid credentials"')).toBeInTheDocument();
         });
     });
 
@@ -95,10 +93,11 @@ describe('LoginPage', () => {
         loginUser.mockRejectedValue(new Error('Network error'));
 
         render(<MemoryRouter><LoginPage /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Login', { selector: 'button' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Login' }));
 
         await waitFor(() => {
-            expect(screen.getByText('Network error')).toBeInTheDocument();
+            // err.message is a string, JSON.stringify wraps it in quotes
+            expect(screen.getByText('"Network error"')).toBeInTheDocument();
         });
     });
 });
