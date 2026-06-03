@@ -32,7 +32,7 @@ WORKDIR /app
 
 # ── Production + dev dependency layer (cached unless package*.json changes) ───
 COPY package.json package-lock.json ./
-RUN npm ci --include=dev
+RUN npm install --legacy-peer-deps
 
 # ── Install test-only packages on top ────────────────────────────────────────
 # Kept separate so the test layer can be rebuilt without reinstalling
