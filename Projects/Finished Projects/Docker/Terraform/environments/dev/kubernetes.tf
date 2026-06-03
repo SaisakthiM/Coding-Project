@@ -118,6 +118,7 @@ resource "null_resource" "kind_images" {
     command = <<EOT
       cd ~/.cache/
       # Cassandra
+      docker pull --platform=linux/amd64 cassandra:5.0
       docker save cassandra:5.0-amd64 -o cassandra.tar
       docker cp cassandra.tar social-media-control-plane:/cassandra.tar
       docker cp cassandra.tar social-media-worker:/cassandra.tar
@@ -127,6 +128,7 @@ resource "null_resource" "kind_images" {
       docker exec -i social-media-worker2 ctr -n k8s.io images import /cassandra.tar
 
       # Kafka
+      docker pull --platform=linux/amd64 confluentinc/cp-kafka:7.6.0  
       docker save confluentinc/cp-kafka:7.6.0 -o kafka.tar
       docker cp kafka.tar social-media-control-plane:/kafka.tar
       docker cp kafka.tar social-media-worker:/kafka.tar
@@ -539,28 +541,55 @@ resource "kubectl_manifest" "kafka_statefulset" {
         spec:
           containers:
             - name: kafka
-              image: strimzi-kafka-local:latest
+              image: confluentinc/cp-kafka:7.6.0
               imagePullPolicy: IfNotPresent
               env:
-                - name: KAFKA_LOG_DIR
-                  value: "/tmp/kafka-logs"
-                - name: LOG_DIR
-                  value: "/tmp/kafka-logs"
+                # 1. Enable KRaft and define combined roles
+                - name: KAFKA_NODE_ID
+                  value: "1"
+                - name: KAFKA_PROCESS_ROLES
+                  value: "broker,controller"
+                
+                # 2. Configure Listeners for internal cluster and outside traffic
+                - name: KAFKA_LISTENERS
+                  value: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+                - name: KAFKA_ADVERTISED_LISTENERS
+                  value: "PLAINTEXT://kafka:9092"
+                - name: KAFKA_CONTROLLER_LISTENER_NAMES
+                  value: "CONTROLLER"
+                - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+                  value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+                - name: KAFKA_INTER_BROKER_LISTENER_NAME
+                  value: "PLAINTEXT"
+                
+                # 3. Establish Controller Quorum Voters
+                - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+                  value: "1@kafka:9093"
+                
+                # 4. Generate a unique Cluster ID for KRaft storage formatting
+                - name: CLUSTER_ID
+                  value: "MkU3OEVBNTcwNTJENDM2Qk"
+
+                # 5. Handle Logging Configurations natively
+                - name: KAFKA_LOG_DIRS
+                  value: "/var/lib/kafka/data"
                 - name: KAFKA_GC_LOG_OPTS
-                  value: "-Xlog:gc*:file=/tmp/kafka-logs/kafkaServer-gc.log:time,tags:filecount=10,filesize=100M"
-              command:
-                - /bin/bash
-                - -c
-                - |
-                  mkdir -p /tmp/kafka-logs
-                  cp /opt/kafka/config/server.properties /tmp/server.properties
-                  sed -i 's|advertised.listeners=.*|advertised.listeners=PLAINTEXT://kafka:9092|' /tmp/server.properties
-                  sed -i 's|controller.quorum.bootstrap.servers=.*|controller.quorum.bootstrap.servers=kafka:9093|' /tmp/server.properties
-                  echo "controller.quorum.voters=1@kafka:9093" >> /tmp/server.properties
-                  /opt/kafka/bin/kafka-storage.sh format -t $$(cat /proc/sys/kernel/random/uuid) -c /tmp/server.properties &&
-                  /opt/kafka/bin/kafka-server-start.sh /tmp/server.properties
+                  value: "-Xlog:gc*:file=/var/lib/kafka/data/kafkaServer-gc.log:time,tags:filecount=10,filesize=100M"
+                
+                # 6. Minimum parameters for a stable 1-node cluster
+                - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+                  value: "1"
+                - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+                  value: "0"
+                - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+                  value: "1"
+                - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+                  value: "1"
               ports:
                 - containerPort: 9092
+                  name: broker
+                - containerPort: 9093
+                  name: controller
               resources:
                 requests:
                   memory: "512Mi"
@@ -570,6 +599,7 @@ resource "kubectl_manifest" "kafka_statefulset" {
                   cpu: "1000m"
   YAML
 }
+
 
 resource "kubectl_manifest" "kafka_service" {
   depends_on = [kubectl_manifest.kafka_statefulset]
@@ -626,8 +656,12 @@ resource "kubectl_manifest" "cassandra_statefulset" {
               imagePullPolicy: IfNotPresent
               ports:
                 - containerPort: 9042
+                  name: cql
               env:
+                # 1. Increased heap size to match allocated memory limits cleanly
                 - name: MAX_HEAP_SIZE
+                  value: "1024M"
+                - name: HEAP_NEWSIZE
                   value: "256M"
                 - name: CASSANDRA_CLUSTER_NAME
                   value: "cassandra-cluster"
@@ -638,17 +672,18 @@ resource "kubectl_manifest" "cassandra_statefulset" {
                 limits:
                   memory: "2Gi"
                   cpu: "1000m"
+              # 2. Replaced heavy CLI execution probes with lightweight TCP port checks
               readinessProbe:
-                exec:
-                  command: ["cqlsh", "-e", "describe keyspaces"]
-                initialDelaySeconds: 60
+                tcpSocket:
+                  port: 9042
+                initialDelaySeconds: 45
                 periodSeconds: 10
-                failureThreshold: 10
+                failureThreshold: 3
               livenessProbe:
-                exec:
-                  command: ["nodetool", "status"]
-                initialDelaySeconds: 90
-                periodSeconds: 30
+                tcpSocket:
+                  port: 9042
+                initialDelaySeconds: 60
+                periodSeconds: 20
                 failureThreshold: 5
   YAML
 }
@@ -668,6 +703,7 @@ resource "kubectl_manifest" "cassandra_service" {
       ports:
         - port: 9042
           targetPort: 9042
+          name: cql
   YAML
 }
 
