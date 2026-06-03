@@ -5,6 +5,9 @@ import { MemoryRouter } from 'react-router-dom';
 import RegisterPage from './Register';
 import { registerUser } from '../api/authServices.js';
 
+const mockNavigate = vi.hoisted(() => vi.fn());
+
+
 vi.mock('../api/authServices.js');
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');   // ✅ Vitest syntax

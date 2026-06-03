@@ -5,6 +5,8 @@ import { MemoryRouter } from 'react-router-dom';
 import LoginPage from './Login'
 import { loginUser } from '../api/authServices.js';
 
+const mockNavigate = vi.hoisted(() => vi.fn());
+
 // Mock dependencies
 vi.mock('../api/authServices.js');
 vi.mock('../components/AuthContext.jsx', () => ({
