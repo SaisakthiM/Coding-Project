@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bankmanagement.bank_management.database.Bank;
@@ -26,6 +27,7 @@ import jakarta.transaction.Transactional;
 @SpringBootTest  
 @AutoConfigureMockMvc
 @Transactional 
+@ActiveProfiles("test")
 class BankManagementApplicationTests {
 
     @Autowired
