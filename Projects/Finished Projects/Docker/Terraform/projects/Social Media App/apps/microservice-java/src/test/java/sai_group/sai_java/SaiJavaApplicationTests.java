@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
     CassandraReactiveDataAutoConfiguration.class
 })
 @ActiveProfiles("test")
-@EmbeddedKafka(partitions = 1, topics = {"post.created", "post.liked", "post.commented", "post.viewed", "user.followed"})
+@EmbeddedKafka(kraft=true, partitions = 1, topics = {"post.created", "post.liked", "post.commented", "post.viewed", "user.followed"})
 class SaiJavaApplicationTests {
 
     @Autowired

@@ -37,7 +37,6 @@ class SocialMediaKafkaConsumerTest {
     @Mock ActivityFeedRepository  activityFeedRepo;
     @Mock AnalyticsService        analyticsService;
 
-
     // Use a real ObjectMapper — it's a value object with no side effects.
     @Spy ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
@@ -56,7 +55,7 @@ class SocialMediaKafkaConsumerTest {
     @Test
     void onPostCreated_fansOutToAllFollowers() throws Exception {
         PostCreatedEvent event = PostCreatedEvent.builder()
-            .postId("post-1")
+            .postId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")  // valid UUID
             .authorId("author-1")
             .authorUsername("alice")
             .authorAvatar("https://cdn.example.com/alice.jpg")
@@ -71,7 +70,7 @@ class SocialMediaKafkaConsumerTest {
         // One ActivityFeed row per follower
         verify(activityFeedRepo, times(3)).save(any(ActivityFeed.class));
         // Analytics bootstrapped once
-        verify(analyticsService).initPostAnalytics("post-1", "author-1");
+        verify(analyticsService).initPostAnalytics("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "author-1");
     }
 
     @Test
