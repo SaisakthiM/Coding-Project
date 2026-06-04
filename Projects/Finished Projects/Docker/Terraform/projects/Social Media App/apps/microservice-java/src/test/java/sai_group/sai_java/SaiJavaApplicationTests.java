@@ -6,7 +6,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.cassandra.CassandraRepositoriesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -15,10 +17,12 @@ import sai_group.sai_java.repository.UserRepository;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
+@Import(TestConfig.class)
 @EnableAutoConfiguration(exclude = {
     CassandraAutoConfiguration.class,
     CassandraDataAutoConfiguration.class,
-    CassandraReactiveDataAutoConfiguration.class
+    CassandraReactiveDataAutoConfiguration.class,
+    CassandraRepositoriesAutoConfiguration.class
 })
 @ActiveProfiles("test")
 @EmbeddedKafka(kraft = true, partitions = 1, topics = {
@@ -27,6 +31,5 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class SaiJavaApplicationTests {
 
     @Test
-    void contextLoads() {
-    }
+    void contextLoads() {}
 }
