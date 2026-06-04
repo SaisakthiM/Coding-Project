@@ -75,7 +75,8 @@ describe('Ask component', () => {
     fireEvent.click(screen.getByRole('button', { name: '↑' }));
 
     await waitFor(() =>
-      expect(screen.getByText('Humanity is old.')).toBeInTheDocument()
+      expect(screen.getByText('Humanity is old.')).toBeInTheDocument(),
+      { timeout: 600 }
     );
   });
 
