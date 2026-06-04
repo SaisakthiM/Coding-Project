@@ -117,6 +117,9 @@ pipeline {
                             docker run --rm hospital:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi hospital:test || true' }
+                    }
                 }
 
                 stage('Blog Website') {
@@ -132,6 +135,9 @@ pipeline {
                                 blog:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi blog:test || true' }
+                    }
                 }
 
                 stage('Notes App - Backend') {
@@ -146,6 +152,9 @@ pipeline {
                                 -e DJANGO_SETTINGS_MODULE=notes_app.test_settings \
                                 notes-backend:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi notes-backend:test || true' }
                     }
                 }
 
@@ -164,6 +173,9 @@ pipeline {
                                 social-backend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi social-backend:test || true' }
+                    }
                 }
 
                 stage('Document Intelligence - Backend') {
@@ -180,6 +192,9 @@ pipeline {
                                 -e OLLAMA_HOST=localhost \
                                 doc-backend:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi doc-backend:test || true' }
                     }
                 }
 
@@ -201,6 +216,9 @@ pipeline {
                             docker run --rm quiz-app:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi quiz-app:test || true' }
+                    }
                 }
 
                 stage('Notes App - Frontend') {
@@ -213,6 +231,9 @@ pipeline {
                                 "${PROJECTS_ROOT}/Notes App/frontend/notes_app_frontend"
                             docker run --rm notes-frontend:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi notes-frontend:test || true' }
                     }
                 }
 
@@ -227,6 +248,9 @@ pipeline {
                             docker run --rm api-frontend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi api-frontend:test || true' }
+                    }
                 }
 
                 stage('API Service - Backend') {
@@ -240,9 +264,12 @@ pipeline {
                             docker run --rm api-backend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi api-backend:test || true' }
+                    }
                 }
 
-                /* 
+                /*
                 stage('Bank Manager - Frontend') {
                     when { expression { env.BUILD_BANK_FRONTEND == 'true' } }
                     steps {
@@ -254,8 +281,10 @@ pipeline {
                             docker run --rm bank-frontend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi bank-frontend:test || true' }
+                    }
                 }
-                
                 */
 
                 stage('Social Media App - Frontend') {
@@ -269,6 +298,9 @@ pipeline {
                             docker run --rm social-frontend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi social-frontend:test || true' }
+                    }
                 }
 
                 stage('Document Intelligence - Frontend') {
@@ -281,6 +313,9 @@ pipeline {
                                 "${PROJECTS_ROOT}/Document Intelligence Platform/frontend/document_frontend"
                             docker run --rm doc-frontend:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi doc-frontend:test || true' }
                     }
                 }
 
@@ -304,6 +339,9 @@ pipeline {
                                 bank-backend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi bank-backend:test || true' }
+                    }
                 }
 
                 stage('Video Uploader - Backend') {
@@ -319,6 +357,9 @@ pipeline {
                                 video-backend:test
                         """
                     }
+                    post {
+                        always { sh 'docker rmi video-backend:test || true' }
+                    }
                 }
 
                 stage('Social Media App - Java Microservice') {
@@ -333,6 +374,9 @@ pipeline {
                                 -v /home/saisakthi/.m2:/root/.m2 \
                                 social-java:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi social-java:test || true' }
                     }
                 }
 
@@ -353,6 +397,9 @@ pipeline {
                                 "${PROJECTS_ROOT}/Social Media App/apps/microservice-go"
                             docker run --rm social-go:test
                         """
+                    }
+                    post {
+                        always { sh 'docker rmi social-go:test || true' }
                     }
                 }
 

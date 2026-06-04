@@ -20,7 +20,6 @@ import com.bankmanagement.bank_management.database.Bank;
 import com.bankmanagement.bank_management.repository.BankRepository;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 public class BankRepositoryTest {
 
