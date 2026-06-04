@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 })
 class SaiJavaApplicationTests {
 
-    @MockitoBean // or @MockBean
-    private ReactiveCassandraTemplate reactiveCassandraTemplate;
+    
 
     @Test
     void contextLoads() {}
