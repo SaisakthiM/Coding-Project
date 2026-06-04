@@ -36,7 +36,8 @@ describe('Upload component', () => {
     fireEvent.click(screen.getByRole('button', { name: /upload document/i }));
 
     await waitFor(() =>
-      expect(screen.getByText(/uploaded successfully/i)).toBeInTheDocument()
+      expect(screen.getByText(/uploaded successfully/i)).toBeInTheDocument(),
+      { timeout: 600 }
     );
   });
 
