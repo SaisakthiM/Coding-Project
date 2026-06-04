@@ -1,7 +1,6 @@
 package sai_group.sai_java;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
@@ -9,16 +8,15 @@ import org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveDa
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraRepositoriesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import sai_group.sai_java.repository.ActivityFeedRepository;
+import sai_group.sai_java.repository.NotificationRepository;
 import sai_group.sai_java.repository.UserRepository;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@SpringBootTest
+@SpringBootTest(properties = "spring.main.allow-bean-definition-overriding=true")
 @Import(TestConfig.class)
 @EnableAutoConfiguration(exclude = {
     CassandraAutoConfiguration.class,
@@ -32,8 +30,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 })
 class SaiJavaApplicationTests {
 
-    
+    @MockitoBean
+    private NotificationRepository notificationRepository;
+
+    @MockitoBean
+    private ActivityFeedRepository activityFeedRepository;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Test
-    void contextLoads() {}
+    void contextLoads() {
+    }
 }
