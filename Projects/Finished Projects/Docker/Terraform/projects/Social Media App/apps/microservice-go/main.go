@@ -345,7 +345,7 @@ func unreadTotalHandler(w http.ResponseWriter, r *http.Request) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-func startServer() {
+func main() {
 	redisHost := os.Getenv("REDIS_HOST")
 	if redisHost == "" {
 		redisHost = "redis"

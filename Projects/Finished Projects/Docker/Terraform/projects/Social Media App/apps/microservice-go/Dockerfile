@@ -12,7 +12,7 @@ COPY . .
 # Build main microservice
 RUN go build -o microservice-go ./main.go
 # Build wait-for-redis binary
-RUN go build -o wait-for-redis ./wait-for-redis.go
+RUN go build -o wait-for-redis ./wait-for-redis/wait-for-redis.go
 
 # ---- Runtime stage ----
 FROM gcr.io/distroless/base-debian12

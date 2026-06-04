@@ -872,3 +872,53 @@ resource "docker_container" "jenkins_agent" {
 
   depends_on = [docker_container.jenkins]
 }
+
+resource "docker_volume" "n8n_data" {
+  name = "gateway_n8n-data"
+}
+resource "docker_container" "n8n" {
+  name    = "n8n"
+  image   = "n8nio/n8n:latest"
+  restart = "unless-stopped"
+
+  env = [
+    "N8N_PORT=5679",
+    "N8N_HOST=0.0.0.0",
+    "N8N_PROTOCOL=https",
+    "N8N_PATH=/n8n/",          # ← no trailing slash
+    "N8N_PROXY_HOPS=1",
+    "N8N_EDITOR_BASE_URL=https://${var.domain}/n8n/",
+    "WEBHOOK_URL=https://${var.domain}/n8n/",
+    "N8N_BASIC_AUTH_ACTIVE=true",
+    "N8N_BASIC_AUTH_USER=${var.n8n_user}",
+    "N8N_BASIC_AUTH_PASSWORD=${var.n8n_password}",
+    "GENERIC_TIMEZONE=Asia/Kolkata",
+    "TZ=Asia/Kolkata",
+    "N8N_DIAGNOSTICS_ENABLED=false",
+    "N8N_RUNNERS_DISABLED=true",
+
+    # CSP override as JSON string
+    <<EOT
+N8N_CONTENT_SECURITY_POLICY={
+  "default-src": ["'self'", "blob:", "data:"],
+  "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://static.cloudflareinsights.com"],
+  "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+  "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+  "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
+  "connect-src": ["'self'", "ws:", "wss:", "https:", "http:"],
+  "worker-src": ["'self'", "blob:"],
+  "frame-ancestors": ["http://n8n", "https://${var.domain}"]
+}
+EOT
+  ]
+
+  mounts {
+    source = docker_volume.n8n_data.name
+    target = "/home/node/.n8n"
+    type   = "volume"
+  }
+
+  networks_advanced {
+    name = docker_network.gateway_net.name
+  }
+}
