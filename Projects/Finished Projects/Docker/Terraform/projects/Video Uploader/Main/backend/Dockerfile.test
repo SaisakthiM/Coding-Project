@@ -5,7 +5,8 @@ WORKDIR /app
 
 # Copy pom.xml first (cached layer — only rebuilds if dependencies change)
 COPY pom.xml .
-RUN mvn dependency:go-offline -q
+RUN --mount=type=cache,id=mvn-cache,target=/root/.m2 \
+    mvn dependency:go-offline -q
 
 # Copy source
 COPY src ./src

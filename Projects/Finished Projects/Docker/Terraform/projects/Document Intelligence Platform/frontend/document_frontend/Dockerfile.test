@@ -32,12 +32,14 @@ WORKDIR /app
 
 # ── Production + dev dependency layer (cached unless package*.json changes) ───
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
+    npm install --legacy-peer-deps
 
 # ── Install test-only packages on top ────────────────────────────────────────
 # Kept separate so the test layer can be rebuilt without reinstalling
 # the full app's node_modules from scratch.
-RUN npm install --legacy-peer-deps --save-dev \
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
+    npm install --legacy-peer-deps --save-dev \
     vitest@2 \
     @vitest/coverage-v8@2 \
     @testing-library/dom@10 \

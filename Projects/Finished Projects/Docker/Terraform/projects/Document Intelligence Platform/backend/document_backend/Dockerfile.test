@@ -10,7 +10,8 @@ WORKDIR /app
 
 # Install only what's needed for tests — skip torch/sentence-transformers
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
+RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
+    pip install -r requirements.txt \
     --extra-index-url https://download.pytorch.org/whl/cpu
 
 ARG CACHE_BUST

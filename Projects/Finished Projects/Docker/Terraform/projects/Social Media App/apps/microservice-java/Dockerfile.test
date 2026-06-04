@@ -36,7 +36,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -q
+RUN --mount=type=cache,id=mvn-cache,target=/root/.m2 \
+    chmod +x mvnw && ./mvnw dependency:go-offline -q
 
 # ── Source ───────────────────────────────────────────────────────────────────
 COPY src ./src

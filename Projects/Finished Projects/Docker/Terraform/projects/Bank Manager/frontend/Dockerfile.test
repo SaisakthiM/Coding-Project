@@ -5,7 +5,8 @@ WORKDIR /app
 
 # Install deps first (cached layer — only rebuilds if package.json changes)
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
+    npm install --legacy-peer-deps
 
 # Copy source
 ARG CACHE_BUST

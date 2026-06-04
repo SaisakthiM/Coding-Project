@@ -30,11 +30,15 @@ WORKDIR /app
 
 # ── Dependency layer (cached unless go.mod / go.sum change) ──────────────────
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,id=go-mod-cache,target=/go/pkg/mod \
+    --mount=type=cache,id=go-build-cache,target=/root/.cache/go-build \
+    go mod download
 
 # ── Add miniredis (in-process fake Redis — no sidecar needed) ────────────────
 # We add it here so it's cached separately from source changes.
-RUN go get github.com/alicebob/miniredis/v2
+RUN --mount=type=cache,id=go-mod-cache,target=/go/pkg/mod \
+    --mount=type=cache,id=go-build-cache,target=/root/.cache/go-build \
+    go get github.com/alicebob/miniredis/v2
 
 # ── Source ───────────────────────────────────────────────────────────────────
 COPY main.go main_test.go wait-for-redis.go ./

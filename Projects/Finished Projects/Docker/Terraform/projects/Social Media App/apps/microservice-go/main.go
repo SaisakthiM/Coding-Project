@@ -345,7 +345,7 @@ func unreadTotalHandler(w http.ResponseWriter, r *http.Request) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-func main() {
+func startServer() {
 	redisHost := os.Getenv("REDIS_HOST")
 	if redisHost == "" {
 		redisHost = "redis"
@@ -369,32 +369,31 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Health
-	mux.HandleFunc("GET /",               healthHandler)
-	mux.HandleFunc("GET /health",         healthHandler)
+	mux.HandleFunc("GET /", healthHandler)
+	mux.HandleFunc("GET /health", healthHandler)
 
 	// Rate limiting
 	mux.HandleFunc("POST /api/go/rate-limit/check", rateLimitHandler)
 
 	// Presence
-	mux.HandleFunc("POST /api/go/presence/heartbeat",  presenceHeartbeatHandler)
-	mux.HandleFunc("GET  /api/go/presence/{user_id}",  presenceGetHandler)
-	mux.HandleFunc("POST /api/go/presence/bulk",       presenceBulkHandler)
+	mux.HandleFunc("POST /api/go/presence/heartbeat", presenceHeartbeatHandler)
+	mux.HandleFunc("GET  /api/go/presence/{user_id}", presenceGetHandler)
+	mux.HandleFunc("POST /api/go/presence/bulk", presenceBulkHandler)
 
 	// Feed cache
-	mux.HandleFunc("POST   /api/go/cache/feed",            cacheFeedSetHandler)
-	mux.HandleFunc("GET    /api/go/cache/feed/{user_id}",  cacheFeedGetHandler)
-	mux.HandleFunc("DELETE /api/go/cache/feed/{user_id}",  cacheFeedInvalidateHandler)
+	mux.HandleFunc("POST   /api/go/cache/feed", cacheFeedSetHandler)
+	mux.HandleFunc("GET    /api/go/cache/feed/{user_id}", cacheFeedGetHandler)
+	mux.HandleFunc("DELETE /api/go/cache/feed/{user_id}", cacheFeedInvalidateHandler)
 
 	// Typing indicators
-	mux.HandleFunc("POST /api/go/typing",                        typingHandler)
-	mux.HandleFunc("GET  /api/go/typing/{conversation_id}",      typingGetHandler)
+	mux.HandleFunc("POST /api/go/typing", typingHandler)
+	mux.HandleFunc("GET  /api/go/typing/{conversation_id}", typingGetHandler)
 
 	// Unread counts
-	mux.HandleFunc("POST /api/go/unread/increment",    unreadIncrementHandler)
-	mux.HandleFunc("POST /api/go/unread/clear",        unreadClearHandler)
-	mux.HandleFunc("GET  /api/go/unread/{user_id}",    unreadTotalHandler)
+	mux.HandleFunc("POST /api/go/unread/increment", unreadIncrementHandler)
+	mux.HandleFunc("POST /api/go/unread/clear", unreadClearHandler)
+	mux.HandleFunc("GET  /api/go/unread/{user_id}", unreadTotalHandler)
 
 	log.Println("Go microservice listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
-
