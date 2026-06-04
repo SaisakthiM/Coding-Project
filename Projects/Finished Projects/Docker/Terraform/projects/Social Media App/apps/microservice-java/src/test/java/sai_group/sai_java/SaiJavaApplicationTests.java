@@ -9,8 +9,10 @@ import org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveDa
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraRepositoriesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import sai_group.sai_java.repository.UserRepository;
 
@@ -29,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
     "post.created", "post.liked", "post.commented", "post.viewed", "user.followed"
 })
 class SaiJavaApplicationTests {
+
+    @MockitoBean // or @MockBean
+    private ReactiveCassandraTemplate reactiveCassandraTemplate;
 
     @Test
     void contextLoads() {}
