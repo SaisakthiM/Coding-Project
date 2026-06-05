@@ -2,27 +2,25 @@
     "version": "2.0.0",
     "tasks": [
         /*
-        {
-            "label": "Start Starcoder2-3B Ollama GPU (Auto Server & Wait)",
-            "type": "shell",
-            "command": "powershell.exe",
-            "args": [
-                "-NoProfile",
-                "-ExecutionPolicy", "Bypass",
-                "-Command",
-                "& { if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port 11434).TcpTestSucceeded) { Write-Host '🚀 Starting Ollama server...'; Start-Process -NoNewWindow ollama -ArgumentList 'serve' -PassThru | Out-Null; Start-Sleep -Seconds 5 }; Write-Host '💾 Preloading Starcoder2-3B model on GPU...'; try { ollama run starcoder-2 'Warmup for GPU caching' | Out-Null } catch { $_ | Out-File \"$env:TEMP\\starcoder2_task_error.log\" -Append; Write-Host \"⚠️ Error logged to $env:TEMP\\starcoder2_task_error.log\" }; Write-Host '✅ Starcoder2-3B ready for Cline or AI Toolkit connection.' }"
-            ],
-            "isBackground": true,
-            "problemMatcher": []
-        }
-        */
+    {
+        "label": "Start Starcoder2-3B Ollama GPU (Auto Server & Wait)",
+        "type": "shell",
+        "command": "powershell.exe",
+        "args": [
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-Command",
+            "& { if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port 11434).TcpTestSucceeded) { Write-Host '🚀 Starting Ollama server...'; Start-Process -NoNewWindow ollama -ArgumentList 'serve' -PassThru | Out-Null; Start-Sleep -Seconds 5 }; Write-Host '💾 Preloading Starcoder2-3B model on GPU...'; try { ollama run starcoder-2 'Warmup for GPU caching' | Out-Null } catch { $_ | Out-File \"$env:TEMP\\starcoder2_task_error.log\" -Append; Write-Host \"⚠️ Error logged to $env:TEMP\\starcoder2_task_error.log\" }; Write-Host '✅ Starcoder2-3B ready for Cline or AI Toolkit connection.' }"
+        ],
+        "isBackground": true,
+        "problemMatcher": []
+    }
+    */
         {
             "label": "Daily Git Auto Commit",
             "type": "shell",
-
             // Default — will be overwritten by platform-specific options
             "command": "echo Platform not supported",
-
             // Windows-specific
             "windows": {
                 "command": "powershell.exe",
@@ -33,7 +31,6 @@
                     "${workspaceFolder}/.vscode/Scripts/auto-commit.ps1"
                 ]
             },
-
             // Linux-specific
             "linux": {
                 "command": "/bin/bash",
@@ -41,7 +38,6 @@
                     "${workspaceFolder}/.vscode/Scripts/auto-commit.sh"
                 ]
             },
-
             "problemMatcher": []
         },
         {
@@ -49,14 +45,62 @@
             "type": "shell",
             "linux": {
                 "command": "/bin/bash",
-                "args": ["${workspaceFolder}/.vscode/Scripts/update_modules.sh"]
+                "args": [
+                    "${workspaceFolder}/.vscode/Scripts/update_modules.sh"
+                ]
             },
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
             },
             "runOptions": {},
-            "problemMatcher": [],
+            "problemMatcher": []
+        },
+        {
+            "label": "C: gcc build active file",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "C++: g++ build active file",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "C++: build folder (custom path)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "FOLDER=\"${input:cppFolderPath}\" && mkdir -p \"${workspaceFolder}/.vscode/build\" && g++ -g \"$FOLDER\"/*.cpp -o \"${workspaceFolder}/.vscode/build/out\""
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Run All Startup Tasks",
@@ -66,6 +110,14 @@
             "runOptions": {
                 "runOn": "folderOpen"
             }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "cppFolderPath",
+            "type": "promptString",
+            "description": "Path to the folder containing your .cpp files (e.g. /home/saisakthi/project/src)",
+            "default": "${fileDirname}"
         }
     ]
 }
