@@ -73,7 +73,6 @@
     "*.asm": "asm-intel-x86-generic",
     "*.html": "html"
   },
-  // OPTIMIZED: Expanded file watcher exclusions to reduce background scanning
   "files.watcherExclude": {
     "**/node_modules/**": true,
     "**/dist/**": true,
@@ -87,7 +86,6 @@
     "**/out/**": true,
     "**/.vscode/**": true
   },
-  // OPTIMIZED: Expanded search exclusions
   "search.exclude": {
     "**/node_modules/**": true,
     "**/.git/**": true,
@@ -98,7 +96,6 @@
     "**/target/**": true,
     "**/out/**": true
   },
-  // OPTIMIZED: Disabled symlink following for better performance
   "search.followSymlinks": false,
   "workbench.editorAssociations": {
     "*.copilotmd": "vscode.markdown.preview.editor",
@@ -121,7 +118,6 @@
     "editor.inlayHints.maximumLength": 0
   },
   "python.defaultInterpreterPath": "/bin/python",
-  // OPTIMIZED: Disabled resource-heavy Python analysis features
   "python.analysis.autoImportCompletions": false,
   "python.analysis.indexing": false,
   "python.analysis.extraPaths": [
@@ -353,7 +349,6 @@
   "C_Cpp.default.compilerPath": "C:\\MinGW\\bin\\gcc.exe",
   "liveServer.settings.donotShowInfoMsg": true,
   "dbcode.resultLocation": "below",
-  // OPTIMIZED: Disabled GitHub Copilot completely to save resources
   "github.copilot.enable": {
     "*": false,
     "plaintext": false,
@@ -468,9 +463,7 @@
     "css": "css"
   },
   "security.workspace.trust.untrustedFiles": "open",
-  // OPTIMIZED: Disabled C++ IntelliSense to reduce resource usage
   "C_Cpp.intelliSenseEngine": "disabled",
-  // OPTIMIZED: Disabled git autofetch - fetch manually when needed
   "git.autofetch": false,
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.cursorBlinking": true,
@@ -488,11 +481,9 @@
     "typescriptreact": "typescriptreact"
   },
   "docker.extension.dockerEngineAvailabilityPrompt": false,
-  // OPTIMIZED: Disabled Continue tab autocomplete for better performance
   "continue.enableTabAutocomplete": false,
   "github.copilot.selectedCompletionModel": "",
   "tabnine.experimentalAutoImports": true,
-  // OPTIMIZED: Disabled Codeium for resource-heavy languages
   "codeium.enableConfig": {
     "*": true,
     "html": false,
@@ -531,7 +522,6 @@
   "gemini-cli-vscode.migration.v3.notified": true,
   "cSpell.enabled": true,
   "cSpell.language": "en",
-  // OPTIMIZED: Reduced spell check limit for better performance
   "cSpell.checkLimit": 5000,
   "cSpell.enabledFileTypes": {
     "*": true
@@ -555,13 +545,11 @@
     "Saika",
     "Saisakthi"
   ],
-  // OPTIMIZED: Increased spell check delay to reduce CPU usage
   "cSpell.spellCheckDelayMs": 300,
   "cSpell.allowCompoundWords": true,
   "editor.quickSuggestions": {
     "strings": true
   },
-  // OPTIMIZED: Changed to explicit for manual control
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
@@ -582,9 +570,7 @@
   },
   "maven.terminal.useJavaHome": true,
   "git.confirmSync": false,
-  // OPTIMIZED: Disabled automatic null analysis for Java
   "java.compile.nullAnalysis.mode": "disabled",
-  // OPTIMIZED: Changed to interactive for manual control
   "java.configuration.updateBuildConfiguration": "interactive",
   "git.ignoreRebaseWarning": true,
   "jdk.telemetry.enabled": false,
@@ -592,7 +578,6 @@
     ".github/instructions": true,
     "/home/saisakthi/.aitk/instructions/": true
   },
-  // OPTIMIZED: Add these new performance settings
   "extensions.autoUpdate": false,
   "extensions.autoCheckUpdates": false,
   "typescript.disableAutomaticTypeAcquisition": true,
@@ -601,5 +586,62 @@
   "files.autoSave": "afterDelay",
   "editor.formatOnSave": false,
   "java.jdt.ls.vmargs": "-XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1G -Xms256m",
-  "java.format.settings.url": ".vscode/java-formatter.xml"
+  "java.format.settings.url": ".vscode/java-formatter.xml",
+  "C_Cpp_Runner.msvcBatchPath": "",
+  "C_Cpp_Runner.cCompilerPath": "gcc",
+  "C_Cpp_Runner.cppCompilerPath": "g++",
+  "C_Cpp_Runner.debuggerPath": "gdb",
+  "C_Cpp_Runner.cStandard": "",
+  "C_Cpp_Runner.cppStandard": "",
+  "C_Cpp_Runner.useMsvc": false,
+  "C_Cpp_Runner.warnings": [
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-Wshadow",
+    "-Wformat=2",
+    "-Wcast-align",
+    "-Wconversion",
+    "-Wsign-conversion",
+    "-Wnull-dereference"
+  ],
+  "C_Cpp_Runner.msvcWarnings": [
+    "/W4",
+    "/permissive-",
+    "/w14242",
+    "/w14287",
+    "/w14296",
+    "/w14311",
+    "/w14826",
+    "/w44062",
+    "/w44242",
+    "/w14905",
+    "/w14906",
+    "/w14263",
+    "/w44265",
+    "/w14928"
+  ],
+  "C_Cpp_Runner.enableWarnings": true,
+  "C_Cpp_Runner.warningsAsError": false,
+  "C_Cpp_Runner.compilerArgs": [],
+  "C_Cpp_Runner.linkerArgs": [],
+  "C_Cpp_Runner.includePaths": [],
+  "C_Cpp_Runner.includeSearch": [
+    "*",
+    "**/*"
+  ],
+  "C_Cpp_Runner.excludeSearch": [
+    "**/build",
+    "**/build/**",
+    "**/.*",
+    "**/.*/**",
+    "**/.vscode",
+    "**/.vscode/**"
+  ],
+  "C_Cpp_Runner.useAddressSanitizer": false,
+  "C_Cpp_Runner.useUndefinedSanitizer": false,
+  "C_Cpp_Runner.useLeakSanitizer": false,
+  "C_Cpp_Runner.showCompilationTime": false,
+  "C_Cpp_Runner.useLinkTimeOptimization": false,
+  "C_Cpp_Runner.msvcSecureNoWarnings": false
 }

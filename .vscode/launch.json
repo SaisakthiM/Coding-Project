@@ -1,77 +1,91 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "jdk",
+      "name": "SaiApplication",
+      "request": "launch",
+      "mainClass": "com.generics.sai.SaiApplication"
+    },
+    {
+      "type": "jdk",
+      "name": "Others",
+      "request": "launch",
+      "mainClass": "Exercises.Others.Others"
+    },
+    {
+      "type": "jdk",
+      "name": "Vehicle",
+      "request": "launch",
+      "mainClass": "Vehicle"
+    },
+    {
+      "name": "Python Debugger: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Cargo test",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib"
+        ]
+      },
+      "args": []
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Cargo run",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib"
+        ]
+      },
+      "args": []
+    },
+    {
+      "type": "jdk",
+      "name": "Spring Boot-SaisakthiApplication<saisakthi>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "spring_boot.saisakthi.SaisakthiApplication",
+      "args": ""
+    },
+    {
+      "type": "jdk",
+      "name": "Spring Boot-Application2<spring>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "spring_project.spring.Application2",
+      "args": ""
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C++/Tasks",
+      "program": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C++/Tasks/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
         {
-            "type": "jdk",
-            "name": "SaiApplication",
-            "request": "launch",
-            "mainClass": "com.generics.sai.SaiApplication",
-            
-        },
-        {
-            "type": "jdk",
-            "name": "Others",
-            "request": "launch",
-            "mainClass": "Exercises.Others.Others",
-            
-        },
-        {
-            "type": "jdk",
-            "name": "Vehicle",
-            "request": "launch",
-            "mainClass": "Vehicle",
-        },
-        {
-            "name": "Python Debugger: Current File",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Cargo test",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--lib"
-                ]
-            },
-            "args": []
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Cargo run",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--lib"
-                ]
-            },
-            "args": []
-        },
-        {
-            "type": "jdk",
-            "name": "Spring Boot-SaisakthiApplication<saisakthi>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "spring_boot.saisakthi.SaisakthiApplication",
-            "args": "",
-        },
-        {
-            "type": "jdk",
-            "name": "Spring Boot-Application2<spring>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "spring_project.spring.Application2",
-            "args": "",
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
         }
-    ]
+      ]
+    }
+  ]
 }
