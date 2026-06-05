@@ -12,7 +12,7 @@ int multiply(int a, int b) {
     return a*b;
 }
 
-int divide(int a, int b) {
+extern int divide(int a, int b) {
     return a/b;
 }
 
@@ -29,7 +29,8 @@ void story(char a) {
 }
 
 int main() {
-    
+    string s = "saisakthi";
+    printf("%s", s.c_str());
     log(1);
     story('a');
     std::cout << "hello world" << std::endl;
@@ -38,6 +39,7 @@ int main() {
     cout << x << endl;
     cout << sizeof(float) << endl;
     cout << multiply(1, -1) << endl;
+    cout << divide(1, 0) << endl;
 
     return 1;
 }
