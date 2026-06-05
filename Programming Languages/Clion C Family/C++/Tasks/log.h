@@ -8,7 +8,9 @@ int log(int a) {
 } 
 
 struct Log {
-  void printLog(const std::any& value) {
+
+  static void printLog(const std::any& value) {
     printf("%s",std::any_cast<std::string>(&value));
   };
+
 };

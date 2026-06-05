@@ -37,9 +37,7 @@ void story(char a) {
 }
 
 int main() {
-
-    Log log;
-    log.printLog('a');
+    Log::printLog('a');
     int a = 10;
     int* ptr = &a;
     *ptr = 100;
