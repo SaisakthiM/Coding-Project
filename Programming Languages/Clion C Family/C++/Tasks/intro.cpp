@@ -45,8 +45,9 @@ int main() {
     cout << sizeof(float) << endl;
     cout << multiply(1, -1) << endl;
     for (; ; ) {
-        std::allocator<int> alloc;
-        int* raw_array = alloc.allocate(100000000000000);
+        std::allocator<double> alloc;
+        double* raw_array = alloc.allocate(100);
+        raw_array[0] = 1;
     }
 
     return 1;
