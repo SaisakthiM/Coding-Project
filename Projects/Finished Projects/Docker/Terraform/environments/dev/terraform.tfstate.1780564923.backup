@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "1.14.6",
-  "serial": 3841,
+  "serial": 3814,
   "lineage": "d6808725-3cfc-aef7-1b8c-4e0ac9ea42a6",
   "outputs": {},
   "resources": [
@@ -1611,14 +1611,12 @@
             ],
             "env": [
               "GENERIC_TIMEZONE=Asia/Kolkata",
-              "N8N_AI_ASSISTANT_BASE_URL=http://ollama:11434",
               "N8N_BASIC_AUTH_ACTIVE=true",
               "N8N_BASIC_AUTH_PASSWORD=saisakthi2008",
               "N8N_BASIC_AUTH_USER=admin",
               "N8N_CONTENT_SECURITY_POLICY={\n  \"default-src\": [\"'self'\", \"blob:\", \"data:\"],\n  \"script-src\": [\"'self'\", \"'unsafe-inline'\", \"'unsafe-eval'\", \"blob:\", \"data:\", \"https://static.cloudflareinsights.com\"],\n  \"style-src\": [\"'self'\", \"'unsafe-inline'\", \"https://fonts.googleapis.com\"],\n  \"font-src\": [\"'self'\", \"https://fonts.gstatic.com\", \"data:\"],\n  \"img-src\": [\"'self'\", \"data:\", \"blob:\", \"https:\", \"http:\"],\n  \"connect-src\": [\"'self'\", \"ws:\", \"wss:\", \"https:\", \"http:\"],\n  \"worker-src\": [\"'self'\", \"blob:\"],\n  \"frame-ancestors\": [\"http://n8n\", \"https://saisakthi.qzz.io\"]\n}\n",
               "N8N_DIAGNOSTICS_ENABLED=true",
-              "N8N_DISABLE_PUSH_ORIGIN_CHECK=true",
-              "N8N_EDITOR_BASE_URL=https://saisakthi.qzz.io/n8n",
+              "N8N_EDITOR_BASE_URL=https://saisakthi.qzz.io/n8n/",
               "N8N_ENFORCE_SETTINGS_PERMISSION=true",
               "N8N_HOST=0.0.0.0",
               "N8N_METRICS=true",
@@ -1629,15 +1627,15 @@
               "N8N_RUNNERS_DISABLED=true",
               "N8N_TELEMETRY_ENABLED=true",
               "TZ=Asia/Kolkata",
-              "WEBHOOK_URL=https://saisakthi.qzz.io/n8n"
+              "WEBHOOK_URL=https://saisakthi.qzz.io/n8n/"
             ],
             "exit_code": null,
             "gpus": null,
             "group_add": null,
             "healthcheck": null,
             "host": [],
-            "hostname": "58231c42a348",
-            "id": "58231c42a3488c4fdb57dc8dbbf72c86a51c4db182a2f9370a147703b4066614",
+            "hostname": "556d685e5308",
+            "id": "556d685e530831ded24c75a39a7d658816f4154efde37227232c367f1e859ef3",
             "image": "n8nio/n8n:latest",
             "init": false,
             "ipc_mode": "private",
@@ -1670,7 +1668,7 @@
                 "ip_address": "172.19.0.17",
                 "ip_prefix_length": 16,
                 "ipv6_gateway": "",
-                "mac_address": "de:de:a6:5f:1f:88",
+                "mac_address": "5a:5f:13:d9:fd:20",
                 "network_name": "gateway-net"
               }
             ],
@@ -1690,7 +1688,7 @@
             "publish_all_ports": false,
             "read_only": false,
             "remove_volumes": true,
-            "restart": "no",
+            "restart": "unless-stopped",
             "rm": false,
             "runtime": "runc",
             "security_opts": [],
@@ -1712,7 +1710,14 @@
             "wait_timeout": 60,
             "working_dir": "/home/node"
           },
-          "sensitive_attributes": [],
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "env"
+              }
+            ]
+          ],
           "identity_schema_version": 0,
           "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjIifQ==",
           "dependencies": [
@@ -4059,7 +4064,7 @@
           "attributes": {
             "cluster": [],
             "driver": "local",
-            "driver_opts": null,
+            "driver_opts": {},
             "id": "gateway_n8n-data",
             "labels": [],
             "mountpoint": "/var/lib/docker/volumes/gateway_n8n-data/_data",
@@ -6841,9 +6846,10 @@
       "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
       "instances": [
         {
+          "status": "tainted",
           "schema_version": 0,
           "attributes": {
-            "id": "5247352850245418849",
+            "id": "3504798499349794469",
             "triggers": null
           },
           "sensitive_attributes": [],
@@ -7445,9 +7451,9 @@
             "cpus": null,
             "destroy_grace_seconds": null,
             "devices": [],
-            "dns": null,
-            "dns_opts": null,
-            "dns_search": null,
+            "dns": [],
+            "dns_opts": [],
+            "dns_search": [],
             "domainname": "",
             "entrypoint": [
               "/docker-entrypoint.sh"
@@ -7455,17 +7461,17 @@
             "env": [],
             "exit_code": null,
             "gpus": null,
-            "group_add": null,
-            "healthcheck": null,
+            "group_add": [],
+            "healthcheck": [],
             "host": [],
-            "hostname": "0389d2206de2",
-            "id": "0389d2206de2ee9cc794b740d6ec220543be27dc769e6829966d0996815d94c3",
+            "hostname": "b84c9a74f037",
+            "id": "b84c9a74f037817c97f645b41e4e26e79a5fe51874786def96d67662733ac332",
             "image": "nginx:alpine",
             "init": false,
             "ipc_mode": "private",
             "labels": [],
             "log_driver": "json-file",
-            "log_opts": null,
+            "log_opts": {},
             "logs": false,
             "max_retry_count": 0,
             "memory": 0,
@@ -7477,15 +7483,6 @@
                 "read_only": true,
                 "source": "/home/saisakthi/Coding-Project/Projects/Finished Projects/Docker/Terraform/environments/dev/nginx/default.conf",
                 "target": "/etc/nginx/conf.d/default.conf",
-                "tmpfs_options": [],
-                "type": "bind",
-                "volume_options": []
-              },
-              {
-                "bind_options": [],
-                "read_only": true,
-                "source": "/home/saisakthi/letsencrypt/",
-                "target": "/etc/letsencrypt/",
                 "tmpfs_options": [],
                 "type": "bind",
                 "volume_options": []
@@ -7567,13 +7564,23 @@
             "name": "gateway",
             "network_data": [
               {
-                "gateway": "",
+                "gateway": "172.18.0.1",
+                "global_ipv6_address": "fc00:f853:ccd:e793::6",
+                "global_ipv6_prefix_length": 64,
+                "ip_address": "172.18.0.6",
+                "ip_prefix_length": 16,
+                "ipv6_gateway": "fc00:f853:ccd:e793::1",
+                "mac_address": "8e:e5:f2:b6:f1:ff",
+                "network_name": "kind"
+              },
+              {
+                "gateway": "172.19.0.1",
                 "global_ipv6_address": "",
                 "global_ipv6_prefix_length": 0,
-                "ip_address": "",
-                "ip_prefix_length": 0,
+                "ip_address": "172.19.0.11",
+                "ip_prefix_length": 16,
                 "ipv6_gateway": "",
-                "mac_address": "",
+                "mac_address": "96:31:21:48:8e:47",
                 "network_name": "gateway-net"
               }
             ],
@@ -7588,7 +7595,14 @@
               }
             ],
             "pid_mode": "",
-            "ports": [],
+            "ports": [
+              {
+                "external": 80,
+                "internal": 80,
+                "ip": "0.0.0.0",
+                "protocol": "tcp"
+              }
+            ],
             "privileged": false,
             "publish_all_ports": false,
             "read_only": false,
@@ -7602,9 +7616,9 @@
             "stdin_open": false,
             "stop_signal": "SIGQUIT",
             "stop_timeout": 1,
-            "storage_opts": null,
-            "sysctls": null,
-            "tmpfs": null,
+            "storage_opts": {},
+            "sysctls": {},
+            "tmpfs": {},
             "tty": false,
             "ulimit": [],
             "upload": [],

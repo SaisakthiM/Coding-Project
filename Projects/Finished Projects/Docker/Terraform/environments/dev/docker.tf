@@ -282,6 +282,49 @@ resource "docker_image" "jenkins" {
   keep_locally = true
 }
 
+/*
+resource "null_resource" "ssl_setup" {
+  provisioner "local-exec" {
+    command = <<EOT
+      # Create SSH key if not exists
+      if [ ! -f ~/.ssh/id_ed25519 ]; then
+        ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+      fi
+
+      # Generate Diffie-Hellman params if missing
+      if [ ! -f /etc/letsencrypt/ssl-dhparams.pem ]; then
+        sudo openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
+      fi
+
+      # Create options-ssl-nginx.conf if missing
+      if [ ! -f /etc/letsencrypt/options-ssl-nginx.conf ]; then
+        sudo tee /etc/letsencrypt/options-ssl-nginx.conf > /dev/null <<'CONF'
+ssl_session_cache shared:le_nginx_SSL:10m;
+ssl_session_timeout 1440m;
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+
+ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:
+             ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:
+             ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305";
+CONF
+      fi
+  mkdir -p ~/letsencrypt
+sudo cp /etc/letsencrypt/live/saisakthi.qzz.io/fullchain.pem ~/letsencrypt/                                                                                                   ─╯
+sudo cp /etc/letsencrypt/live/saisakthi.qzz.io/privkey.pem ~/letsencrypt/
+sudo cp /etc/letsencrypt/options-ssl-nginx.conf ~/letsencrypt/
+sudo cp /etc/letsencrypt/ssl-dhparams.pem ~/letsencrypt/
+
+    EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+
+
+ */
+
 # ─── GATEWAY ──────────────────────────────────────────────────
 module "gateway" {
   source        = "../../modules/docker_app"
@@ -296,8 +339,15 @@ module "gateway" {
       host_path      = abspath("${path.module}/nginx/default.conf")
       container_path = "/etc/nginx/conf.d/default.conf"
       read_only      = true
-    }
+    },
+    {
+      host_path      = "/home/saisakthi/letsencrypt/"
+      container_path = "/etc/letsencrypt/"
+      read_only      = true
+    },
   ]
+
+
 
   named_volumes = [
     { volume_name = docker_volume.notes_dist.name, container_path = "/apps/notes", read_only = true },
@@ -877,40 +927,10 @@ resource "docker_volume" "n8n_data" {
   name = "gateway_n8n-data"
 }
 resource "docker_container" "n8n" {
-  name    = "n8n"
-  image   = "n8nio/n8n:latest"
-  restart = "unless-stopped"
+  name  = "n8n"
+  image = "n8nio/n8n:latest"
 
-  env = [
-    "N8N_PORT=5679",
-    "N8N_HOST=0.0.0.0",
-    "N8N_PROTOCOL=https",
-    "N8N_PATH=/n8n/",          # ← no trailing slash
-    "N8N_PROXY_HOPS=1",
-    "N8N_EDITOR_BASE_URL=https://${var.domain}/n8n/",
-    "WEBHOOK_URL=https://${var.domain}/n8n/",
-    "N8N_BASIC_AUTH_ACTIVE=true",
-    "N8N_BASIC_AUTH_USER=${var.n8n_user}",
-    "N8N_BASIC_AUTH_PASSWORD=${var.n8n_password}",
-    "GENERIC_TIMEZONE=Asia/Kolkata",
-    "TZ=Asia/Kolkata",
-    "N8N_DIAGNOSTICS_ENABLED=false",
-    "N8N_RUNNERS_DISABLED=true",
-
-    # CSP override as JSON string
-    <<EOT
-N8N_CONTENT_SECURITY_POLICY={
-  "default-src": ["'self'", "blob:", "data:"],
-  "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://static.cloudflareinsights.com"],
-  "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-  "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
-  "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
-  "connect-src": ["'self'", "ws:", "wss:", "https:", "http:"],
-  "worker-src": ["'self'", "blob:"],
-  "frame-ancestors": ["http://n8n", "https://${var.domain}"]
-}
-EOT
-  ]
+  env = [for k, v in var.n8n_env : "${k}=${v}"]
 
   mounts {
     source = docker_volume.n8n_data.name
@@ -922,3 +942,4 @@ EOT
     name = docker_network.gateway_net.name
   }
 }
+

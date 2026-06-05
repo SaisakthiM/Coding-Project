@@ -40,18 +40,6 @@ variable "load_images" {
 
 # ─── n8n variables — add these to your existing variables.tf ──
 
-variable "n8n_user" {
-  description = "n8n basic auth username"
-  type        = string
-  default     = "admin"
-}
-
-variable "n8n_password" {
-  description = "n8n basic auth password"
-  type        = string
-  sensitive   = true
-}
-
 variable "main_server_ip" {
   description = "IP of your main server (192.168.31.227) — used by n8n to reach apps"
   type        = string
@@ -62,6 +50,11 @@ variable "domain" {
   description = "Your public domain"
   type        = string
   default     = "saisakthi.qzz.io"
+}
+
+variable "n8n_env" {
+  description = "Environment variables for the n8n container"
+  type        = map(string)
 }
 
 
