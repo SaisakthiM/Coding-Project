@@ -164,8 +164,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/saisakthi/Coding-Project",
-      "program": "/home/saisakthi/Coding-Project/build/Debug/outDebug",
+      "cwd": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C++/Tasks",
+      "program": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C++/Tasks/build/Release/outRelease",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

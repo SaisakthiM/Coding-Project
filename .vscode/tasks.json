@@ -103,6 +103,27 @@
             ]
         },
         {
+            "label": "C++: run folder output",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "FOLDER=\"${input:cppFolderPath}\" && mkdir -p \"${workspaceFolder}/.vscode/build\" && g++ -g \"$FOLDER\"/*.cpp -o \"${workspaceFolder}/.vscode/build/out\" 2>&1; BUILD_CODE=$?; if [ $BUILD_CODE -ne 0 ]; then echo \"--- Build failed (exit $BUILD_CODE) ---\"; exit $BUILD_CODE; fi; echo \"--- Build successful, running... ---\"; \"${workspaceFolder}/.vscode/build/out\" 2>&1; RUN_CODE=$?; if [ $RUN_CODE -eq 0 ]; then echo \"--- Exited successfully (code 0) ---\"; elif [ $RUN_CODE -eq 139 ]; then echo \"--- Crashed: Segmentation fault SIGSEGV (code 139) ---\"; elif [ $RUN_CODE -eq 134 ]; then echo \"--- Crashed: Abort SIGABRT (code 134) ---\"; elif [ $RUN_CODE -eq 136 ]; then echo \"--- Crashed: Arithmetic exception SIGFPE (code 136) ---\"; elif [ $RUN_CODE -eq 132 ]; then echo \"--- Crashed: Illegal instruction SIGILL (code 132) ---\"; else echo \"--- Exited with code $RUN_CODE ---\"; fi"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
             "label": "Run All Startup Tasks",
             "dependsOn": [
                 "Daily Git Auto Commit"
