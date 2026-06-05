@@ -1,6 +1,6 @@
 #pragma once
 
-void log(int a) {
-    
+int log(int a) {
+    return a;
 } 
 

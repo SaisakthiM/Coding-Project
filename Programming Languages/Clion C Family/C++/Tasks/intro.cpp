@@ -1,7 +1,7 @@
-#include <cstddef>
+#include <algorithm>
+#include <cstdio>
 #include <iostream>
-#include <string>
-#include <vector>
+#include "log.h"
 using namespace std;
 
 int sum(int a, int b) {
@@ -16,7 +16,22 @@ int divide(int a, int b) {
     return a/b;
 }
 
+void story(char a) {
+    if (a == 'a') {
+        cout << "hi" << endl;
+    }
+    else if (a == 'b') {
+        cout << "hello" << endl;
+    } 
+    else {
+        cout << "who" << endl;
+    }
+}
+
 int main() {
+    
+    log(1);
+    story('a');
     std::cout << "hello world" << std::endl;
     unsigned int x = 10;
     cout << x << endl;
