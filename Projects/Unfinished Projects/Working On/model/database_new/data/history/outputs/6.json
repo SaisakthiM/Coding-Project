@@ -1,0 +1,9 @@
+{
+  "id": 6,
+  "code": "echo history test",
+  "exit_code": "0",
+  "language": "bash",
+  "output": "history test",
+  "timestamp": "2026-06-06T15:25:27",
+  "username": "testuser_1780739726"
+}

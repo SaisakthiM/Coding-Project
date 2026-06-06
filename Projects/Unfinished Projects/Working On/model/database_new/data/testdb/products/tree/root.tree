@@ -1,0 +1,6 @@
+LEAF
+3
+1|available=true|name=Widget|price=9.99|stock=100
+2|available=true|name=Gadget|price=24.50|stock=50
+3|available=false|name=Doohickey|price=4.00|stock=0
+0

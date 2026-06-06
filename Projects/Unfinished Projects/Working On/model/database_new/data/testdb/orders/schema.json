@@ -1,0 +1,9 @@
+{
+"table_name":"orders",
+"columns":{
+"product":"string",
+"qty":"int",
+"total":"float"
+},
+"rows":[]
+}
