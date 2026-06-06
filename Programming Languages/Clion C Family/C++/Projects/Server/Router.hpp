@@ -1,27 +1,60 @@
-#include <functional>
+#pragma once
+
+#include <map>
 #include <string>
+#include <functional>
+
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
-struct Router {
-    std::map<std::string, std::function<HttpResponse(HttpRequest)>> getRoutes;
+class Router {
+private:
+    using Handler = std::function<HttpResponse(HttpRequest&)>;
 
-    void addGet(const std::string& path,
-                std::function<HttpResponse(HttpRequest)> handler) {
+    std::map<std::string, Handler> getRoutes;
+    std::map<std::string, Handler> postRoutes;
+
+public:
+
+    void get(
+        const std::string& path,
+        Handler handler
+    ) {
         getRoutes[path] = handler;
     }
 
-    HttpResponse handle(HttpRequest req) {
+    void post(
+        const std::string& path,
+        Handler handler
+    ) {
+        postRoutes[path] = handler;
+    }
+
+    HttpResponse handle(HttpRequest& req) {
+
         if (req.method == "GET") {
-            if (getRoutes.count(req.path)) {
-                return getRoutes[req.path](req);
+
+            auto it = getRoutes.find(req.path);
+
+            if (it != getRoutes.end()) {
+                return it->second(req);
+            }
+        }
+
+        else if (req.method == "POST") {
+
+            auto it = postRoutes.find(req.path);
+
+            if (it != postRoutes.end()) {
+                return it->second(req);
             }
         }
 
         HttpResponse res;
         res.statusCode = 404;
         res.contentType = "text/plain";
-        res.body = "Not Found";
+        res.body = "Route Not Found";
+
         return res;
     }
 };
