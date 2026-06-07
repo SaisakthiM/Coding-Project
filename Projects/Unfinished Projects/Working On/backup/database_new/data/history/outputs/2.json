@@ -1,0 +1,9 @@
+{
+  "id": 2,
+  "code": "print(sum(range(1,6)))",
+  "exit_code": "0",
+  "language": "python",
+  "output": "15",
+  "timestamp": "2026-06-07T08:17:19",
+  "username": "testuser_1780800438"
+}

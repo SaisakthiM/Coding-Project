@@ -1,0 +1,12 @@
+{
+  "id": 4,
+  "code": "raise ValueError(\"intentional error\")",
+  "exit_code": "1",
+  "language": "python",
+  "output": "Traceback (most recent call last):
+  File \"/tmp/code_1714636915.py\", line 1, in <module>
+    raise ValueError(\"intentional error\")
+ValueError: intentional error",
+  "timestamp": "2026-06-07T08:17:19",
+  "username": "testuser_1780800438"
+}

@@ -1,0 +1,11 @@
+LEAF
+5
+4|code=raise ValueError("intentional error")|exit_code=1|language=python|output=Traceback (most recent call last):
+  File "/tmp/code_1714636915.py", line 1, in <module>
+    raise ValueError("intentional error")
+ValueError: intentional error|timestamp=2026-06-07T08:17:19|username=testuser_1780800438
+4|code=raise ValueError("intentional error")|exit_code=1|language=python|output=Traceback (most recent call last):
+5|code=print(42)|exit_code=0|language=python|output=42|timestamp=2026-06-06T15:25:27|username=testuser_1780739726
+6|code=echo history test|exit_code=0|language=bash|output=history test|timestamp=2026-06-06T15:25:27|username=testuser_1780739726
+7|code=print(99)|exit_code=0|language=python|output=99|timestamp=2026-06-06T15:25:27|username=testuser_1780739726
+0

@@ -1,0 +1,9 @@
+{
+  "id": 3,
+  "code": "echo hello from bash",
+  "exit_code": "0",
+  "language": "bash",
+  "output": "hello from bash",
+  "timestamp": "2026-06-07T08:17:19",
+  "username": "testuser_1780800438"
+}
