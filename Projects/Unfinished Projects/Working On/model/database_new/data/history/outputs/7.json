@@ -1,9 +1,0 @@
-{
-  "id": 7,
-  "code": "print(99)",
-  "exit_code": "0",
-  "language": "python",
-  "output": "99",
-  "timestamp": "2026-06-06T15:25:27",
-  "username": "testuser_1780739726"
-}

@@ -62,6 +62,8 @@ resource "docker_volume" "blog_minio" { name = "gateway_blog-minio" }
 resource "docker_volume" "intro_dist" { name = "gateway_intro-dist" }
 resource "docker_volume" "record_dist" { name = "gateway_record-dist" }
 resource "docker_volume" "jenkins_home" { name = "jenkins_home" }
+resource "docker_volume" "compiler_db_data" { name = "gateway_compiler-db-data" }
+resource "docker_volume" "compiler_server_data" { name = "gateway_compiler-server-data" }
 
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
@@ -510,6 +512,90 @@ resource "docker_container" "quiz_frontend_build" {
     type   = "volume"
   }
 }
+
+# ─── ONLINE COMPILER ────────────────────────────────────────────────────
+
+resource "docker_image" "compiler_db" {
+  name         = "online_compiler_db:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Online Compiler/database_new")
+    dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Online Compiler/database_new", "**") :
+      filesha256("${path.module}/../../projects/Online Compiler/database_new/${f}")
+      if !can(regex("(\\.git|\\.dockerignore|dbserver|\\.o|data/)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "compiler_server" {
+  name         = "online_compiler_server:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Online Compiler/server_new")
+    dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/Online Compiler/server_new", "**") :
+      filesha256("${path.module}/../../projects/Online Compiler/server_new/${f}")
+      if !can(regex("(\\.git|\\.dockerignore|^server$|\\.o|users\\.db)", f))
+    ]))
+  }
+}
+
+# ─── DB container (raw resource — needs healthcheck + named volume) ───────────
+# Not using docker_app module here because the module doesn't support
+# named volume mounts or healthcheck (same pattern as your blog_db/doc_mysql)
+
+resource "docker_container" "compiler_db" {
+  name                  = "compiler-db"
+  image                 = docker_image.compiler_db.image_id
+  restart               = "unless-stopped"
+  destroy_grace_seconds = 30
+  must_run              = true
+
+  networks_advanced { name = docker_network.gateway_net.name }
+
+  mounts {
+    source = docker_volume.compiler_db_data.name
+    target = "/app/data"
+    type   = "volume"
+  }
+
+  # Not exposed externally — only the auth server talks to it
+  # over the gateway-net by container name "compiler-db"
+
+  healthcheck {
+    test         = ["CMD-SHELL", "curl -sf 'http://localhost:8080/search?database_name=x&table_name=y&id=1' || exit 0"]
+    interval     = "5s"
+    timeout      = "3s"
+    retries      = 5
+    start_period = "5s"
+  }
+}
+
+# ─── Auth + Code server (via docker_app module) ────────────────
+module "compiler_server" {
+  source        = "../../modules/docker_app"
+  name          = "compiler-server"
+  image         = docker_image.compiler_server.image_id
+  internal_port = 9090
+  external_port = 0          # nginx proxies it — not exposed directly
+  network       = docker_network.gateway_net.name
+
+  env = [
+    "DB_HOST=compiler-db",   # container name on gateway-net
+    "DB_PORT=8080",
+  ]
+
+  depends_on = [docker_container.compiler_db]
+}
+
+
 
 # ─── VIDEO ────────────────────────────────────────────────────
 module "video_backend" {

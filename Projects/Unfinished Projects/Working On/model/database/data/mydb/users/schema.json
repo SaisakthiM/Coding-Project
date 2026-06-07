@@ -1,9 +1,0 @@
-{
-"table_name":"users",
-"columns":{
-"active":"bool",
-"age":"int",
-"name":"string"
-},
-"rows":[]
-}

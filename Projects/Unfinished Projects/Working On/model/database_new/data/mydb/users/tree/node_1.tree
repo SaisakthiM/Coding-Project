@@ -1,8 +1,0 @@
-LEAF
-5
-1|active=true|age=30|name=Alice|score=9.5
-2|active=false|age=25|name=Bob|score=7.2
-3|active=true|age=28|name=Alice|score=8.1
-4|active=true|age=1|name=User1|score=1.0
-5|active=true|age=2|name=User2|score=2.0
-0

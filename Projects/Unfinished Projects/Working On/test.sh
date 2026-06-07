@@ -268,7 +268,7 @@ R=$(request POST "$SRV/register" \
     -H "Content-Type: application/json" \
     -d '{"username":""}')
 info "Empty username: $R"
-assert_contains "Rejects empty username" "$R" '"status":false'
+assert_contains "Rejects empty username" "$R" "required"
 
 # ── 8. Auth server: login ─────────────────────────────────────────────────────
 header "8. Auth Server — Login"

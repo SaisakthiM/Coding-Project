@@ -1,8 +1,0 @@
-{
-"table_name":"users",
-"columns":{
-"password_hash":"string",
-"username":"string"
-},
-"rows":[]
-}

@@ -1,8 +1,0 @@
-{
-"table_name":"products",
-"columns":{
-"name":"string",
-"price":"float"
-},
-"rows":[]
-}
