@@ -1,0 +1,15 @@
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/bin/Debug/net10.0/linux-x64/Project 1
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/bin/Debug/net10.0/linux-x64/Project 1.deps.json
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/bin/Debug/net10.0/linux-x64/Project 1.runtimeconfig.json
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/bin/Debug/net10.0/linux-x64/Project 1.dll
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/bin/Debug/net10.0/linux-x64/Project 1.pdb
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.GeneratedMSBuildEditorConfig.editorconfig
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.AssemblyInfoInputs.cache
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.AssemblyInfo.cs
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.csproj.CoreCompileInputs.cache
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.sourcelink.json
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.dll
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/refint/Project 1.dll
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.pdb
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/Project 1.genruntimeconfig.cache
+/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/Debug/net10.0/linux-x64/ref/Project 1.dll
