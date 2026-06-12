@@ -1,6 +1,7 @@
 pub mod routes;
 pub mod database;
 use std::env;
+pub mod configurations;
 
 use axum::Router;
 
@@ -19,7 +20,9 @@ async fn main() {
         .merge(routes::room())
         .merge(routes::joinRoom())
         .merge(routes::getMessage())
-        
+        .merge(routes::login())
+        .merge(routes::ws())
+        .merge(routes::room_routes())
         .with_state(state)
         ;
     println!("DATABASE_URL = {:?}", env::var("DATABASE_URL"));

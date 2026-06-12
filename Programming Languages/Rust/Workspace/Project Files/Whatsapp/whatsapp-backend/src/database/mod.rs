@@ -1,10 +1,15 @@
+use std::{collections::HashMap, sync::Arc};
+
 use sqlx::{Executor,PgPool, postgres::PgPoolOptions};
 use env::var;
 use dotenvy;
+use tokio::sync::{Mutex, broadcast};
+use uuid::Uuid;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub db: PgPool,
+    pub db: sqlx::PgPool,
+    pub rooms: Arc<Mutex<HashMap<Uuid, broadcast::Sender<String>>>>,
 }
 
 pub async fn connect_db() -> AppState {
@@ -16,7 +21,10 @@ pub async fn connect_db() -> AppState {
         .connect(&database_url)
         .await
         .expect("Failed to connect");
-    AppState {db: pool}
+    AppState {
+        db: pool,
+        rooms: Arc::new(Mutex::new(HashMap::new())),
+    }
 }
 
 pub async fn init_database(pool: &PgPool) -> Result<(), sqlx::Error> {
