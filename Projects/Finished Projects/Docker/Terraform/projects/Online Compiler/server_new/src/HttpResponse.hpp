@@ -13,7 +13,16 @@ struct HttpResponse {
         r += Status::reasonPhrase(statusCode) + "\r\n";
         r += "Content-Type: "   + contentType + "\r\n";
         r += "Content-Length: " + std::to_string(body.size()) + "\r\n";
-        r += "Access-Control-Allow-Origin: *\r\n";
+        
+        // ── COMPLETE CORS HEADERS ───────────────────────────────────────────
+        // Allows requests from your React origin (or use "*" for wildcard)
+        r += "Access-Control-Allow-Origin: http://localhost:3000\r\n";
+        // Allows the browser to send GET, POST, and preflight OPTIONS requests
+        r += "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n";
+        // Crucial for allowing your React app to pass the Authorization token
+        r += "Access-Control-Allow-Headers: Content-Type, Authorization\r\n";
+        // ────────────────────────────────────────────────────────────────────
+        
         r += "Connection: close\r\n";
         r += "\r\n";
         r += body;

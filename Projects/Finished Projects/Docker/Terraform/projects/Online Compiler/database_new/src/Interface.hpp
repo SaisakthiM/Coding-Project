@@ -9,6 +9,7 @@
 #include "HttpRequest.hpp"
 #include "Json.hpp"
 
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 // POST /create        → create database + table
 // POST /insert        → insert a row (type-validated)
@@ -91,10 +92,6 @@ public:
         sendHttp(body, "200 OK");
     }
 
-    void sendError(const std::string& message) {
-        std::string body = "{\"status\":false,\"message\":\"" + escape(message) + "\"}";
-        sendHttp(body, "400 Bad Request");
-    }
 
 private:
     static std::string escape(const std::string& s) {
@@ -116,4 +113,7 @@ private:
             "\r\n" + body;
         ::send(clientSocket, response.c_str(), response.size(), 0);
     }
+    
+
+    
 };

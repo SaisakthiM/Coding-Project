@@ -42,4 +42,5 @@ public:
     void removeSession(const std::string& token) {
         sessions_.erase(token);
     }
+    
 };

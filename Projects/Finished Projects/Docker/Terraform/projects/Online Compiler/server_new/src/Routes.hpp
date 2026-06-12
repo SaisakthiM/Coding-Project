@@ -34,6 +34,26 @@ inline void registerRoutes(Router&         router,
     SessionManager* pSessions = &sessions;
     HistoryClient*  pHistory  = &history;
 
+    // ── CORS PREFLIGHT (OPTIONS) HANDLERS ───────────────────────────────────
+    // Browsers send an OPTIONS preflight to verify server access permissions.
+    // They just need a 200 OK empty body back.
+    
+    router.options("/register", [](const HttpRequest&) {
+        return HttpResponse::ok(""); 
+    });
+
+    router.options("/login", [](const HttpRequest&) {
+        return HttpResponse::ok(""); 
+    });
+
+    router.options("/code", [](const HttpRequest&) {
+        return HttpResponse::ok(""); 
+    });
+
+    router.options("/history", [](const HttpRequest&) {
+        return HttpResponse::ok(""); 
+    });
+
     // ── POST /register ──────────────────────────────────────────────────────
     router.post("/register", [pAuth](const HttpRequest& req) {
         JsonParser parser;
@@ -139,4 +159,6 @@ inline void registerRoutes(Router&         router,
     router.get("/health", [](const HttpRequest&) {
         return HttpResponse::ok("{\"status\":\"ok\"}", "application/json");
     });
+
+    
 }

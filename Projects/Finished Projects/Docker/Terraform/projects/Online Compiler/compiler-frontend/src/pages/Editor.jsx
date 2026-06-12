@@ -94,7 +94,7 @@ export const Editor = () => {
             <h1 className="text-xl font-bold text-compiler-accent">Code Compiler</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-compiler-textSecondary">Welcome, <span className="font-semibold text-compiler-text">{user}</span></span>
+            <span className="text-compiler-textSecondary">Welcome, <span className="font-semibold text-compiler-text">{user?.username}</span></span>
             <button
               onClick={handleLogout}
               className="bg-compiler-error text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
