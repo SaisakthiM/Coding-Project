@@ -8,14 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user')
     const storedToken = localStorage.getItem('token')
+    const storedUser = localStorage.getItem('user')
     
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser))
+    if (storedToken && storedUser) {
       setToken(storedToken)
+      setUser(JSON.parse(storedUser))
     }
-    
     setLoading(false)
   }, [])
 
@@ -33,14 +32,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token')
   }
 
-  const value = {
-    user,
-    token,
-    loading,
-    login,
-    logout,
-    isAuthenticated: !!token
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, token, loading, login, logout, isAuthenticated: !!token }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }

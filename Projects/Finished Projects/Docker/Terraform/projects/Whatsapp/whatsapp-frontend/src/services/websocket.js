@@ -18,7 +18,6 @@ export class WebSocketService {
         this.ws.onopen = () => {
           console.log('WebSocket connected')
           this.isConnected = true
-          // Send queued messages
           while (this.messageQueue.length > 0) {
             const msg = this.messageQueue.shift()
             this.ws.send(msg)
@@ -66,16 +65,6 @@ export class WebSocketService {
       this.listeners.set(event, [])
     }
     this.listeners.get(event).push(callback)
-  }
-
-  off(event, callback) {
-    if (this.listeners.has(event)) {
-      const callbacks = this.listeners.get(event)
-      const index = callbacks.indexOf(callback)
-      if (index > -1) {
-        callbacks.splice(index, 1)
-      }
-    }
   }
 
   emit(event, data) {
