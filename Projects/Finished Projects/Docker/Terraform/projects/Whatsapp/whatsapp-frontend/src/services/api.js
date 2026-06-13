@@ -1,44 +1,103 @@
 import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE_URL = 'http://localhost:3000'
 
-const api = axios.create({
-  baseURL: API_URL,
-  headers: { 'Content-Type': 'application/json' }
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 })
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+// Add JWT token to all requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
   return config
-})
+}, error => Promise.reject(error))
 
+// ============ AUTH APIs ============
 export const authAPI = {
-  register: (username, password) => api.post('/users', { username, password }),
-  login: (username, password) => api.post('/login', { username, password }),
-  getProfile: userId => api.get(`/profile/${userId}`),
-  updateProfile: (userId, data) => api.put(`/profile/${userId}`, data),
-  getSettings: userId => api.get(`/settings/${userId}`),
-  updateSettings: (userId, data) => api.put(`/settings/${userId}`, data),
-}
+  register: async (username, password) => {
+    const response = await apiClient.post('/users', { username, password })
+    return response.data
+  },
 
-export const chatAPI = {
-  getRooms: userId => api.get('/rooms', { params: { user_id: userId } }),
-  createRoom: name => api.post('/room', { name }),
-  joinRoom: (roomId, userId) => api.post('/room/join', { room_id: roomId, user_id: userId }),
-  getMessages: (roomId, userId) => api.get('/message', { params: { room_id: roomId, user_id: userId } }),
-  getRoomMembers: roomId => api.get(`/room/${roomId}/members`),
-  sendMessage: (roomId, senderId, content) => api.post('/message', { room_id: roomId, sender_id: senderId, content }),
-}
+  login: async (username, password) => {
+    const response = await apiClient.post('/login', { username, password })
+    return response.data
+  },
 
-export const fileAPI = {
-  uploadAvatar: (userId, file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    return api.post(`/upload/avatar/${userId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+  getUser: async (userId) => {
+    const response = await apiClient.get(`/users/${userId}`)
+    return response.data
+  },
+
+  updateUser: async (userId, newName) => {
+    const response = await apiClient.put(`/users/${userId}`, { new_name: newName })
+    return response.data
+  },
+
+  deleteUser: async (userId) => {
+    const response = await apiClient.delete(`/users/${userId}`)
+    return response.data
   }
 }
 
-export default api
+// ============ ROOM APIs ============
+export const roomAPI = {
+  createRoom: async (name) => {
+    const response = await apiClient.post('/room', { name })
+    return response.data
+  },
+
+  getUserRooms: async (userId) => {
+    const response = await apiClient.get('/rooms', {
+      params: { user_id: userId }
+    })
+    return response.data
+  },
+
+  joinRoom: async (roomId, userId) => {
+    const response = await apiClient.post('/room/join', {
+      room_id: roomId,
+      user_id: userId
+    })
+    return response.data
+  },
+
+  getRoomMembers: async (roomId) => {
+    const response = await apiClient.get(`/room/${roomId}/members`)
+    return response.data
+  }
+}
+
+// ============ MESSAGE APIs ============
+export const messageAPI = {
+  createMessage: async (roomId, senderId, content) => {
+    const response = await apiClient.post('/message', {
+      room_id: roomId,
+      sender_id: senderId,
+      content
+    })
+    return response.data
+  },
+
+  getMessages: async (roomId, userId) => {
+    const response = await apiClient.get('/message', {
+      params: { room_id: roomId, user_id: userId }
+    })
+    return response.data
+  }
+}
+
+// ============ WebSocket ============
+export const createWebSocketConnection = (roomId, token) => {
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const wsUrl = `${wsProtocol}//${window.location.hostname}:3000/ws/${roomId}?token=${token}`
+  return new WebSocket(wsUrl)
+}
+
+export default apiClient

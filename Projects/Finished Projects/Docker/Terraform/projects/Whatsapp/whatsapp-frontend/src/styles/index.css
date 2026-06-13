@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-whatsapp-lighter text-whatsapp-dark font-sans;
+  }
+
+  input, textarea {
+    @apply focus:outline-none;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-whatsapp-green hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-whatsapp-green text-whatsapp-green hover:bg-green-50 font-semibold py-2 px-4 rounded-lg transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm;
+  }
+
+  .divider {
+    @apply border-b border-whatsapp-border;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-whatsapp-border rounded-lg focus:border-whatsapp-green focus:ring-1 focus:ring-whatsapp-green transition-colors;
+  }
+
+  .message-bubble {
+    @apply max-w-xs px-4 py-2 rounded-lg text-sm;
+  }
+
+  .message-sent {
+    @apply bg-whatsapp-green text-white rounded-br-none;
+  }
+
+  .message-received {
+    @apply bg-white text-whatsapp-dark rounded-bl-none;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* WhatsApp chat background */
+.chat-bg {
+  background-color: #ECE5DD;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -1,36 +1,66 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import { useAuth } from './hooks/useAuth'
-import { Box, CircularProgress } from '@mui/material'
+import { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useAuthStore } from './store/authStore'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import ChatPage from './pages/ChatPage'
-import ProfilePage from './pages/ProfilePage'
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth()
-  
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
-    )
+  const { user, token } = useAuthStore()
+
+  if (!user || !token) {
+    return <Navigate to="/login" replace />
   }
-  
-  return isAuthenticated ? children : <Navigate to="/" replace />
+
+  return children
+}
+
+function AuthRoute({ children }) {
+  const { user, token } = useAuthStore()
+
+  if (user && token) {
+    return <Navigate to="/" replace />
+  }
+
+  return children
 }
 
 export default function App() {
+  const initAuth = useAuthStore(state => state.initAuth)
+
+  useEffect(() => {
+    initAuth()
+  }, [initAuth])
+
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+    <Router>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <AuthRoute>
+              <LoginPage />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthRoute>
+              <RegisterPage />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   )
 }

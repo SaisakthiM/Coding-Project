@@ -2,17 +2,31 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { login, isLoading, error, clearError } = useAuthStore()
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const { register, isLoading, error, clearError } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     clearError()
+    setPasswordError('')
+
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+
+    if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters')
+      return
+    }
+
     try {
-      await login(username, password)
+      await register(username, password)
       navigate('/')
     } catch (err) {
       // Error handled in store
@@ -30,10 +44,10 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">WhatsApp</h1>
-          <p className="text-white/80">Connect with friends and family</p>
+          <p className="text-white/80">Create your account</p>
         </div>
 
-        {/* Login Form */}
+        {/* Register Form */}
         <div className="card p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -44,7 +58,7 @@ export default function LoginPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder="Choose a username"
                 className="input-field"
                 required
                 disabled={isLoading}
@@ -59,7 +73,22 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="At least 6 characters"
+                className="input-field"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-whatsapp-dark mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
                 className="input-field"
                 required
                 disabled={isLoading}
@@ -72,12 +101,18 @@ export default function LoginPage() {
               </div>
             )}
 
+            {passwordError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {passwordError}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={isLoading}
               className="btn-primary w-full"
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Creating account...' : 'Register'}
             </button>
           </form>
 
@@ -85,9 +120,9 @@ export default function LoginPage() {
 
           <div className="text-center">
             <p className="text-whatsapp-gray text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-whatsapp-green font-semibold hover:underline">
-                Register here
+              Already have an account?{' '}
+              <Link to="/login" className="text-whatsapp-green font-semibold hover:underline">
+                Login here
               </Link>
             </p>
           </div>

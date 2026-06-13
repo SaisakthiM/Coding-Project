@@ -1,8 +1,0 @@
-/target
-.env
-.env.local
-Cargo.lock
-*.swp
-*.swo
-*~
-.DS_Store

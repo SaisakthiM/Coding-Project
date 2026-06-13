@@ -1,252 +1,77 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { chatAPI } from '../services/api'
-import { WebSocketService } from '../services/websocket'
-import {
-  Box, AppBar, Toolbar, Typography, TextField, Button,
-  List, ListItem, ListItemButton, ListItemText,
-  Paper, Drawer, IconButton, Menu, MenuItem, CircularProgress,
-  Dialog, DialogTitle, DialogContent, DialogActions, Chip
-} from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu'
-import LogoutIcon from '@mui/icons-material/Logout'
-import PersonIcon from '@mui/icons-material/Person'
-import SendIcon from '@mui/icons-material/Send'
-import AddIcon from '@mui/icons-material/Add'
+import { useAuthStore } from '../store/authStore'
+import { roomAPI } from '../services/api'
+import ChatList from '../components/ChatList'
+import ChatView from '../components/ChatView'
 
 export default function ChatPage() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, token } = useAuthStore()
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
+  const [selectedRoomName, setSelectedRoomName] = useState('')
   const [rooms, setRooms] = useState([])
-  const [selectedRoom, setSelectedRoom] = useState(null)
-  const [messages, setMessages] = useState([])
-  const [newMessage, setNewMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState(null)
-  const [openCreateRoom, setOpenCreateRoom] = useState(false)
-  const [roomName, setRoomName] = useState('')
-  const wsRef = useRef(null)
-  const messagesEndRef = useRef(null)
 
   useEffect(() => {
+    if (!user || !token) {
+      navigate('/login')
+    }
+  }, [user, token, navigate])
+
+  useEffect(() => {
+    const loadRooms = async () => {
+      if (user?.id) {
+        try {
+          const data = await roomAPI.getUserRooms(user.id)
+          setRooms(data || [])
+          if (data && data.length > 0 && !selectedRoomId) {
+            setSelectedRoomId(data[0].id)
+            setSelectedRoomName(data[0].name)
+          }
+        } catch (error) {
+          console.error('Failed to load rooms:', error)
+        }
+      }
+    }
+
     loadRooms()
-  }, [user])
+  }, [user?.id])
 
-  const loadRooms = async () => {
-    try {
-      const { data } = await chatAPI.getRooms(user.id)
-      setRooms(data || [])
-    } catch (err) {
-      console.error('Failed to load rooms:', err)
-    }
-  }
-
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedRoom) return
-
-    try {
-      await chatAPI.sendMessage(selectedRoom.id, user.id, newMessage)
-      setNewMessage('')
-    } catch (err) {
-      console.error('Failed to send message:', err)
-    }
-  }
-
-  const handleCreateRoom = async () => {
-    if (!roomName.trim()) return
-    try {
-      const { data } = await chatAPI.createRoom(roomName)
-      setRoomName('')
-      setOpenCreateRoom(false)
-      loadRooms()
-    } catch (err) {
-      console.error('Failed to create room:', err)
+  const handleRoomSelect = (roomId) => {
+    setSelectedRoomId(roomId)
+    const room = rooms.find(r => r.id === roomId)
+    if (room) {
+      setSelectedRoomName(room.name)
     }
   }
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
+    navigate('/login')
   }
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* App Bar */}
-      <AppBar position="fixed" sx={{ zIndex: 1300 }}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            WhatsApp
-          </Typography>
-          <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-          >
-            <MenuItem onClick={() => { navigate('/profile'); setAnchorEl(null); }}>
-              <PersonIcon sx={{ mr: 1 }} /> Profile
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <LogoutIcon sx={{ mr: 1 }} /> Logout
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-
+    <div className="flex h-screen bg-white overflow-hidden">
       {/* Sidebar */}
-      <Drawer
-        variant={{ xs: 'temporary', sm: 'permanent' }}
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        sx={{
-          width: 320,
-          '& .MuiDrawer-paper': {
-            width: 320,
-            mt: 8,
-            backgroundColor: '#111B21',
-          },
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            startIcon={<AddIcon />}
-            onClick={() => setOpenCreateRoom(true)}
-          >
-            New Chat
-          </Button>
-        </Box>
-        <List>
-          {rooms.map((room) => (
-            <ListItemButton
-              key={room.id}
-              selected={selectedRoom?.id === room.id}
-              onClick={() => { setSelectedRoom(room); setMobileOpen(false); }}
-            >
-              <ListItemText
-                primary={room.name}
-                secondary={new Date(room.created_at).toLocaleDateString()}
-              />
-            </ListItemButton>
-          ))}
-        </List>
-      </Drawer>
+      <ChatList
+        selectedRoomId={selectedRoomId}
+        onRoomSelect={handleRoomSelect}
+        onLogout={handleLogout}
+      />
 
       {/* Chat Area */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', ml: { sm: '320px' }, mt: 8 }}>
-        {selectedRoom ? (
-          <>
-            {/* Chat Header */}
-            <Paper sx={{ p: 2, backgroundColor: '#202C33' }}>
-              <Typography variant="h6">{selectedRoom.name}</Typography>
-            </Paper>
-
-            {/* Messages */}
-            <Box
-              sx={{
-                flex: 1,
-                overflowY: 'auto',
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 1,
-              }}
-            >
-              {messages.map((msg) => (
-                <Box
-                  key={msg.id}
-                  sx={{
-                    alignSelf: msg.sender_id === user.id ? 'flex-end' : 'flex-start',
-                    maxWidth: '70%',
-                  }}
-                >
-                  <Paper
-                    sx={{
-                      p: 1.5,
-                      backgroundColor: msg.sender_id === user.id ? 'primary.main' : '#2A3F35',
-                      color: msg.sender_id === user.id ? 'black' : 'text.primary',
-                    }}
-                  >
-                    <Typography variant="body2">{msg.content}</Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mt: 0.5,
-                        opacity: 0.7,
-                      }}
-                    >
-                      {new Date(msg.created_at).toLocaleTimeString()}
-                    </Typography>
-                  </Paper>
-                </Box>
-              ))}
-              <div ref={messagesEndRef} />
-            </Box>
-
-            {/* Input */}
-            <Paper sx={{ p: 2, backgroundColor: '#202C33' }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                <IconButton
-                  color="primary"
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                >
-                  <SendIcon />
-                </IconButton>
-              </Box>
-            </Paper>
-          </>
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-            <Typography color="text.secondary">Select a chat to start messaging</Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* Create Room Dialog */}
-      <Dialog open={openCreateRoom} onClose={() => setOpenCreateRoom(false)}>
-        <DialogTitle>Create New Chat</DialogTitle>
-        <DialogContent sx={{ minWidth: 300 }}>
-          <TextField
-            autoFocus
-            fullWidth
-            label="Chat Name"
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-            sx={{ mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCreateRoom(false)}>Cancel</Button>
-          <Button onClick={handleCreateRoom} variant="contained" color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+      {selectedRoomId ? (
+        <ChatView roomId={selectedRoomId} roomName={selectedRoomName} />
+      ) : (
+        <div className="flex-1 flex items-center justify-center bg-whatsapp-light">
+          <div className="text-center">
+            <svg className="w-20 h-20 mx-auto mb-4 opacity-30 text-whatsapp-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <p className="text-lg font-semibold text-whatsapp-gray">Select a chat to start messaging</p>
+            <p className="text-sm text-whatsapp-gray/70 mt-2">Or create a new one from the menu</p>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
