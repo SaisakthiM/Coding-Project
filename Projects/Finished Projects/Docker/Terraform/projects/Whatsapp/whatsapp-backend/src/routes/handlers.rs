@@ -1,4 +1,4 @@
-use crate::{database::AppState, routes::dto};
+use crate::{database::AppState, routes::dto::{self, ChatRoomRequest}};
 use axum::{
     Json, Router,
     extract::{State, Path, Query},
@@ -152,30 +152,25 @@ pub async fn create_room(
     Ok(Json(dto::MessageResponse { id }))
 }
 
+// Join room endpoint
 pub async fn join_room(
-    State(state): State<AppState>,
-    Json(request): Json<dto::JoinRoomRequest>,
-) -> Result<StatusCode, StatusCode> {
-    let result = sqlx::query(
-        r#"
-        INSERT INTO room_members (
-            room_id,
-            user_id
-        )
-        VALUES ($1, $2)
-        "#
+    State(pool): State<AppState>,
+    Json(payload): Json<dto::JoinRoomRequest>,
+) -> Result<StatusCode, (StatusCode, String)> {
+    sqlx::query(
+        "INSERT INTO room_members (room_id, user_id, last_seen_at)
+         VALUES ($1, $2, now())
+         ON CONFLICT (room_id, user_id) DO UPDATE SET last_seen_at = now()"
     )
-    .bind(request.room_id)
-    .bind(request.user_id)
-    .execute(&state.db)
-    .await;
-
-    println!("{:?}", result);
-
-    result.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    .bind(payload.room_id)
+    .bind(payload.user_id)
+    .execute(&pool.db)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
     Ok(StatusCode::CREATED)
 }
+
 
 pub async fn get_message(
     State(state): State<AppState>,
@@ -430,28 +425,30 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, room_id: Uuid, state: A
 }
 
 pub async fn get_user_rooms(
-    State(state): State<AppState>,
-    Query(params): Query<dto::UserIdQuery>,
-) -> Result<Json<Vec<dto::RoomRow>>, StatusCode> {
+    State(pool): State<AppState>,
+    Query(params): Query<dto::GetRoomsParams>,
+) -> Result<Json<Vec<dto::RoomRow>>, (StatusCode, String)> {
     let rooms = sqlx::query_as::<_, dto::RoomRow>(
-        r#"
-        SELECT cr.id, cr.name, cr.created_at
-        FROM chat_rooms cr
-        JOIN room_members rm ON rm.room_id = cr.id
-        WHERE rm.user_id = $1
-        ORDER BY cr.created_at DESC
-        "#
+        "SELECT DISTINCT cr.id, cr.name, cr.created_at 
+         FROM chat_rooms cr
+         LEFT JOIN room_members rm ON cr.id = rm.room_id
+         WHERE rm.user_id = $1 OR cr.id IN (
+             SELECT room_id FROM room_members WHERE user_id = $1
+         )
+         ORDER BY cr.created_at DESC"
     )
     .bind(params.user_id)
-    .fetch_all(&state.db)
+    .fetch_all(&pool.db)
     .await
     .map_err(|e| {
-        println!("DB Error: {:?}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
+        eprintln!("Database error: {:?}", e);
+        (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
     })?;
 
     Ok(Json(rooms))
 }
+
+
 
 pub async fn get_room_members(
     State(state): State<AppState>,

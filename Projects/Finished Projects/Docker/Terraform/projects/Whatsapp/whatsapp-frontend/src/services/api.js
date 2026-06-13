@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:3000'
+const API_BASE_URL = 'http://localhost:8000'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +9,6 @@ const apiClient = axios.create({
   }
 })
 
-// Add JWT token to all requests
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken')
   if (token) {
@@ -22,11 +21,13 @@ apiClient.interceptors.request.use((config) => {
 export const authAPI = {
   register: async (username, password) => {
     const response = await apiClient.post('/users', { username, password })
+    console.log('Register response:', response.data)
     return response.data
   },
 
   login: async (username, password) => {
     const response = await apiClient.post('/login', { username, password })
+    console.log('Login response:', response.data)
     return response.data
   },
 
@@ -50,14 +51,21 @@ export const authAPI = {
 export const roomAPI = {
   createRoom: async (name) => {
     const response = await apiClient.post('/room', { name })
+    console.log('Create room response:', response.data)
     return response.data
   },
 
   getUserRooms: async (userId) => {
-    const response = await apiClient.get('/rooms', {
-      params: { user_id: userId }
-    })
-    return response.data
+    try {
+      const response = await apiClient.get('/rooms', {
+        params: { user_id: userId }
+      })
+      console.log('Get rooms response:', response.data)
+      return response.data || []
+    } catch (error) {
+      console.error('Error fetching rooms:', error.response?.data || error.message)
+      return []
+    }
   },
 
   joinRoom: async (roomId, userId) => {
@@ -65,12 +73,14 @@ export const roomAPI = {
       room_id: roomId,
       user_id: userId
     })
+    console.log('Join room response:', response.data)
     return response.data
   },
 
   getRoomMembers: async (roomId) => {
     const response = await apiClient.get(`/room/${roomId}/members`)
-    return response.data
+    console.log('Get members response:', response.data)
+    return response.data || []
   }
 }
 
@@ -89,14 +99,14 @@ export const messageAPI = {
     const response = await apiClient.get('/message', {
       params: { room_id: roomId, user_id: userId }
     })
-    return response.data
+    return response.data || []
   }
 }
 
 // ============ WebSocket ============
 export const createWebSocketConnection = (roomId, token) => {
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${wsProtocol}//${window.location.hostname}:3000/ws/${roomId}?token=${token}`
+  const wsUrl = `${wsProtocol}//${window.location.hostname}:8000/ws/${roomId}?token=${token}`
   return new WebSocket(wsUrl)
 }
 

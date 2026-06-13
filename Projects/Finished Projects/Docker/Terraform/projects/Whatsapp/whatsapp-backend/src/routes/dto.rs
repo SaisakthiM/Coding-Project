@@ -103,3 +103,7 @@ pub struct UserRow {
     pub created_at: chrono::DateTime<Utc>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct GetRoomsParams {
+    pub user_id: Uuid,
+}

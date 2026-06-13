@@ -1,7 +1,9 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { roomAPI } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
+import "react"
 
 export default function ChatList({ selectedRoomId, onRoomSelect, onLogout }) {
   const { user, logout } = useAuthStore()
@@ -15,10 +17,13 @@ export default function ChatList({ selectedRoomId, onRoomSelect, onLogout }) {
     const loadRooms = async () => {
       if (user?.id) {
         try {
+          console.log('Loading rooms for user:', user.id)
           const data = await roomAPI.getUserRooms(user.id)
-          setRooms(data || [])
+          console.log('Loaded rooms:', data)
+          setRooms(Array.isArray(data) ? data : [])
         } catch (error) {
           console.error('Failed to load rooms:', error)
+          setRooms([])
         } finally {
           setIsLoading(false)
         }
@@ -35,11 +40,21 @@ export default function ChatList({ selectedRoomId, onRoomSelect, onLogout }) {
     if (!newRoomName.trim()) return
 
     try {
-      await roomAPI.createRoom(newRoomName)
+      console.log('Creating room:', newRoomName)
+      const response = await roomAPI.createRoom(newRoomName)
+      console.log('Room created:', response)
+      
+      // Join the room automatically
+      if (response && response.id) {
+        await roomAPI.joinRoom(response.id, user.id)
+      }
+      
       setNewRoomName('')
       setShowCreateDialog(false)
+      
+      // Reload rooms
       const data = await roomAPI.getUserRooms(user.id)
-      setRooms(data || [])
+      setRooms(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Failed to create room:', error)
     }
