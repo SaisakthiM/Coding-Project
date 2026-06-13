@@ -1,19 +1,23 @@
 use crate::{database::AppState, routes::dto::{self, ChatRoomRequest}};
 use axum::{
     Json, Router,
-    extract::{State, Path, Query},
+    extract::{State, Path, Query, Multipart},
     http::StatusCode,
     routing::{get, post, any},
     extract::ws::{WebSocketUpgrade, WebSocket, Message},
     response::{IntoResponse, Response},
 };
 use serde_json;
-use futures_util::{StreamExt, SinkExt};
+use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use bcrypt::{DEFAULT_COST, hash, verify};
 use jsonwebtoken::{EncodingKey, DecodingKey, Header, Validation, encode, decode};
+use sqlx::Row;
 use tokio::sync::broadcast;
 use uuid::Uuid;
 use chrono::{Duration, Utc};
+use minio::s3::{MinioClient, MinioClientBuilder, builders::{CompleteMultipartUpload, CreateMultipartUpload, UploadPart}, creds::StaticProvider, http::BaseUrl, response::BucketExistsResponse, response_traits::HasEtagFromHeaders, types::S3Api};
+use minio::s3::types::BucketName;
+
 
 pub async fn chat_home() -> Json<serde_json::Value> {
     Json(serde_json::json!({
@@ -119,37 +123,54 @@ pub async fn create_user(
     Ok(Json(dto::AuthResponse { id, token }))
 }
 
-pub async fn create_room(
-    State(state): State<AppState>,
-    Json(request): Json<dto::ChatRoomRequest>,
-) -> Result<Json<dto::MessageResponse>, StatusCode> {
-    let id = Uuid::new_v4();
-    let timestamp = Utc::now();
 
-    let result = sqlx::query(
+pub async fn create_room(
+    State(pool): State<AppState>,
+    Json(payload): Json<ChatRoomRequest>,
+) -> Result<Json<ChatRoomRequest>, (StatusCode, String)> {
+    let room_id = Uuid::new_v4();
+
+    // Start a transaction
+    let mut tx = pool.db.begin().await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    // Create the room
+    sqlx::query("INSERT INTO chat_rooms (id, name, created_at) VALUES ($1, $2, now())")
+        .bind(room_id)
+        .bind(&payload.name)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?;
+
+    // Automatically add creator to room_members
+    sqlx::query(
+        "INSERT INTO room_members (room_id, user_id, last_seen_at)
+         VALUES ($1, $2, now())"
+    )
+    .bind(room_id)
+    .bind(payload.creator_id)
+    .execute(&mut *tx)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    let name = sqlx::query(
         r#"
-        INSERT INTO chat_rooms (
-            id,
-            name,
-            created_at
-        )
-        VALUES ($1, $2, $3)
+        SELECT name FROM chat_rooms WHERE id=$1;
         "#
     )
-    .bind(id)
-    .bind(request.name)
-    .bind(timestamp)
-    .execute(&state.db)
-    .await;
+    .bind(room_id)
+    .fetch_one(&pool.db)
+    .await
+    .expect("Id not found");
 
-    println!("{:?}", result);
 
-    result.map_err(|e| {
-        println!("DB Error: {:?}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    // Commit the transaction
+    tx.commit().await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
-    Ok(Json(dto::MessageResponse { id }))
+    println!("Room created: {} by user: {}", room_id, payload.creator_id);
+
+    Ok(Json(ChatRoomRequest { name: name.get("name"), creator_id: payload.creator_id }))
 }
 
 // Join room endpoint
@@ -534,3 +555,96 @@ pub async fn get_user(
 
     Ok(Json(user))
 }
+
+
+#[allow(dead_code)]
+pub fn create_client() -> Result<MinioClient, Box<dyn std::error::Error + Send + Sync>> {
+    let base_url = "http://localhost:9000".parse::<BaseUrl>()?;
+
+    let static_provider = StaticProvider::new("minioadmin", "minioadmin", None);
+
+    let client = MinioClientBuilder::new(base_url.clone())
+        .provider(Some(static_provider))
+        .build()?;
+    Ok(client)
+}
+
+pub async fn create_bucket_if_not_exists(
+    bucket: &str,
+    client: &MinioClient,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let bucket = BucketName::try_from(bucket)?;
+    let resp: BucketExistsResponse = client.bucket_exists(bucket.clone())?.build().send().await?;
+
+    if !resp.exists() {
+        client.create_bucket(bucket)?.build().send().await?;
+    };
+    Ok(())
+}
+
+pub async fn file_upload(
+    mut multipart: Multipart,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let client: MinioClient = create_client()?;
+    let bucket: &str = "file-upload-rust-bucket";
+
+    // Ensure bucket exists
+    create_bucket_if_not_exists(bucket, &client).await?;
+
+    while let Some(field) = multipart.next_field().await? {
+        let file_name = field.file_name().unwrap_or("unknown_file").to_string();
+
+        // Start multipart upload
+        let create_res = client
+            .create_multipart_upload(
+                BucketName::try_from(bucket)?,
+                file_name.clone(),
+            )?
+            .build()
+            .send()
+            .await?;
+        let upload_id = create_res.upload_id().await;
+        let upload_id_2 = upload_id?.clone();
+
+        let mut completed_parts = Vec::new();
+        let mut part_number = 1;
+
+        // Stream file chunks
+        let mut stream = field.into_stream();
+        while let Some(chunk) = stream.next().await {
+            let chunk = chunk?;
+
+            let part_res = client
+                .upload_part(
+                    BucketName::try_from(bucket)?,
+                    file_name.clone(),
+                    upload_id_2.as_ref(),
+                    part_number,
+                    chunk.clone().into(),
+                )?
+                .build()
+                .send()
+                .await?;
+
+            let etag = part_res.etag()?;
+            let part_size = chunk.len() as u64;
+            completed_parts.push(minio::s3::types::PartInfo::new(part_number, etag, part_size, None));
+            part_number += 1;
+        }
+
+        // Complete upload
+        client
+            .complete_multipart_upload(
+                BucketName::try_from(bucket)?,
+                file_name.clone(),
+                upload_id_2.as_ref(),
+                completed_parts,
+            )?
+            .build()
+            .send()
+            .await?;
+    }
+
+    Ok(())
+}
+

@@ -24,6 +24,7 @@ pub struct CreateUserRequest {
 #[derive(Deserialize)]
 pub struct ChatRoomRequest {
     pub name: String,
+    pub creator_id: Uuid,  
 }
 
 #[derive(Deserialize)]
