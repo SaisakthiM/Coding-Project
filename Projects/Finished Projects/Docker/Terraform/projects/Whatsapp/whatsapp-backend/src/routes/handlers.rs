@@ -1,11 +1,6 @@
 use crate::{database::AppState, routes::dto::{self, ChatRoomRequest}};
 use axum::{
-    Json, Router,
-    extract::{State, Path, Query, Multipart},
-    http::StatusCode,
-    routing::{get, post, any},
-    extract::ws::{WebSocketUpgrade, WebSocket, Message},
-    response::{IntoResponse, Response},
+    Json, Router, extract::{Multipart, Path, Query, State, ws::{Message, WebSocket, WebSocketUpgrade, close_code::STATUS}}, http::StatusCode, response::{IntoResponse, Response}, routing::{any, get, post}
 };
 use serde_json;
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
@@ -122,7 +117,6 @@ pub async fn create_user(
 
     Ok(Json(dto::AuthResponse { id, token }))
 }
-
 
 pub async fn create_room(
     State(pool): State<AppState>,
