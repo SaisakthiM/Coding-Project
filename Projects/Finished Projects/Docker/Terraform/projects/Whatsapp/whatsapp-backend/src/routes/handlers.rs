@@ -743,8 +743,10 @@ pub async fn serve_file(
 #[allow(dead_code)]
 pub fn create_client() -> Result<MinioClient, Box<dyn std::error::Error + Send + Sync>> {
     let base_url = "http://localhost:9000".parse::<BaseUrl>()?;
+    let username = env::var("MINIO_USER").unwrap_or_else(|_| "minioadmin".to_string());
+    let password = env::var("MINIO_PASSWORD").unwrap_or_else(|_| "minioadmin".to_string());
 
-    let static_provider = StaticProvider::new("minioadmin", "minioadmin", None);
+    let static_provider = StaticProvider::new(&username, &password, None);
 
     let client = MinioClientBuilder::new(base_url.clone())
         .provider(Some(static_provider))

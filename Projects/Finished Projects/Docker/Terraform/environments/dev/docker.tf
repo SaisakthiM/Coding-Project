@@ -50,6 +50,7 @@ resource "docker_volume" "bank_dist" { name = "gateway_bank-dist" }
 resource "docker_volume" "quiz_dist" { name = "gateway_quiz-dist" }
 resource "docker_volume" "video_dist" { name = "gateway_video-dist" }
 resource "docker_volume" "api_dist" { name = "gateway_api-dist" }
+resource "docker_volume" "whisper_dist" { name = "gateway_whisper-dist"}
 resource "docker_volume" "notes_pgdata" { name = "gateway_notes-pgdata" }
 resource "docker_volume" "notes_static" { name = "gateway_notes-static" }
 resource "docker_volume" "notes_media" { name = "gateway_notes-media" }
@@ -64,6 +65,9 @@ resource "docker_volume" "record_dist" { name = "gateway_record-dist" }
 resource "docker_volume" "jenkins_home" { name = "jenkins_home" }
 resource "docker_volume" "compiler_db_data" { name = "gateway_compiler-db-data" }
 resource "docker_volume" "compiler_server_data" { name = "gateway_compiler-server-data" }
+resource "docker_volume" "whisper_pgdata" { name = "gateway_whisper-pgdata"}
+resource "docker_volume" "whisper_minio_data" { name = "whisper_minio_data" }
+
 
 # ─── DOCKER IMAGES ────────────────────────────────────────────
 resource "docker_image" "bank_backend" {
@@ -274,6 +278,39 @@ resource "docker_image" "doc_frontend_build" {
   }
 }
 
+resource "docker_image" "whisper_backend" {
+  name         = "whisper-backend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Whatsapp/whatsapp-backend")
+    dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/projects/Whatsapp/whatsapp-backend", "**") :
+      filesha256("${path.module}/../../projects/projects/Whatsapp/whatsapp-backend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
+resource "docker_image" "whisper_frontend" {
+  name         = "whisper-frontend:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/../../projects/Whatsapp/whatsapp-frontend")
+    dockerfile = "Dockerfile.prod"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/../../projects/projects/Whatsapp/whatsapp-frontend", "**") :
+      filesha256("${path.module}/../../projects/projects/Whatsapp/whatsapp-frontend/${f}")
+      if !can(regex("(\\.git|node_modules|dist)", f))
+    ]))
+  }
+}
+
+
 resource "docker_image" "otel_gateway" {
   name         = "otel/opentelemetry-collector-contrib:0.100.0"
   keep_locally = true
@@ -283,6 +320,8 @@ resource "docker_image" "jenkins" {
   name         = "jenkins/jenkins:lts"
   keep_locally = true
 }
+
+
 
 /*
 resource "null_resource" "ssl_setup" {
@@ -360,6 +399,8 @@ module "gateway" {
     { volume_name = docker_volume.doc_dist.name, container_path = "/apps/document", read_only = true },
     { volume_name = docker_volume.intro_dist.name, container_path = "/apps/intro", read_only = true },
     { volume_name = docker_volume.record_dist.name, container_path = "/apps/record", read_only = true },
+    { volume_name = docker_volume.whisper_dist.name, container_path = "/apps/whisper", read_only = true },
+
   ]
 }
 
@@ -448,6 +489,76 @@ resource "docker_container" "notes_frontend_build" {
     type   = "volume"
   }
 }
+
+# ─── Whisper App ─────────────────────────────────────────────────
+
+resource "docker_container" "whisper-postgres" {
+  
+  name  = "gateway_whisper-pgdata"
+  image = "postgres:15-alpine"
+  
+  env = [
+    "POSTGRES_USER=${var.whisper_db_user}",
+    "POSTGRES_PASSWORD=${var.whisper_db_password}",
+    "POSTGRES_DB=${var.whisper_db_database}"
+  ]
+
+  # Map the volume here
+  volumes {
+    volume_name    = docker_volume.whisper_pgdata.name
+    container_path = "/var/lib/postgresql/data"
+  }
+}
+
+resource "docker_container" "whisper_minio" {
+  name  = "whisper-minio"
+  image = "minio/minio:latest"
+  
+  command = ["server", "/data", "--console-address", ":9001"]
+
+  env = [
+    "MINIO_ROOT_USER=${var.whisper_minio_user}",
+    "MINIO_ROOT_PASSWORD=${var.whisper_minio_password}"
+  ]
+
+  # Map the volume here
+  volumes {
+    volume_name    = docker_volume.whisper_minio_data.name
+    container_path = "/data"
+  }
+}
+
+module "whisper_backend" {
+  source        = "../../modules/docker_app"
+  name    =  "whisper-backend"
+  image = docker_image.whisper_backend.name
+  internal_port = 8000
+  external_port = 0
+  network       = docker_network.gateway_net.name
+
+  env = [
+    "DATABASE_URL=postgresql://whisper-postgres:5432/${var.whisper_db_database}",
+    "DATABASE_TEST_URL=postgresql://whisper-postgres:5432/${var.whisper_db_test_db}",
+    "MINIO_USER=${var.whisper_minio_user}",
+    "MINIO_PASSWORD=${var.whisper_minio_password}",
+    "JWT_SECRET=${var.whisper_jwt_secret}"
+  ]
+  
+}
+
+resource "docker_container" "whisper_frontend_build" {
+  name                  = "whisper-frontend-build"
+  image                 = docker_image.bank_frontend_build.name
+  destroy_grace_seconds = 30
+  must_run              = true
+  networks_advanced { name = docker_network.gateway_net.name }
+  mounts {
+    source = docker_volume.whisper_dist.name
+    target = "/dist"
+    type   = "volume"
+  }
+}
+
 
 # ─── BANK APP ─────────────────────────────────────────────────
 resource "docker_container" "bank_postgres" {

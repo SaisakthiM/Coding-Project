@@ -57,4 +57,12 @@ variable "n8n_env" {
   type        = map(string)
 }
 
+# ─── Whisper App ─────────────────────────────────────────────
 
+variable "whisper_db_user" {}
+variable "whisper_db_password" {}
+variable "whisper_db_database" {}
+variable "whisper_db_test_db" {}
+variable "whisper_minio_user" {}
+variable "whisper_minio_password" {}
+variable "whisper_jwt_secret" {}
