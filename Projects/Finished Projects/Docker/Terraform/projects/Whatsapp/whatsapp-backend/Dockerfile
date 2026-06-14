@@ -1,10 +1,14 @@
 # Stage 1: Build Environment
-FROM rust:1-bookworm AS builder
+FROM rust:1-slim-bookworm AS builder
 
 WORKDIR /app
 
 # Install musl-dev to compile C-dependencies required by sqlx/tokio on Alpine
-RUN apk add --no-cache musl-dev
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    musl-tools \
+    libssl-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Copy all source files
 COPY . .

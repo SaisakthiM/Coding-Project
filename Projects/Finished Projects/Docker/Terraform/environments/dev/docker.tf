@@ -279,16 +279,16 @@ resource "docker_image" "doc_frontend_build" {
 }
 
 resource "docker_image" "whisper_backend" {
-  name         = "whisper-backend:latest"
+  name         = "whisper_backend:latest"
   keep_locally = true
   build {
     context    = abspath("${path.module}/../../projects/Whatsapp/whatsapp-backend")
-    dockerfile = "Dockerfile.prod"
+    dockerfile = "Dockerfile"
   }
   triggers = {
     dir_sha = sha256(join("", [
-      for f in fileset("${path.module}/../../projects/projects/Whatsapp/whatsapp-backend", "**") :
-      filesha256("${path.module}/../../projects/projects/Whatsapp/whatsapp-backend/${f}")
+      for f in fileset("${path.module}/../../projects/Whatsapp/whatsapp-backend", "**") :
+      filesha256("${path.module}/../../projects/Whatsapp/whatsapp-backend/${f}")
       if !can(regex("(\\.git|node_modules|dist)", f))
     ]))
   }
@@ -530,7 +530,7 @@ resource "docker_container" "whisper_minio" {
 
 module "whisper_backend" {
   source        = "../../modules/docker_app"
-  name    =  "whisper-backend"
+  name    =  "whisper_backend"
   image = docker_image.whisper_backend.name
   internal_port = 8000
   external_port = 0
