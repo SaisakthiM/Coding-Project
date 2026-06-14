@@ -34,6 +34,7 @@ fn build_app(state: AppState) -> Router {
         .merge(routes::getMessage())
         .merge(routes::login())
         .merge(routes::ws())
-        .merge(routes::room_routes()) 
+        .merge(routes::room_routes())
+        .merge(routes::media_routes()) 
         .with_state(state)
 }

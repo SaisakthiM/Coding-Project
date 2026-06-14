@@ -28,6 +28,7 @@ async fn main() {
         .merge(routes::login())
         .merge(routes::ws())
         .merge(routes::room_routes())
+        .merge(routes::media_routes())
         .with_state(state)
         .layer(cors); // Add this line
 

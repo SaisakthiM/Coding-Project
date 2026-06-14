@@ -8,6 +8,21 @@ pub struct CreateMessageRequest {
     pub room_id: Uuid,
     pub sender_id: Uuid,
     pub content: String,
+    #[serde(default = "default_message_type")]
+    pub message_type: String,
+    #[serde(default)]
+    pub media_url: Option<String>,
+}
+
+fn default_message_type() -> String {
+    "text".to_string()
+}
+
+#[derive(Serialize)]
+pub struct ChatRoomResponse {
+    pub id: Uuid,
+    pub name: String,
+    pub creator_id: Uuid,
 }
 
 #[derive(Serialize)]
@@ -21,7 +36,7 @@ pub struct CreateUserRequest {
     pub password: String
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize,Deserialize)]
 pub struct ChatRoomRequest {
     pub name: String,
     pub creator_id: Uuid,  
@@ -69,8 +84,12 @@ pub struct MessageRow {
     room_id: Uuid,
     sender_id: Uuid,
     content: String,
+    #[sqlx(default)]
+    pub message_type: String,
+    #[sqlx(default)]
+    pub media_url: Option<String>,
     #[sqlx(rename = "created_at")]
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, FromRow)]
@@ -102,9 +121,61 @@ pub struct UserRow {
     pub id: Uuid,
     pub username: String,
     pub created_at: chrono::DateTime<Utc>,
+    #[sqlx(default)]
+    pub profile_photo_url: Option<String>, // Added this line
 }
 
 #[derive(Debug, Deserialize)]
 pub struct GetRoomsParams {
     pub user_id: Uuid,
+}
+
+#[derive(Serialize)]
+pub struct UploadResponse {
+    pub url: String,
+    pub filename: String,
+}
+
+#[derive(Debug)]
+pub enum SocketError {
+    Database(sqlx::Error),
+    Serialization(serde_json::Error),
+    Network(axum::Error),
+}
+
+// Implement From traits for easy error propagation using the ? operator
+impl From<sqlx::Error> for SocketError {
+    fn from(err: sqlx::Error) -> Self { Self::Database(err) }
+}
+impl From<serde_json::Error> for SocketError {
+    fn from(err: serde_json::Error) -> Self { Self::Serialization(err) }
+}
+impl From<axum::Error> for SocketError {
+    fn from(err: axum::Error) -> Self { Self::Network(err) }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DiscoverRoomsParams {
+    pub user_id: Uuid,
+    #[serde(default)]
+    pub q: Option<String>,
+}
+
+#[derive(Serialize, FromRow)]
+pub struct DiscoverRoomRow {
+    pub id: Uuid,
+    pub name: String,
+    pub created_at: chrono::DateTime<Utc>,
+    pub member_count: i64,
+    pub is_member: bool,
+}
+
+#[derive(Deserialize)]
+pub struct SearchQuery {
+    pub q: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UpdateProfileRequest {
+    pub profile_photo_url: String,
 }

@@ -1,5 +1,5 @@
 
-use chatting_app::database::AppState;
+use whatsapp_backend::database::AppState;
 use reqwest;
 use sqlx::{Connection, Error::Database, PgPool, Row};
 use tokio::sync::Mutex;

@@ -1,7 +1,8 @@
 use crate::{database::AppState, routes::dto::{self, ChatRoomRequest}};
 use axum::{
-    Json, Router, extract::{Multipart, Path, Query, State, ws::{Message, WebSocket, WebSocketUpgrade, close_code::STATUS}}, http::StatusCode, response::{IntoResponse, Response}, routing::{any, get, post}
+    Json, Router, extract::{Multipart, Path, Query, State, ws::{Message, WebSocket, WebSocketUpgrade, close_code::STATUS}}, handler::{HandlerService, HandlerWithoutStateExt}, http::StatusCode, response::{IntoResponse, Response}, routing::{any, get, post}
 };
+
 use serde_json;
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use bcrypt::{DEFAULT_COST, hash, verify};
@@ -10,7 +11,7 @@ use sqlx::Row;
 use tokio::sync::broadcast;
 use uuid::Uuid;
 use chrono::{Duration, Utc};
-use minio::s3::{MinioClient, MinioClientBuilder, builders::{CompleteMultipartUpload, CreateMultipartUpload, UploadPart}, creds::StaticProvider, http::BaseUrl, response::BucketExistsResponse, response_traits::HasEtagFromHeaders, types::S3Api};
+use minio::s3::{MinioClient, MinioClientBuilder, creds::StaticProvider, http::BaseUrl, response::BucketExistsResponse, types::S3Api};
 use minio::s3::types::BucketName;
 
 
@@ -60,15 +61,19 @@ pub async fn create_message(
             room_id,
             sender_id,
             content,
+            message_type,
+            media_url,
             created_at
         )
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         "#
     )
     .bind(id)
     .bind(request.room_id)
     .bind(request.sender_id)
     .bind(&request.content)
+    .bind(&request.message_type)
+    .bind(&request.media_url)
     .bind(timestamp)
     .execute(&state.db)
     .await;
@@ -120,58 +125,74 @@ pub async fn create_user(
 
 pub async fn create_room(
     State(pool): State<AppState>,
-    Json(payload): Json<ChatRoomRequest>,
-) -> Result<Json<ChatRoomRequest>, (StatusCode, String)> {
+    Json(payload): Json<dto::ChatRoomRequest>,
+) -> Result<Json<dto::ChatRoomResponse>, (StatusCode, String)> {
     let room_id = Uuid::new_v4();
 
-    // Start a transaction
-    let mut tx = pool.db.begin().await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    let mut tx = match pool.db.begin().await {
+        Ok(tx) => tx,
+        Err(e) => {
+            eprintln!("DB begin error: {:?}", e);
+            return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+        }
+    };
 
-    // Create the room
-    sqlx::query("INSERT INTO chat_rooms (id, name, created_at) VALUES ($1, $2, now())")
+    if let Err(e) = sqlx::query("INSERT INTO chat_rooms (id, name, created_at) VALUES ($1, $2, now())")
         .bind(room_id)
         .bind(&payload.name)
         .execute(&mut *tx)
         .await
-        .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?;
+    {
+        eprintln!("Insert chat_rooms error: {:?}", e);
+        return Err((StatusCode::BAD_REQUEST, e.to_string()));
+    }
 
-    // Automatically add creator to room_members
-    sqlx::query(
-        "INSERT INTO room_members (room_id, user_id, last_seen_at)
-         VALUES ($1, $2, now())"
+    if let Err(e) = sqlx::query(
+        "INSERT INTO room_members (room_id, user_id, last_seen_at) VALUES ($1, $2, now())"
     )
     .bind(room_id)
     .bind(payload.creator_id)
     .execute(&mut *tx)
     .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    {
+        eprintln!("Insert room_members error: {:?}", e);
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+    }
 
-    let name = sqlx::query(
-        r#"
-        SELECT name FROM chat_rooms WHERE id=$1;
-        "#
-    )
-    .bind(room_id)
-    .fetch_one(&pool.db)
-    .await
-    .expect("Id not found");
+    let row = match sqlx::query("SELECT name FROM chat_rooms WHERE id=$1")
+        .bind(room_id)
+        .fetch_one(&mut *tx)
+        .await
+    {
+        Ok(row) => row,
+        Err(e) => {
+            eprintln!("Select chat_rooms error: {:?}", e);
+            return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+        }
+    };
 
+    if let Err(e) = tx.commit().await {
+        eprintln!("Commit error: {:?}", e);
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+    }
 
-    // Commit the transaction
-    tx.commit().await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
-
-    println!("Room created: {} by user: {}", room_id, payload.creator_id);
-
-    Ok(Json(ChatRoomRequest { name: name.get("name"), creator_id: payload.creator_id }))
+    Ok(Json(dto::ChatRoomResponse {
+        id: room_id,
+        name: row.get("name"),
+        creator_id: payload.creator_id,
+    }))
 }
+
 
 // Join room endpoint
 pub async fn join_room(
     State(pool): State<AppState>,
     Json(payload): Json<dto::JoinRoomRequest>,
 ) -> Result<StatusCode, (StatusCode, String)> {
+    let mut tx = match pool.db.begin().await {
+        Ok(tx) => tx,
+        Err(e) => return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string())),
+    };
     sqlx::query(
         "INSERT INTO room_members (room_id, user_id, last_seen_at)
          VALUES ($1, $2, now())
@@ -190,28 +211,26 @@ pub async fn join_room(
 pub async fn get_message(
     State(state): State<AppState>,
     Query(request): Query<dto::MessageRequest>,
-) -> Result<StatusCode, StatusCode> {
-    let result = sqlx::query(
+) -> Result<Json<Vec<dto::MessageRow>>, StatusCode> {
+    let messages = sqlx::query_as::<_, dto::MessageRow>(
         r#"
-        SELECT m.*
+        SELECT m.id, m.room_id, m.sender_id, m.content, m.message_type, m.media_url, m.created_at
         FROM messages m
-        JOIN room_members rm
-            ON rm.room_id = m.room_id
-        WHERE m.room_id = $1
-        AND rm.user_id = $2
+        JOIN room_members rm ON rm.room_id = m.room_id
+        WHERE m.room_id = $1 AND rm.user_id = $2
         ORDER BY m.created_at ASC;
         "#
     )
     .bind(request.room_id)
     .bind(request.user_id)
     .fetch_all(&state.db)
-    .await;
+    .await
+    .map_err(|e| {
+        eprintln!("DB Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
-    println!("{:?}", result);
-
-    result.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    Ok(StatusCode::CREATED)
+    Ok(Json(messages))
 }
 
 pub fn create_token(user_id: Uuid) -> Result<String, jsonwebtoken::errors::Error> {
@@ -271,7 +290,6 @@ pub async fn login(
 }
 
 
-
 pub async fn handler(
     ws: WebSocketUpgrade,
     Path(room_id): Path<Uuid>,
@@ -294,13 +312,32 @@ pub async fn handler(
         Err(_) => return StatusCode::UNAUTHORIZED.into_response(),
     };
 
+    // Extractors end here. We move raw data types (Uuid, AppState) into the socket closure.
     ws.on_upgrade(move |socket| handle_socket(socket, user_id, room_id, state))
 }
 
+// 3. The Connection Coordinator (Converts Socket Worker Result into void)
 async fn handle_socket(socket: WebSocket, user_id: Uuid, room_id: Uuid, state: AppState) {
+    // Pass the actual upgraded raw socket and variables into our core logic
+    match handle_socket_core(socket, user_id, room_id, state).await {
+        Ok(_) => println!("User {} cleanly disconnected from room {}", user_id, room_id),
+        Err(e) => eprintln!("Socket error occurred for user {} in room {}: {:?}", user_id, room_id, e),
+    }
+}
+
+// 4. The Fallible Core Worker (NO Extractors, Plain Rust arguments only!)
+
+async fn handle_socket_core(
+    socket: WebSocket, 
+    user_id: Uuid, 
+    room_id: Uuid, 
+    state: AppState
+) -> Result<(), dto::SocketError> {
+    
+    // Now socket.split() works perfectly!
     let (mut sender, mut receiver) = socket.split();
 
-    // 1. Get or create broadcast channel for this room
+    // 1. Get/Create Room Channel
     let tx = {
         let mut rooms = state.rooms.lock().await;
         rooms.entry(room_id)
@@ -309,7 +346,7 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, room_id: Uuid, state: A
     };
     let mut rx = tx.subscribe();
 
-    // 1. Snapshot last_seen_at BEFORE updating it
+    // 2. Fetch history & update last seen
     let last_seen: (chrono::DateTime<Utc>,) = sqlx::query_as(
         "SELECT last_seen_at FROM room_members WHERE room_id = $1 AND user_id = $2"
     )
@@ -319,103 +356,120 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, room_id: Uuid, state: A
     .await
     .unwrap_or((chrono::DateTime::from_timestamp(0, 0).unwrap(),));
 
-    // 2. Update last_seen_at to now IMMEDIATELY (before catch-up send)
-    let _ = sqlx::query(
-        "UPDATE room_members SET last_seen_at = now() WHERE room_id = $1 AND user_id = $2"
-    )
-    .bind(room_id)
-    .bind(user_id)
-    .execute(&state.db)
-    .await;
+    sqlx::query("UPDATE room_members SET last_seen_at = now() WHERE room_id = $1 AND user_id = $2")
+        .bind(room_id)
+        .bind(user_id)
+        .execute(&state.db)
+        .await?; // <-- using ? now
 
-    // 3. Catch-up using the SNAPSHOTTED timestamp, not the live one
     let missed = sqlx::query_as::<_, dto::MessageRow>(
-        r#"
-        SELECT id, room_id, sender_id, content, created_at
-        FROM messages
-        WHERE room_id = $1
-          AND created_at > $2
-        ORDER BY created_at ASC
-        "#
+        r#"SELECT id, room_id, sender_id, content, created_at FROM messages 
+           WHERE room_id = $1 AND created_at > $2 ORDER BY created_at ASC"#
     )
     .bind(room_id)
     .bind(last_seen.0)
     .fetch_all(&state.db)
-    .await
-    .unwrap_or_default();
+    .await?; // <-- using ? now
 
     for msg in missed {
-        let json = serde_json::to_string(&msg).unwrap();
-        if sender.send(Message::Text(json.into())).await.is_err() {
-            return;
-        }
+        let json = serde_json::to_string(&msg)?;
+        sender.send(Message::Text(json.into())).await?; // <-- using ? now
     }
 
-    // 3. Update last_seen_at
-    let _ = sqlx::query(
-        "UPDATE room_members SET last_seen_at = now() WHERE room_id = $1 AND user_id = $2"
-    )
-    .bind(room_id)
-    .bind(user_id)
-    .execute(&state.db)
-    .await;
-
-
-    // 4. Spawn task: forward broadcasts from other users TO this socket
+    // 3. Spawn Broadcast-to-Client Task (with heartbeat ping to keep connection alive)
     let mut send_task = tokio::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            if sender.send(Message::Text(msg.into())).await.is_err() {
-                break;
+        let mut ping_interval = tokio::time::interval(std::time::Duration::from_secs(20));
+        ping_interval.tick().await; // skip immediate tick
+
+        loop {
+            tokio::select! {
+                msg = rx.recv() => {
+                    match msg {
+                        Ok(text) => {
+                            if sender.send(Message::Text(text.into())).await.is_err() {
+                                break;
+                            }
+                        }
+                        Err(broadcast::error::RecvError::Lagged(_)) => {
+                            // We missed some messages because the buffer overflowed.
+                            // Skip them instead of killing the connection.
+                            continue;
+                        }
+                        Err(broadcast::error::RecvError::Closed) => {
+                            break;
+                        }
+                    }
+                }
+                _ = ping_interval.tick() => {
+                    if sender.send(Message::Ping(Vec::new().into())).await.is_err() {
+                        break;
+                    }
+                }
             }
         }
     });
 
     let state2 = state.clone();
+    let tx_clone = tx.clone();
 
-    // 5. Receive loop: read from this socket, persist, broadcast to room
-    let mut recv_task = tokio::spawn(async move{
+    // 4. Spawn Client-to-Room Task
+    let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(msg)) = receiver.next().await {
             match msg {
                 Message::Text(text) => {
-                    // Ignore control messages
+                    let mut content = text.to_string();
+                    let mut message_type = "text".to_string();
+                    let mut media_url: Option<String> = None;
+
                     if text.trim_start().starts_with('{') {
                         if let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) {
                             if v.get("type").and_then(|t| t.as_str()) == Some("ping") {
                                 continue;
                             }
+
+                            if let Some(t) = v.get("type").and_then(|t| t.as_str()) {
+                                if t == "image" {
+                                    message_type = "image".to_string();
+                                    media_url = v.get("media_url")
+                                        .and_then(|u| u.as_str())
+                                        .map(|s| s.to_string());
+                                    content = v.get("content")
+                                        .and_then(|c| c.as_str())
+                                        .unwrap_or("")
+                                        .to_string();
+                                }
+                            }
                         }
                     }
 
-                    // Persist to DB
                     let msg_id = Uuid::new_v4();
                     let timestamp = Utc::now();
+
                     let _ = sqlx::query(
-                        r#"INSERT INTO messages (id, room_id, sender_id, content, created_at)
-                           VALUES ($1, $2, $3, $4, $5)"#
+                        r#"INSERT INTO messages (id, room_id, sender_id, content, message_type, media_url, created_at)
+                           VALUES ($1, $2, $3, $4, $5, $6, $7)"#
                     )
                     .bind(msg_id)
                     .bind(room_id)
                     .bind(user_id)
-                    .bind(text.as_str())
+                    .bind(&content)
+                    .bind(&message_type)
+                    .bind(&media_url)
                     .bind(timestamp)
-                    .execute(&state.db.clone())
+                    .execute(&state2.db)
                     .await;
 
-                    // Broadcast to all subscribers in this room (including sender)
                     let payload = serde_json::json!({
                         "id": msg_id,
                         "room_id": room_id,
                         "sender_id": user_id,
-                        "content": text.as_str(),
+                        "content": content,
+                        "message_type": message_type,
+                        "media_url": media_url,
                         "created_at": timestamp,
                     }).to_string();
 
-                    let _ = tx.send(payload);
-                }
-                Message::Ping(payload) => {
-                    // axum handles pong automatically, but just in case
-                    let _ = tx.send(serde_json::json!({"type":"pong"}).to_string());
-                    let _ = payload;
+                    let _ = tx_clone.send(payload);
                 }
                 Message::Close(_) => break,
                 _ => {}
@@ -423,26 +477,31 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, room_id: Uuid, state: A
         }
     });
 
-    // 6. If either task exits, abort the other
+    // 5. Race tasks
     tokio::select! {
         _ = &mut send_task => recv_task.abort(),
         _ = &mut recv_task => send_task.abort(),
     }
 
-    // 7. Update last_seen_at on disconnect
-    let _ = sqlx::query(
-        "UPDATE room_members SET last_seen_at = now() WHERE room_id = $1 AND user_id = $2"
-    )
-    .bind(room_id)
-    .bind(user_id)
-    .execute(&state2.db)
-    .await;
+    // 6. Update last seen upon exit
+    sqlx::query("UPDATE room_members SET last_seen_at = now() WHERE room_id = $1 AND user_id = $2")
+        .bind(room_id)
+        .bind(user_id)
+        .execute(&state.db)
+        .await?;
+
+    Ok(())
 }
+
 
 pub async fn get_user_rooms(
     State(pool): State<AppState>,
     Query(params): Query<dto::GetRoomsParams>,
 ) -> Result<Json<Vec<dto::RoomRow>>, (StatusCode, String)> {
+    let mut tx = match pool.db.begin().await {
+        Ok(tx) => tx,
+        Err(e) => return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string())),
+    };
     let rooms = sqlx::query_as::<_, dto::RoomRow>(
         "SELECT DISTINCT cr.id, cr.name, cr.created_at 
          FROM chat_rooms cr
@@ -453,7 +512,7 @@ pub async fn get_user_rooms(
          ORDER BY cr.created_at DESC"
     )
     .bind(params.user_id)
-    .fetch_all(&pool.db)
+    .fetch_all(&mut *tx)
     .await
     .map_err(|e| {
         eprintln!("Database error: {:?}", e);
@@ -464,6 +523,41 @@ pub async fn get_user_rooms(
 }
 
 
+
+pub async fn discover_rooms(
+    State(state): State<AppState>,
+    Query(params): Query<dto::DiscoverRoomsParams>,
+) -> Result<Json<Vec<dto::DiscoverRoomRow>>, StatusCode> {
+    let search_term = format!("%{}%", params.q.unwrap_or_default());
+
+    let rooms = sqlx::query_as::<_, dto::DiscoverRoomRow>(
+        r#"
+        SELECT
+            cr.id,
+            cr.name,
+            cr.created_at,
+            (SELECT COUNT(*) FROM room_members rm2 WHERE rm2.room_id = cr.id) AS member_count,
+            EXISTS (
+                SELECT 1 FROM room_members rm3
+                WHERE rm3.room_id = cr.id AND rm3.user_id = $2
+            ) AS is_member
+        FROM chat_rooms cr
+        WHERE cr.name ILIKE $1
+        ORDER BY cr.created_at DESC
+        LIMIT 50
+        "#
+    )
+    .bind(search_term)
+    .bind(params.user_id)
+    .fetch_all(&state.db)
+    .await
+    .map_err(|e| {
+        eprintln!("DB Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    Ok(Json(rooms))
+}
 
 pub async fn get_room_members(
     State(state): State<AppState>,
@@ -551,6 +645,101 @@ pub async fn get_user(
 }
 
 
+pub const MEDIA_BUCKET: &str = "chat-media";
+
+pub async fn upload_image(
+    mut multipart: Multipart,
+) -> Result<Json<dto::UploadResponse>, (StatusCode, String)> {
+    let client = create_client()
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    create_bucket_if_not_exists(MEDIA_BUCKET, &client)
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?
+    {
+        let original_name = field.file_name().unwrap_or("upload").to_string();
+        let ext = std::path::Path::new(&original_name)
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("bin");
+
+        let object_name = format!("{}.{}", Uuid::new_v4(), ext);
+
+        let data = field
+            .bytes()
+            .await
+            .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?;
+
+        client
+            .put_object(
+                BucketName::try_from(MEDIA_BUCKET)
+                    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?,
+                object_name.clone(),
+                minio::s3::segmented_bytes::SegmentedBytes::from(data),
+            )
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+            .build()
+            .send()
+            .await
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+        return Ok(Json(dto::UploadResponse {
+            url: format!("/files/{}", object_name),
+            filename: object_name,
+        }));
+    }
+
+    Err((StatusCode::BAD_REQUEST, "No file provided".to_string()))
+}
+
+pub async fn serve_file(
+    Path(filename): Path<String>,
+) -> Result<Response, StatusCode> {
+    let client = create_client().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let resp = client
+        .get_object(MEDIA_BUCKET, filename.as_str())
+        .map_err(|_| StatusCode::NOT_FOUND)?
+        .build()
+        .send()
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+
+    let segmented = resp
+        .content()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .to_segmented_bytes()
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let bytes = segmented.to_bytes();
+
+    let content_type = match std::path::Path::new(&filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("")
+        .to_lowercase()
+        .as_str()
+    {
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "gif" => "image/gif",
+        "webp" => "image/webp",
+        "svg" => "image/svg+xml",
+        _ => "application/octet-stream",
+    };
+
+    Ok((
+        [(axum::http::header::CONTENT_TYPE, content_type)],
+        bytes,
+    ).into_response())
+}
+
 #[allow(dead_code)]
 pub fn create_client() -> Result<MinioClient, Box<dyn std::error::Error + Send + Sync>> {
     let base_url = "http://localhost:9000".parse::<BaseUrl>()?;
@@ -576,69 +765,44 @@ pub async fn create_bucket_if_not_exists(
     Ok(())
 }
 
-pub async fn file_upload(
-    mut multipart: Multipart,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let client: MinioClient = create_client()?;
-    let bucket: &str = "file-upload-rust-bucket";
+pub async fn search_users(
+    State(state): State<AppState>,
+    Query(query): Query<dto::SearchQuery>,
+) -> Result<Json<Vec<dto::UserRow>>, StatusCode> {
+    let search_term = format!("%{}%", query.q);
+    
+    let users = sqlx::query_as::<_, dto::UserRow>(
+        "SELECT id, username, created_at, profile_photo_url FROM users WHERE username ILIKE $1 LIMIT 20"
+    )
+    .bind(search_term)
+    .fetch_all(&state.db)
+    .await
+    .map_err(|e| {
+        eprintln!("DB Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
-    // Ensure bucket exists
-    create_bucket_if_not_exists(bucket, &client).await?;
-
-    while let Some(field) = multipart.next_field().await? {
-        let file_name = field.file_name().unwrap_or("unknown_file").to_string();
-
-        // Start multipart upload
-        let create_res = client
-            .create_multipart_upload(
-                BucketName::try_from(bucket)?,
-                file_name.clone(),
-            )?
-            .build()
-            .send()
-            .await?;
-        let upload_id = create_res.upload_id().await;
-        let upload_id_2 = upload_id?.clone();
-
-        let mut completed_parts = Vec::new();
-        let mut part_number = 1;
-
-        // Stream file chunks
-        let mut stream = field.into_stream();
-        while let Some(chunk) = stream.next().await {
-            let chunk = chunk?;
-
-            let part_res = client
-                .upload_part(
-                    BucketName::try_from(bucket)?,
-                    file_name.clone(),
-                    upload_id_2.as_ref(),
-                    part_number,
-                    chunk.clone().into(),
-                )?
-                .build()
-                .send()
-                .await?;
-
-            let etag = part_res.etag()?;
-            let part_size = chunk.len() as u64;
-            completed_parts.push(minio::s3::types::PartInfo::new(part_number, etag, part_size, None));
-            part_number += 1;
-        }
-
-        // Complete upload
-        client
-            .complete_multipart_upload(
-                BucketName::try_from(bucket)?,
-                file_name.clone(),
-                upload_id_2.as_ref(),
-                completed_parts,
-            )?
-            .build()
-            .send()
-            .await?;
-    }
-
-    Ok(())
+    Ok(Json(users))
 }
 
+pub async fn update_profile_photo(
+    State(state): State<AppState>,
+    Path(user_id): Path<Uuid>,
+    Json(body): Json<dto::UpdateProfileRequest>,
+) -> Result<StatusCode, StatusCode> {
+    let result = sqlx::query("UPDATE users SET profile_photo_url=$1 WHERE id=$2")
+        .bind(&body.profile_photo_url)
+        .bind(user_id)
+        .execute(&state.db)
+        .await
+        .map_err(|e| {
+            eprintln!("DB Error: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err(StatusCode::NOT_FOUND);
+    }
+
+    Ok(StatusCode::NO_CONTENT)
+}

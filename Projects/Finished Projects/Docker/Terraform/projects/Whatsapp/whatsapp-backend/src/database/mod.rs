@@ -90,5 +90,23 @@ pub async fn init_database(pool: &PgPool) -> Result<(), sqlx::Error> {
         "#
     ).await?;
 
+    pool.execute(
+        r#"
+        ALTER TABLE messages ADD COLUMN IF NOT EXISTS message_type TEXT NOT NULL DEFAULT 'text';
+        "#
+    ).await?;
+
+    pool.execute(
+        r#"
+        ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_url TEXT;
+        "#
+    ).await?;
+
+    pool.execute(
+        r#"
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo_url TEXT;
+        "#
+    ).await?;
+
     Ok(())
 }
