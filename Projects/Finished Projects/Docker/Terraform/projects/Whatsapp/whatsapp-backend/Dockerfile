@@ -1,34 +1,34 @@
-# Stage 1: Build Environment
-FROM rust:1-slim-bookworm AS builder
-
+# Stage 1: Install cargo-chef
+FROM rust:1-slim-bookworm AS chef
 WORKDIR /app
+RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+RUN cargo install cargo-chef --locked
 
-# Install musl-dev to compile C-dependencies required by sqlx/tokio on Alpine
-RUN apt-get update && apt-get install -y \
-    pkg-config \
-    musl-tools \
-    libssl-dev \
- && rm -rf /var/lib/apt/lists/*
-
-# Copy all source files
+# Stage 2: Compute the dependency recipe (only re-runs if Cargo.toml/lock changes)
+FROM chef AS planner
 COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Build the release binary
+# Stage 3: Build dependencies first (heaviest layer — cached unless deps change)
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# Now copy source and build — only this layer re-runs on src changes
+COPY . .
 RUN cargo build --release
 
-# Stage 2: Production Environment
-FROM alpine:latest
-
+# Stage 4: Minimal runtime (debian-slim matches the glibc the binary was compiled against)
+FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 
-# Copy ONLY the compiled binary from the builder stage
-COPY --from=builder /app/target/release/whatsapp-backend .
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy your .env file so the database URL and JWT secret are loaded
+COPY --from=builder /app/target/release/whatsapp-backend .
 COPY .env .
 
-# Expose the port your Axum server runs on
 EXPOSE 8000
-
-# Run the binary
 CMD ["./whatsapp-backend"]
