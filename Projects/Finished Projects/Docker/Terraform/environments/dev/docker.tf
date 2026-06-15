@@ -537,18 +537,20 @@ module "whisper_backend" {
   network       = docker_network.gateway_net.name
 
   env = [
-    "DATABASE_URL=postgresql://whisper-postgres:5432/${var.whisper_db_database}",
+    "DATABASE_URL=postgresql://admin:saisakthi@gateway_whisper-pgdata:5432/${var.whisper_db_database}",
     "DATABASE_TEST_URL=postgresql://whisper-postgres:5432/${var.whisper_db_test_db}",
     "MINIO_USER=${var.whisper_minio_user}",
     "MINIO_PASSWORD=${var.whisper_minio_password}",
-    "JWT_SECRET=${var.whisper_jwt_secret}"
+    "JWT_SECRET=${var.whisper_jwt_secret}",
+    "MINIO_URL=http://whisper-minio:9000",
+
   ]
   
 }
 
 resource "docker_container" "whisper_frontend_build" {
   name                  = "whisper-frontend-build"
-  image                 = docker_image.bank_frontend_build.name
+  image                 = docker_image.whisper_frontend.name
   destroy_grace_seconds = 30
   must_run              = true
   networks_advanced { name = docker_network.gateway_net.name }

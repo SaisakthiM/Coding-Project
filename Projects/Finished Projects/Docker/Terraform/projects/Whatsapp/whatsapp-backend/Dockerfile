@@ -17,6 +17,7 @@ RUN cargo chef cook --release --recipe-path recipe.json
 # Now copy source and build — only this layer re-runs on src changes
 COPY . .
 RUN cargo build --release
+RUN cargo install sqlx-cli --no-default-features --features postgres --locked
 
 # Stage 4: Minimal runtime (debian-slim matches the glibc the binary was compiled against)
 FROM debian:bookworm-slim AS runtime
@@ -28,7 +29,11 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/target/release/whatsapp-backend .
+COPY --from=builder /usr/local/cargo/bin/sqlx .
+COPY migrations/ ./migrations/  
 COPY .env .
 
 EXPOSE 8000
-CMD ["./whatsapp-backend"]
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]

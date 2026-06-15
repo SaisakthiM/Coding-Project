@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://whisper-backend:8000'
+const API_BASE_URL = '/whisper/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -113,7 +113,7 @@ export const mediaAPI = {
 
 export const createWebSocketConnection = (roomId, token) => {
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${wsProtocol}//${window.location.hostname}:8000/ws/${roomId}?token=${token}`
+  const wsUrl = `${wsProtocol}//${window.location.host}/whisper/ws/${roomId}?token=${token}`
   return new WebSocket(wsUrl)
 }
 

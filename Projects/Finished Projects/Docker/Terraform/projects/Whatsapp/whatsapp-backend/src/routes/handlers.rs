@@ -742,7 +742,8 @@ pub async fn serve_file(
 
 #[allow(dead_code)]
 pub fn create_client() -> Result<MinioClient, Box<dyn std::error::Error + Send + Sync>> {
-    let base_url = "http://localhost:9000".parse::<BaseUrl>()?;
+    let minio_host = env::var("MINIO_URL").unwrap_or_else(|_| "http://whisper-minio:9000".to_string());
+    let base_url = minio_host.parse::<BaseUrl>()?;
     let username = env::var("MINIO_USER").unwrap_or_else(|_| "minioadmin".to_string());
     let password = env::var("MINIO_PASSWORD").unwrap_or_else(|_| "minioadmin".to_string());
 

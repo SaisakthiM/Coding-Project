@@ -33,7 +33,7 @@ export default function App() {
   }, [initAuth])
 
   return (
-    <Router>
+    <Router basename='/whisper/'>
       <Routes>
         <Route
           path="/login"
@@ -41,7 +41,7 @@ export default function App() {
             <AuthRoute>
               <LoginPage />
             </AuthRoute>
-          }
+          }basename='/whisper/'
         />
         <Route
           path="/register"
