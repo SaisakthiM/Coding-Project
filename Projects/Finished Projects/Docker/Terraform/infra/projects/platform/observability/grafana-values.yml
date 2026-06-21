@@ -1,4 +1,6 @@
 grafana:
+  enableServiceLinks: false   # <-- add this; stops k8s injecting JAEGER_AGENT_* env vars
+
   adminPassword: "admin"
 
   grafana.ini:
@@ -11,10 +13,6 @@ grafana:
     runAsGroup: 472
     fsGroup: 472
 
-  # FIX: removed sidecar.securityContext — forcing uid 472 on the
-  # k8s-sidecar image causes CrashLoopBackOff because that image
-  # runs as root by default and breaks on non-root uid.
-
   ingress:
     enabled: false
 
@@ -26,7 +24,6 @@ grafana:
       access: proxy
       jsonData:
         timeInterval: 15s
-        # POST is required for long PromQL queries — GET has URL length limits
         httpMethod: POST
 
     - name: Loki
@@ -74,8 +71,6 @@ grafana:
     - name: Jaeger
       type: jaeger
       uid: jaeger
-      # FIX: was jaeger-all-in-one.monitoring — that service does not exist.
-      # The chart creates a single service named "jaeger".
       url: http://jaeger.monitoring.svc.cluster.local:16686
       access: proxy
       jsonData:
