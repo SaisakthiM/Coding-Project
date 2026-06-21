@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-redis
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: registry-1.docker.io/bitnamicharts
+    chart: redis
+    targetRevision: 20.6.1 # TODO: confirm against `helm search repo` (OCI: oci://registry-1.docker.io/bitnamicharts/redis) and pin deliberately
+    helm:
+      values: |
+        architecture: standalone
+        auth:
+          existingSecret: redis-auth-secret
+          existingSecretPasswordKey: REDIS_PASSWORD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+# OCI helm repos generally need to be registered with ArgoCD first
+# (Settings > Repositories > Connect Repo, type=helm, enableOCI=true,
+# URL=registry-1.docker.io/bitnamicharts) -- a plain Application spec
+# pointing at an unregistered OCI repo will fail to resolve the chart.
+#
+# This is the Bitnami Redis used by the observability stack -- not the same
+# Redis as the social-media app's raw `redis` Deployment in
+# gitops/social-media/raw/16-redis-deployment.yaml. They're two unrelated
+# instances that happen to share a namespace; service names don't collide
+# (this one creates "observability-redis-master", not "redis"), but it's
+# worth knowing both exist.
+#
+# redis-auth-secret is created directly by Terraform (environments/prod-infra),
+# not by ArgoCD -- same reasoning as the social-media secrets.
+#
+# Original Terraform also hashed a redis-values.yml file via set_sensitive
+# purely to force a redeploy when that file changed; that file's contents
+# were never actually loaded as Helm values, and the trick isn't needed
+# here since ArgoCD already re-syncs on any git change to this file.
