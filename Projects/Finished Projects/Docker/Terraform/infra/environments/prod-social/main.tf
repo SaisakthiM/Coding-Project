@@ -288,7 +288,7 @@ resource "kubectl_manifest" "app_of_apps_social" {
       source:
         repoURL: ${var.gitops_repo_url}
         targetRevision: HEAD
-        path: infra/gitops/social-media/apps
+        path: Projects/Finished Projects/Docker/Terraform/infra/gitops/social-media/apps
         directory:
           recurse: false
       destination:

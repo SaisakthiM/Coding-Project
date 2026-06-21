@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: git@github.com:SaisakthiM/Coding-Project.git # e.g. git@github.com:you/your-infra-repo.git
     targetRevision: HEAD
-    path: infra/gitops/social-media/raw
+    path: Projects/Finished Projects/Docker/Terraform/infra/gitops/social-media/raw
   destination:
     server: https://kubernetes.default.svc
     namespace: default
