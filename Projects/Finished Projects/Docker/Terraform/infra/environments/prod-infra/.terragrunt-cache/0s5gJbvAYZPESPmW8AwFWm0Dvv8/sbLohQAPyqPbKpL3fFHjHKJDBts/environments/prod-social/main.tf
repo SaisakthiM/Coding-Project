@@ -144,7 +144,7 @@ resource "null_resource" "kind_images" {
       cd ~/.cache/
       # Cassandra
       docker pull --platform=linux/amd64 cassandra:5.0
-      docker save cassandra:5.0-amd64 -o cassandra.tar
+      docker save cassandra:5.0 -o cassandra.tar
       docker cp cassandra.tar social-media-control-plane:/cassandra.tar
       docker cp cassandra.tar social-media-worker:/cassandra.tar
       docker cp cassandra.tar social-media-worker2:/cassandra.tar

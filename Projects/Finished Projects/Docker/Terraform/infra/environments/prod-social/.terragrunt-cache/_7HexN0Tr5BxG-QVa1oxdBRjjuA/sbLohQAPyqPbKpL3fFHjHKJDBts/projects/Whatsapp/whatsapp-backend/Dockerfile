@@ -30,8 +30,14 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=builder /app/target/release/whatsapp-backend .
 COPY --from=builder /usr/local/cargo/bin/sqlx .
-COPY migrations/ ./migrations/  
-COPY .env .
+COPY migrations/ ./migrations/
+RUN printf '%s\n' \
+    "DATABASE_URL=postgresql://saisakthi:saisakthi2008@localhost:5432/chat" \
+    "DATABASE_TEST_URL=postgresql://saisakthi:saisakthi2008@localhost:5432/chat_test" \
+    "JWT_SECRET=saisakthi2008" \
+    "MINIO_USERNAME=minioadmin" \
+    "MINIO_PASSWORD=minioadmin" \
+    > .env
 
 EXPOSE 8000
 COPY entrypoint.sh .

@@ -7,7 +7,12 @@ WORKDIR /app
 # Copy pom and wrapper first for caching
 COPY pom.xml .
 COPY mvnw .
-COPY .mvn .mvn
+RUN mkdir -p .mvn/wrapper
+RUN cat <<EOF > /app/.mvn/wrapper/maven-wrapper.properties
+wrapperVersion=3.3.4
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.11/apache-maven-3.9.11-bin.zip
+EOF
 
 # Download dependencies offline
 RUN chmod +x mvnw && ./mvnw dependency:go-offline
