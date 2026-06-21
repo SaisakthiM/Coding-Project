@@ -209,6 +209,27 @@ resource "helm_release" "argocd" {
   wait             = true
   timeout          = 300
 }
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "kind-social-media"
+}
+
+resource "kubernetes_secret_v1" "gitops_repo_credentials" {
+  depends_on = [helm_release.argocd]
+  metadata {
+    name      = "coding-project-repo"
+    namespace = "argocd"
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+  data = {
+    type          = "git"
+    url           = "git@github.com:SaisakthiM/Coding-Project.git"
+    sshPrivateKey = var.gitops_repo_ssh_key
+  }
+}
+
 
 # ---------------------------------------------------------------------------
 # Credentials that stay OUT of git. The gitops-managed manifests

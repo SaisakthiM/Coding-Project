@@ -17,3 +17,8 @@ variable "gitops_repo_url" {
   type        = string
   default     = "https://github.com/SaisakthiM/Coding-Project"
 }
+
+variable "gitops_repo_ssh_key" {
+  type      = string
+  sensitive = true
+}

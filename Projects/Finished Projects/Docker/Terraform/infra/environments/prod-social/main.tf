@@ -208,6 +208,12 @@ resource "helm_release" "argocd" {
   create_namespace = true
   wait             = true
   timeout          = 300
+  set =  [
+    {
+      name =  "repoServer.extraArgs[0]"
+      value = "--allow-oob-symlinks"
+    }
+  ]
 }
 provider "kubernetes" {
   config_path    = "~/.kube/config"
