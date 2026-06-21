@@ -22,7 +22,7 @@ spec:
               resources:
                 requests: { cpu: 200m, memory: 512Mi }
                 limits: { cpu: "1000m", memory: 2Gi }
-    - repoURL: <YOUR_GIT_REPO_URL> # same monorepo as the other sources below
+    - repoURL: git@github.com:SaisakthiM/Coding-Project.git # same monorepo as the other sources below
       targetRevision: HEAD
       ref: values
   destination:

@@ -1,7 +1,0 @@
-django
-whitenoise
-gunicorn
-pillow 
-opentelemetry-distro
-opentelemetry-exporter-otlp
-django-prometheus

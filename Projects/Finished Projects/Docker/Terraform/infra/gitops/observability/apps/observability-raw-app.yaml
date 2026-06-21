@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: <YOUR_GIT_REPO_URL>
+    repoURL: git@github.com:SaisakthiM/Coding-Project.git
     targetRevision: HEAD
     path: "Projects/Finished Projects/Docker/Terraform/infra/gitops/observability/raw"
   destination:

@@ -14,7 +14,7 @@ spec:
       helm:
         valueFiles:
           - $values/Projects/Finished Projects/Docker/Terraform/infra/projects/platform/observability/otel-collector-config.yml
-    - repoURL: <YOUR_GIT_REPO_URL>
+    - repoURL: git@github.com:SaisakthiM/Coding-Project.git
       targetRevision: HEAD
       ref: values
   destination:

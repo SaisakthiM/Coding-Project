@@ -42,11 +42,11 @@ It reads each environment's `dependencies` block and applies in the right
 order automatically. Each environment can also be applied on its own
 (`cd environments/prod-gateway && terragrunt apply`) for routine changes.
 
-**Before your first apply anywhere**, replace `<YOUR_GIT_REPO_URL>` in:
+**Before your first apply anywhere**, replace `git@github.com:SaisakthiM/Coding-Project.git` in:
 - `environments/prod-social/terraform.tfvars` (`gitops_repo_url`)
 - `environments/prod-infra/terraform.tfvars` (`gitops_repo_url`)
 - `gitops/social-media/apps/social-workload-app.yaml`
-- every file under `gitops/observability/apps/` that has a `<YOUR_GIT_REPO_URL>` source
+- every file under `gitops/observability/apps/` that has a `git@github.com:SaisakthiM/Coding-Project.git` source
 
 with wherever you're actually pushing this whole tree. ArgoCD needs to be
 able to clone it.
