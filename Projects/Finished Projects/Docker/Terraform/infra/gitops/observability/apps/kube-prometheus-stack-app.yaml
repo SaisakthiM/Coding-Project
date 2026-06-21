@@ -13,8 +13,8 @@ spec:
       targetRevision: 65.5.1 # TODO: confirm against `helm search repo kube-prometheus-stack --versions` and pin deliberately
       helm:
         valueFiles:
-          - $values/projects/platform/observability/prometheus.yml
-          - $values/projects/platform/observability/grafana-values.yml
+          - $values/Projects/Finished Projects/Docker/Terraform/infra/projects/platform/observability/prometheus.yml
+          - $values/Projects/Finished Projects/Docker/Terraform/infra/projects/platform/observability/grafana-values.yml
         values: |
           prometheus:
             prometheusSpec:

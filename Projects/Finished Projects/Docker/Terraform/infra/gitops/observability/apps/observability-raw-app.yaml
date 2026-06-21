@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: <YOUR_GIT_REPO_URL>
     targetRevision: HEAD
-    path: gitops/observability/raw
+    path: "Projects/Finished Projects/Docker/Terraform/infra/gitops/observability/raw"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
