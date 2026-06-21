@@ -208,6 +208,12 @@ resource "helm_release" "argocd" {
   create_namespace = true
   wait             = true
   timeout          = 300
+  set =  [
+    {
+      name =  "repoServer.extraArgs[0]"
+      value = "--allow-oob-symlinks"
+    }
+  ]
 }
 provider "kubernetes" {
   config_path    = "~/.kube/config"
@@ -282,7 +288,7 @@ resource "kubectl_manifest" "app_of_apps_social" {
       source:
         repoURL: ${var.gitops_repo_url}
         targetRevision: HEAD
-        path: gitops/social-media/apps
+        path: infra/gitops/social-media/apps
         directory:
           recurse: false
       destination:
