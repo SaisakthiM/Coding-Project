@@ -1,5 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
+helm:
+  values: |
+    architecture: standalone
+    image:
+      repository: bitnamilegacy/redis
+    auth:
+      existingSecret: redis-auth-secret
+      existingSecretPasswordKey: redis-password
 metadata:
   name: observability-redis
   namespace: argocd
@@ -26,14 +34,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-helm:
-  values: |
-    architecture: standalone
-    image:
-      repository: bitnamilegacy/redis
-    auth:
-      existingSecret: redis-auth-secret
-      existingSecretPasswordKey: redis-password
+
 
 # OCI helm repos generally need to be registered with ArgoCD first
 # (Settings > Repositories > Connect Repo, type=helm, enableOCI=true,
