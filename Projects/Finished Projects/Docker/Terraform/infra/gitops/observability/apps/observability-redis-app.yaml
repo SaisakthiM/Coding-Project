@@ -5,9 +5,10 @@ helm:
     architecture: standalone
     image:
       repository: bitnamilegacy/redis
+      tag: "8.2.1"   
     auth:
       existingSecret: redis-auth-secret
-      existingSecretPasswordKey: redis-password
+      existingSecretPasswordKey: REDIS_PASSWORD
 metadata:
   name: observability-redis
   namespace: argocd
