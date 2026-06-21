@@ -1128,6 +1128,7 @@ resource "docker_volume" "n8n_data" {
 resource "docker_container" "n8n" {
   name  = "n8n"
   image = "n8nio/n8n:latest"
+  depends_on = [ module.gateway ]
 
   env = [for k, v in var.n8n_env : "${k}=${v}"]
 
