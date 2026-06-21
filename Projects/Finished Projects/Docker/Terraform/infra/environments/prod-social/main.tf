@@ -208,13 +208,58 @@ resource "helm_release" "argocd" {
   create_namespace = true
   wait             = true
   timeout          = 300
-  set =  [
+  set = [
     {
-      name =  "repoServer.extraArgs[0]"
+      name  = "repoServer.extraArgs[0]"
       value = "--allow-oob-symlinks"
+    },
+    {
+      # populates argocd-cmd-params-cm: server.insecure
+      # the \\. escapes the literal dot so Helm doesn't try to nest it
+      name  = "configs.params.server\\.insecure"
+      value = "true"
+    },
+    {
+      # populates argocd-cmd-params-cm: server.rootpath
+      name  = "configs.params.server\\.rootpath"
+      value = "/argocd"
     }
   ]
 }
+
+resource "kubernetes_ingress_v1" "argocd_server" {
+  depends_on = [helm_release.argocd]
+
+  metadata {
+    name      = "argocd-server-ingress"
+    namespace = "argocd"
+    annotations = {
+      "nginx.ingress.kubernetes.io/backend-protocol" = "HTTP"
+      "nginx.ingress.kubernetes.io/ssl-redirect"     = "false"
+    }
+  }
+
+  spec {
+    ingress_class_name = "nginx"
+    rule {
+      http {
+        path {
+          path      = "/argocd"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "argocd-server"
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 provider "kubernetes" {
   config_path    = "~/.kube/config"
   config_context = "kind-social-media"
@@ -235,6 +280,7 @@ resource "kubernetes_secret_v1" "gitops_repo_credentials" {
     sshPrivateKey = var.gitops_repo_ssh_key
   }
 }
+
 
 
 # ---------------------------------------------------------------------------
