@@ -35,7 +35,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - ServerSideApply=true
 
 # Original Terraform had `lifecycle { ignore_changes = [values] }` to stop
 # every `terraform apply` from re-triggering an upgrade. That problem goes
