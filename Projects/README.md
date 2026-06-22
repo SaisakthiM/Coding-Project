@@ -560,6 +560,7 @@ Terraform
 - Frontend containers marked `must_run = false` / `restart = no` are one-shot build containers — they copy compiled static assets into a named volume and exit. This is expected behaviour.
 - The observability stack (Prometheus, Grafana, Loki, Tempo, Promtail, Jaeger, OTel Collector) is **live**, ArgoCD-managed, and reachable at `/grafana/`, `/jaeger/`, and `/otel/` — no longer commented out.
 - Helm chart versions in `gitops/*/apps/*.yaml` are placeholders pinned at whatever was current when this was migrated off Terraform's `helm_release` — run `helm search repo <chart> --versions` and pin deliberately before relying on any of them.
+- You can also run this in a domain by setting up a cloudflare tunnel. That's how I usually host it, in my domain saisakthi.qzz.io 
 
 ---
 
