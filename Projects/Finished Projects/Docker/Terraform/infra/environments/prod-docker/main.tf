@@ -474,6 +474,7 @@ resource "docker_container" "quiz_frontend_build" {
   }
 }
 
+/*
 resource "docker_image" "compiler_db" {
   name         = "online_compiler_db:latest"
   keep_locally = true
@@ -548,6 +549,8 @@ module "compiler_server" {
 
   depends_on = [docker_container.compiler_db]
 }
+
+ */
 
 module "video_backend" {
   source        = "../../modules/docker_app"
