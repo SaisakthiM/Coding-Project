@@ -28,6 +28,15 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
+  ignoreDifferences:
+    # ArgoCD's bundled K8s schema doesn't yet know this StatefulSet status
+    # field (added in newer K8s than ArgoCD's vendored OpenAPI schema covers)
+    # — causes a ComparisonError during diff calc, not a real problem.
+    # See: github.com/argoproj/argo-cd/issues/18778, /17358
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /status/terminatingReplicas
   syncPolicy:
     automated:
       prune: true
