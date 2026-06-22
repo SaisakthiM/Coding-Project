@@ -595,7 +595,7 @@ Ans) I know Kafka is used for Event-Driven Architecture but I thought it would b
 
 * There is more to learn, the world of CS is vast and updates fast, every second a breaking changes arrives and breaks your brain. Keep learning and don't give up
 
-* And there is a thing called documentation, which in my experience is a hell to write but I know the importance because future me will stare at present me and tell "What the hell is this". sorry future me, even after doing this big project, i can't write documentation RIP future me
+* And there is a thing called documentation, which in my experience is a hell to write but I know the importance because future me will stare at present me and tell "What the hell is this". Sorry Future Me, even after doing this big project, I can't write documentation R.I.P Future Me
 
 
 ---
