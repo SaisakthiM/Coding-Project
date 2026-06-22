@@ -10,7 +10,7 @@ spec:
   sources:
     - repoURL: https://grafana.github.io/helm-charts
       chart: tempo
-      targetRevision: 1.16.2 # TODO: confirm against `helm search repo tempo --versions` and pin deliberately
+      targetRevision: 2.9.0 # TODO: confirm against `helm search repo tempo --versions` and pin deliberately
       helm:
         valueFiles:
           - $values/Projects/Finished Projects/Docker/Terraform/infra/projects/platform/observability/tempo-config.yml
