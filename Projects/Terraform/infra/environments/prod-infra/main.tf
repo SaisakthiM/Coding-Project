@@ -238,6 +238,90 @@ resource "docker_container" "jenkins_agent" {
 }
 
 # ---------------------------------------------------------------------------
+# Atlantis -- PR-gated terraform/terragrunt plan+apply.
+#
+# Has to run on this same box: it needs the literal docker socket path
+# prod-gateway/prod-docker's "docker" provider hardcodes
+# (/home/saisakthi/.docker/desktop/docker.sock), and ~/.kube/config with the
+# kind-social-media context that prod-social/prod-infra's kubectl/helm/
+# kubernetes providers read. Neither is reachable from a remote runner.
+#
+# BOOTSTRAP NOTE: this block itself has to go through one manual
+# `terragrunt apply` from your terminal before Atlantis exists to apply
+# anything -- same chicken-and-egg as helm_release.argocd in prod-social.
+# Every prod-infra change AFTER that first apply can go through a PR.
+# ---------------------------------------------------------------------------
+resource "docker_volume" "atlantis_data" { name = "gateway_atlantis-data" }
+
+resource "docker_image" "atlantis" {
+  name         = "atlantis-terragrunt:latest"
+  keep_locally = true
+  build {
+    context    = abspath("${path.module}/atlantis")
+    dockerfile = "Dockerfile"
+  }
+  triggers = {
+    dir_sha = sha256(join("", [
+      for f in fileset("${path.module}/atlantis", "**") :
+      filesha256("${path.module}/atlantis/${f}")
+    ]))
+  }
+}
+
+resource "docker_container" "atlantis" {
+  name    = "atlantis"
+  image   = docker_image.atlantis.image_id
+  restart = "unless-stopped"
+
+  # Has to be root (or a uid that can read them) to use the bind-mounted
+  # docker.sock and ~/.kube/config below -- same tradeoff jenkins_agent
+  # already makes for its own docker.sock mount above.
+  user = "0:0"
+
+  env = [
+    "ATLANTIS_GH_USER=${var.atlantis_gh_user}",
+    "ATLANTIS_GH_TOKEN=${var.atlantis_gh_token}",
+    "ATLANTIS_GH_WEBHOOK_SECRET=${var.atlantis_gh_webhook_secret}",
+    "ATLANTIS_REPO_ALLOWLIST=github.com/SaisakthiM/Coding-Project",
+    "ATLANTIS_PORT=4141",
+    "ATLANTIS_ATLANTIS_URL=https://${var.domain}/atlantis",
+    "ATLANTIS_DATA_DIR=/atlantis-data",
+    "ATLANTIS_REPO_CONFIG=/etc/atlantis/repos.yaml",
+    # "~" in prod-social/prod-infra's provider config_path blocks resolves
+    # against this -- has to match where the kubeconfig volume below lands.
+    "HOME=/home/saisakthi",
+  ]
+
+  volumes {
+    volume_name    = docker_volume.atlantis_data.name
+    container_path = "/atlantis-data"
+  }
+  volumes {
+    host_path      = abspath("${path.module}/atlantis/repos.yaml")
+    container_path = "/etc/atlantis/repos.yaml"
+    read_only      = true
+  }
+  # Identical absolute path inside the container as the host, on purpose --
+  # the "docker" provider's host = "unix:///home/saisakthi/..." string gets
+  # evaluated wherever Terraform itself is running, i.e. inside THIS
+  # container once Atlantis applies anything. It has to find a real socket
+  # at that exact path.
+  volumes {
+    host_path      = "/home/saisakthi/.docker/desktop/docker.sock"
+    container_path = "/home/saisakthi/.docker/desktop/docker.sock"
+  }
+  # Same idea for the kind-social-media kubeconfig context.
+  volumes {
+    host_path      = "/home/saisakthi/.kube"
+    container_path = "/home/saisakthi/.kube"
+  }
+
+  networks_advanced {
+    name = "gateway-net"
+  }
+}
+
+# ---------------------------------------------------------------------------
 # Credential kept out of git, referenced by gitops/observability/apps/
 # observability-redis-app.yaml via auth.existingSecret.
 # ---------------------------------------------------------------------------

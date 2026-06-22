@@ -29,3 +29,21 @@ variable "gitops_repo_url" {
   type        = string
   default     = "git@github.com:SaisakthiM/Coding-Project.git"
 }
+
+# ─── Atlantis ───────────────────────────────────────────────
+variable "atlantis_gh_user" {
+  description = "GitHub username Atlantis authenticates and comments as."
+  type        = string
+}
+
+variable "atlantis_gh_token" {
+  description = "Personal access token for atlantis_gh_user. Needs 'repo' scope (or 'public_repo' if Coding-Project is public) so Atlantis can read PR status, post comments, and set commit statuses."
+  type        = string
+  sensitive   = true
+}
+
+variable "atlantis_gh_webhook_secret" {
+  description = "Shared secret Atlantis uses to verify GitHub webhook payloads are genuinely from GitHub. Generate with `openssl rand -hex 32`; the exact same string has to be pasted into the webhook's 'Secret' field in GitHub's repo settings."
+  type        = string
+  sensitive   = true
+}
