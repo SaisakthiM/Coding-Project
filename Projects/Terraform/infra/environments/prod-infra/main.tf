@@ -307,8 +307,9 @@ resource "docker_container" "atlantis" {
   # container once Atlantis applies anything. It has to find a real socket
   # at that exact path.
   volumes {
-    host_path      = "/home/saisakthi/.docker/desktop/docker.sock"
-    container_path = "/home/saisakthi/.docker/desktop/docker.sock"
+    host_path      = "/var/run/docker.sock"   # ← this, not the Desktop socket path
+    container_path = "/var/run/docker.sock"
+    read_only      = false
   }
   # Same idea for the kind-social-media kubeconfig context.
   volumes {

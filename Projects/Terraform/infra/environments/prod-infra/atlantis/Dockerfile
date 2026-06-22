@@ -20,7 +20,7 @@ FROM ghcr.io/runatlantis/atlantis:${ATLANTIS_VERSION}
 
 USER root
 
-ARG TERRAGRUNT_VERSION=v1.1.0
+ARG TERRAGRUNT_VERSION=v1.0.8
 # TODO: check https://github.com/gruntwork-io/terragrunt/releases for newer
 ARG KIND_VERSION=v0.32.0
 # TODO: check https://github.com/kubernetes-sigs/kind/releases for newer
