@@ -43,6 +43,7 @@ order automatically. Each environment can also be applied on its own
 (`cd environments/prod-gateway && terragrunt apply`) for routine changes.
 
 **Before your first apply anywhere**, replace `git@github.com:SaisakthiM/Coding-Project.git` in:
+
 - `environments/prod-social/terraform.tfvars` (`gitops_repo_url`)
 - `environments/prod-infra/terraform.tfvars` (`gitops_repo_url`)
 - `gitops/social-media/apps/social-workload-app.yaml`
@@ -59,7 +60,7 @@ able to clone it.
   string, never by a `docker_network.gateway_net.name` reference, since
   that resource doesn't exist in their state.
 - **prod-docker** owns every actual app stack and all their volumes,
-  *except* the gateway's own `intro`/`record` landing-page volumes (gateway
+  _except_ the gateway's own `intro`/`record` landing-page volumes (gateway
   produces and consumes those itself, so they stayed with gateway).
 - **prod-social** owns the kind cluster, the social-media app's build
   images, and ArgoCD itself. All the raw Kubernetes objects that used to be
@@ -73,7 +74,7 @@ able to clone it.
   (otel-gateway, node-exporter, n8n, jenkins) plus one Application object
   pointing ArgoCD at `gitops/observability/apps/`. Same Secret pattern for
   the observability Redis's password.
-- **prod-manage** is just the one resource that's *actually* about two
+- **prod-manage** is just the one resource that's _actually_ about two
   other environments at once: connecting the gateway container to the kind
   cluster's docker network. Nothing else needed a dedicated shared
   environment -- an earlier draft of this plan put the kind cluster +
@@ -83,7 +84,7 @@ able to clone it.
 ## ArgoCD app-of-apps
 
 Each of `prod-social` / `prod-infra` creates exactly one Terraform-managed
-`Application` (the "app-of-apps"), which points at a folder of *plain YAML*
+`Application` (the "app-of-apps"), which points at a folder of _plain YAML_
 child `Application` objects:
 
 - `gitops/social-media/apps/`: `ingress-nginx-app.yaml` (helm chart, values
@@ -96,7 +97,7 @@ child `Application` objects:
   `kubectl_manifest` objects (otel nodeport, jaeger config, ingresses).
 
 Several of those use ArgoCD's **multi-source** Application pattern
-(`sources:` with a second entry and `ref: values`) to pull the *existing*
+(`sources:` with a second entry and `ref: values`) to pull the _existing_
 external Helm values files (`prometheus.yml`, `loki-config.yml`,
 `tempo-config.yml`, etc.) straight from `projects/platform/observability/`
 in your repo, exactly where the original `local.obs_path` already pointed.
@@ -114,11 +115,11 @@ clean way for a plain git-synced manifest to read a Terraform variable.
 
 ## Known limitations / things to revisit
 
-- **Chart versions are placeholders.** None of the original `helm_release`
+- **Chart versions could change.** Most of the original `helm_release`
   blocks pinned a version (Terraform just installed "whatever's latest" at
   apply time), and ArgoCD's Helm source type requires an explicit
   `targetRevision`. Every `gitops/*/apps/*.yaml` has a plausible-but-
-  unverified version with a `# TODO` comment -- run
+  unverified version with a `# TODO` comment -- run, change if necessary
   `helm search repo <chart> --versions` and pin deliberately before you
   rely on any of these.
 - **Some `depends_on` chains are gone for real, not just relocated.** A few
@@ -159,7 +160,7 @@ clean way for a plain git-synced manifest to read a Terraform variable.
 - `main.tf.bak`, all `terraform.tfstate*` files, `.terraform/` -- not useful,
   and new environments start with fresh state anyway.
 - The top-level `nginx.conf` -- stale, superseded by `nginx/default.conf`
-  (which *did* get carried forward, into `prod-gateway/nginx/default.conf`).
+  (which _did_ get carried forward, into `prod-gateway/nginx/default.conf`).
 - `secret-file` -- a single unreferenced hash, not used by any `.tf` file in
   the original project. If something outside Terraform depends on it,
   it'll need to be reintroduced manually.
