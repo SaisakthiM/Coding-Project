@@ -302,6 +302,7 @@ resource "docker_container" "atlantis" {
   name    = "atlantis"
   image   = docker_image.atlantis.image_id
   restart = "unless-stopped"
+  depends_on = [null_resource.atlantis_ssh_key]
 
   # Has to be root (or a uid that can read them) to use the bind-mounted
   # docker.sock and ~/.kube/config below -- same tradeoff jenkins_agent
@@ -333,13 +334,8 @@ resource "docker_container" "atlantis" {
   }
 
   volumes {
-    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519")
-    container_path = "/root/.ssh/id_ed25519"
-    read_only      = true
-  }
-  volumes {
-    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519.pub")
-    container_path = "/root/.ssh/id_ed25519.pub"
+    host_path      = "/home/saisakthi/.atlantis-ssh"
+    container_path = "/root/.ssh"
     read_only      = true
   }
   # Identical absolute path inside the container as the host, on purpose --
