@@ -399,6 +399,17 @@ module "whisper_backend" {
   
 }
 
+resource "null_resource" "connect_minio" {  
+
+  depends_on = [ docker_container.whisper_minio ]
+    provisioner "local-exec" {
+      command = <<-EOT
+        docker network connect gateway-net whisper-minio
+        docker network connect gateway-net gateway_whisper-pgdata 
+      EOT
+    }
+}
+
 resource "docker_container" "whisper_frontend_build" {
   name                  = "whisper-frontend-build"
   image                 = docker_image.whisper_frontend.name
