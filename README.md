@@ -79,9 +79,4 @@ Coding-Project/
 
 *Open to backend engineering internships and open-source collaborations.*
 
--- 
 
-## Authors 
-
-**SaisakthiM**
-**saisakthi-M**
