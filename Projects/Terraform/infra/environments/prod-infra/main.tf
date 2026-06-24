@@ -270,6 +270,34 @@ resource "docker_image" "atlantis" {
   }
 }
 
+resource "null_resource" "atlantis_ssh_key" {
+  triggers = {
+    always = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      mkdir -p /home/saisakthi/.atlantis-ssh
+      chmod 700 /home/saisakthi/.atlantis-ssh
+
+      # generate key if it doesn't already exist
+      if [ ! -f /home/saisakthi/.atlantis-ssh/id_ed25519 ]; then
+        ssh-keygen -t ed25519 -f /home/saisakthi/.atlantis-ssh/id_ed25519 -N "" -C "atlantis@docker"
+      fi
+
+      chmod 600 /home/saisakthi/.atlantis-ssh/id_ed25519
+      chmod 644 /home/saisakthi/.atlantis-ssh/id_ed25519.pub
+
+      # add to authorized_keys if not already present
+      PUBKEY=$(cat /home/saisakthi/.atlantis-ssh/id_ed25519.pub)
+      if ! grep -qF "$PUBKEY" /home/saisakthi/.ssh/authorized_keys 2>/dev/null; then
+        echo "$PUBKEY" >> /home/saisakthi/.ssh/authorized_keys
+        chmod 600 /home/saisakthi/.ssh/authorized_keys
+      fi
+    EOT
+  }
+}
+
 resource "docker_container" "atlantis" {
   name    = "atlantis"
   image   = docker_image.atlantis.image_id
