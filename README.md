@@ -11,7 +11,7 @@ A self-directed learning journey in software engineering — 2000+ files spannin
 
 ## About
 
-17-year-old self-taught developer focused on backend systems, container infrastructure, and distributed computing. Emphasis on understanding underlying mechanisms, not just surface-level usage.
+3 years self-taught developer focused on backend systems, container infrastructure, and distributed computing. Emphasis on understanding underlying mechanisms, not just surface-level usage.
 
 **2 merged open-source PRs** (FastAPI ecosystem, Matplotlib documentation)
 
