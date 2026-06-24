@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {}
+    "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {}
   },
   "projects": {
-    "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {
+    "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
+        "projectUniqueName": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
         "projectName": "Project 1",
-        "projectPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
+        "projectPath": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
         "packagesPath": "/home/saisakthi/.nuget/packages/",
-        "outputPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/",
+        "outputPath": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/saisakthi/.nuget/NuGet/NuGet.Config"
