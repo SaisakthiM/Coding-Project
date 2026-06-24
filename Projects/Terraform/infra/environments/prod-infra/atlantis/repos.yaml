@@ -1,6 +1,6 @@
 repos:
   - id: github.com/SaisakthiM/Coding-Project
-    repo_config_file: "infra/projects/atlantis.yaml"
+    repo_config_file: "Projects/Terraform/infra/atlantis.yaml"
     allowed_overrides: [apply_requirements, workflow]
     allow_custom_workflows: true
 
