@@ -268,10 +268,39 @@ resource "docker_image" "atlantis" {
   }
 }
 
+resource "null_resource" "atlantis_ssh_key" {
+  triggers = {
+    always = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      mkdir -p /home/saisakthi/.atlantis-ssh
+      chmod 700 /home/saisakthi/.atlantis-ssh
+
+      # generate key if it doesn't already exist
+      if [ ! -f /home/saisakthi/.atlantis-ssh/id_ed25519 ]; then
+        ssh-keygen -t ed25519 -f /home/saisakthi/.atlantis-ssh/id_ed25519 -N "" -C "atlantis@docker"
+      fi
+
+      chmod 600 /home/saisakthi/.atlantis-ssh/id_ed25519
+      chmod 644 /home/saisakthi/.atlantis-ssh/id_ed25519.pub
+
+      # add to authorized_keys if not already present
+      PUBKEY=$(cat /home/saisakthi/.atlantis-ssh/id_ed25519.pub)
+      if ! grep -qF "$PUBKEY" /home/saisakthi/.ssh/authorized_keys 2>/dev/null; then
+        echo "$PUBKEY" >> /home/saisakthi/.ssh/authorized_keys
+        chmod 600 /home/saisakthi/.ssh/authorized_keys
+      fi
+    EOT
+  }
+}
+
 resource "docker_container" "atlantis" {
   name    = "atlantis"
   image   = docker_image.atlantis.image_id
   restart = "unless-stopped"
+  depends_on = [null_resource.atlantis_ssh_key]
 
   # Has to be root (or a uid that can read them) to use the bind-mounted
   # docker.sock and ~/.kube/config below -- same tradeoff jenkins_agent
@@ -303,13 +332,8 @@ resource "docker_container" "atlantis" {
   }
 
   volumes {
-    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519")
-    container_path = "/root/.ssh/id_ed25519"
-    read_only      = true
-  }
-  volumes {
-    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519.pub")
-    container_path = "/root/.ssh/id_ed25519.pub"
+    host_path      = "/home/saisakthi/.atlantis-ssh"
+    container_path = "/root/.ssh"
     read_only      = true
   }
   # Identical absolute path inside the container as the host, on purpose --
