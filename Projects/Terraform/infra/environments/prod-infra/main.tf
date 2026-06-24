@@ -303,6 +303,17 @@ resource "docker_container" "atlantis" {
     container_path = "/etc/atlantis/repos.yaml"
     read_only      = true
   }
+
+  volumes {
+    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519")
+    container_path = "/root/.ssh/id_ed25519"
+    read_only      = true
+  }
+  volumes {
+    host_path      = abspath("${path.module}/atlantis/ssh/id_ed25519.pub")
+    container_path = "/root/.ssh/id_ed25519.pub"
+    read_only      = true
+  }
   # Identical absolute path inside the container as the host, on purpose --
   # the "docker" provider's host = "unix:///home/saisakthi/..." string gets
   # evaluated wherever Terraform itself is running, i.e. inside THIS
