@@ -10,8 +10,6 @@ terraform {
   }
 }
 
-
-
 provider "docker" {
   host = "unix:///home/saisakthi/.docker/desktop/docker.sock"
 }
