@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "docker" {
-  host = "unix:///home/saisakthi/.docker/desktop/docker.sock"
+  host = "unix:///var/run/docker.sock"
 }
 
 # ---------------------------------------------------------------------------
