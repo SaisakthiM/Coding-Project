@@ -11,7 +11,7 @@ terraform {
 }
 
 provider "docker" {
-  host = "unix:///var/run/docker.sock"
+  host = "unix:///home/saisakthi/.docker/desktop/docker.sock"
 }
 
 provider "kubectl" {

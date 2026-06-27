@@ -14,7 +14,8 @@ terraform {
 }
 
 provider "docker" {
-  host = "unix:///var/run/docker.sock"
+  # Was: unix:///home/saisakthi/.docker/desktop/docker.sock  ← default context, no images here
+  host = "unix:///home/saisakthi/.docker/desktop/docker.sock"
 }
 
 provider "kubectl" {
