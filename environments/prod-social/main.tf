@@ -159,6 +159,9 @@ resource "null_resource" "kind_images" {
   }
 
   provisioner "local-exec" {
+    environment = {
+      DOCKER_HOST = "unix:///home/saisakthi/.docker/desktop/docker.sock"
+    }
     command = <<-EOT
       set -e
       cd ~/.cache/
@@ -226,6 +229,10 @@ resource "null_resource" "kind_load_images" {
   }
 
   provisioner "local-exec" {
+    environment = {
+      DOCKER_HOST = "unix:///home/saisakthi/.docker/desktop/docker.sock"
+    }
+
     command = <<-EOT
       set -e
       # Verify all images are actually present before trying to load them.
