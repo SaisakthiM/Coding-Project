@@ -46,6 +46,7 @@ Desktop.ini
 *.swp
 *.tmp
 *.bak
+*.zip
 *.old
 .idea/
 *.iml
