@@ -85,26 +85,6 @@ map("n", "<leader>sw", '<cmd>lua require("spectre").open_visual({select_word=tru
 map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next" })
 map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous" })
 map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete" })
-
--- Tabs
-map("n", "<S-Right>", "<cmd>tabnext<CR>", { desc = "Next tab" })
-map("n", "<S-Left>", "<cmd>tabprevious<CR>", { desc = "Prev tab" })
-map("n", "<C-t>", "<cmd>tab split<CR>", { desc = "New tab" })
-
--- Windows
-
--- Normal mode window navigation
-map("n", "<M-Left>",  "<C-w>h", { desc = "Left" })
-map("n", "<M-Down>",  "<C-w>j", { desc = "Down" })
-map("n", "<M-Up>",    "<C-w>k", { desc = "Up" })
-map("n", "<M-Right>", "<C-w>l", { desc = "Right" })
-
--- Terminal mode window navigation
-map("t", "<M-Left>",  "<C-\\><C-n><C-w>h", { desc = "Left" })
-map("t", "<M-Down>",  "<C-\\><C-n><C-w>j", { desc = "Down" })
-map("t", "<M-Up>",    "<C-\\><C-n><C-w>k", { desc = "Up" })
-map("t", "<M-Right>", "<C-\\><C-n><C-w>l", { desc = "Right" })
-
 -- Exit terminal mode
 map("t", "<Esc><Esc>", "<C-\\><C-n>")
 

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {}
+    "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {}
   },
   "projects": {
-    "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {
+    "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
+        "projectUniqueName": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
         "projectName": "Project 1",
-        "projectPath": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
+        "projectPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/Project 1.csproj",
         "packagesPath": "/home/saisakthi/.nuget/packages/",
-        "outputPath": "/home/saisakthi/tests/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/",
+        "outputPath": "/home/saisakthi/Coding-Project/Programming Languages/Clion C Family/C#/Main/Projects/Project 1/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/saisakthi/.nuget/NuGet/NuGet.Config"
@@ -57,15 +57,11 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[10.0.8, 10.0.8]"
+              "version": "[10.0.9, 10.0.9]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[10.0.8, 10.0.8]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[10.0.8, 10.0.8]"
+              "version": "[10.0.9, 10.0.9]"
             }
           ],
           "frameworkReferences": {
@@ -73,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.108/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.109/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
