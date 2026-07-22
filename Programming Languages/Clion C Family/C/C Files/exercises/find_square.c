@@ -1,10 +1,11 @@
-#include <cstdlib>
 #include <inttypes.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <dirent.h>
 
 int find() {
     int a;
@@ -158,7 +159,63 @@ void learn() {
     fpt = fopen("output.txt","r");
     fscanf(fpt, "%s", text);
     printf("%s", text);
+
+    FILE *fpt;
+    char text[200];
+    int x;
+    fpt = fopen("output.txt", "r");
+    int size = fread(text, 10, 15, fpt);
+    text[size] = '\0';
+    fscanf(fpt,"%d",&x);
+    printf("%s\n", text);
+    printf("%d",x);
+
+    char text[80];
+    scanf("%s", text);
+    fscanf(stdin, "%s", text);
+    printf("%s", text);
     
+    int i;
+    for (i = 0; i < 5; i++) {
+        printf("i=%d\n", i);
+        sleep(1);
+    }
+
+    FILE *fpt;
+    char byte;
+    long int where, move;
+    if (argc != 2) {
+        printf("Usage: fileseek filename\n");
+        exit(0);
+    }
+    if ((fpt = fopen(argv[1], "r")) == NULL) {
+        printf("Unable to open %s for reading\n", argv[1]);
+        exit(0);
+    }
+    while (1) {
+        where = ftell(fpt);        where is file pointer? 
+        fread(&byte, 1, 1, fpt);   moves fpt ahead one byte 
+        fseek(fpt, -1, SEEK_CUR);  back up one byte 
+        printf("Byte %d: %d (%c)\n", where, byte, byte);
+        printf("Enter #bytes (+ or -) to move, or 0 to quit: ");
+        scanf("%d", &move);
+        if (move == 0)
+        break;
+        fseek(fpt, move, SEEK_CUR);  move to desired byte 
+    }
+    fclose(fpt);
+
+    DIR *dpt;
+    struct dirent *entry;
+    dpt = opendir(".");
+    while (1) {
+        entry = readdir(dpt);
+        if (entry == NULL) {
+            break;
+        }
+        printf("%s\n", entry->d_name);
+    }
+    closedir(dpt);
     */
 }
 
@@ -180,8 +237,9 @@ struct Teacher {
     double ppg;
 };
 
-
-
-int main() {
-    
+int main(int argc, char *argv[]) {
+    FILE *fpt;
+    fpt = fopen("/dev/pts/0", "w");
+    fprintf(fpt, "hello world");
+    fclose(fpt);
 }
