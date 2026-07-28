@@ -216,6 +216,11 @@ void learn() {
         printf("%s\n", entry->d_name);
     }
     closedir(dpt);
+
+    FILE *fpt;
+    fpt = fopen("/dev/pts/0", "w");
+    fprintf(fpt, "hello world");
+    fclose(fpt);
     */
 }
 
@@ -239,7 +244,14 @@ struct Teacher {
 
 int main(int argc, char *argv[]) {
     FILE *fpt;
-    fpt = fopen("/dev/pts/0", "w");
-    fprintf(fpt, "hello world");
+    struct frog {
+        float d;
+        int x;
+    } henry;
+    henry.d = 12.73;
+    henry.x = 81925;
+    fpt = fopen("out2", "w");
+    fprintf(fpt, "%7.2f %7d\n", henry.d, henry.x);
+    fwrite(&henry, sizeof(struct frog), 1, fpt);
     fclose(fpt);
 }
