@@ -9,6 +9,9 @@ int list_process() {
         printf("Cannot Open the processes");
         return 1;
     }
+    printf("========================================\n");
+    printf(" RUNNING PROCESSES\n");
+    printf("========================================\n");
     struct dirent *entry;
     while (1) {
         entry = readdir(dpt);
@@ -16,10 +19,11 @@ int list_process() {
             break;
         }
         if (isdigit(entry->d_name[0])) {
-            printf("PID: %s\n", entry->d_name);
+            printf("  PID: %s\n", entry->d_name);
         }
     }
     closedir(dpt);
+    printf("========================================\n");
     return 0;
 }
 
@@ -31,9 +35,13 @@ int proc_status(const char *pid){
         perror(path);
         return 1;
     }
+    printf("========================================\n");
+    printf(" PROCESS STATUS: PID %s\n", pid);
+    printf("========================================\n");
     int ch;
     while ((ch = fgetc(fpt)) != EOF)
         putchar(ch);
     fclose(fpt);
+    printf("========================================\n");
     return 0;
 }

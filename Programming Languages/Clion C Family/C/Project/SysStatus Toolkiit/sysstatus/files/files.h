@@ -11,10 +11,14 @@ int print_file(char *filename) {
         printf("Error: Could not open file.\n");
         return 1;
     }
+    printf("========================================\n");
+    printf(" FILE CONTENTS: %s\n", filename);
+    printf("========================================\n");
     int text;
     while ((text = fgetc(fpt)) != EOF)
         printf("%c", text);
     fclose(fpt);
+    printf("\n========================================\n");
     return 0;
 }
 
@@ -27,6 +31,10 @@ int file_metadata(char *filename) {
         perror("Error opening file");
         return 1;
     }
+
+    printf("========================================\n");
+    printf(" FILE METADATA: %s\n", filename);
+    printf("========================================\n");
 
     // 1. Print File Size (cast to long long for safety)
     printf("File Size:       %lld bytes\n", (long long)file_stat.st_size);
@@ -43,6 +51,8 @@ int file_metadata(char *filename) {
     // 5. Print Last Modification Time
     // ctime() converts the time_t timestamp into a readable string
     printf("Last Modified:   %s", ctime(&file_stat.st_mtime));
+
+    printf("========================================\n");
 
     return 0;
 
