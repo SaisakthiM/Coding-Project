@@ -5,6 +5,9 @@ def Delete_Theatre():
     cur = mycon.cursor()
     th_id = input("Enter the id to delete : ")
     cur.execute(f"delete from cinema where th_id='{th_id}';")
+    print("changes")
     mycon.commit()
     mycon.close()
+
+    
 Delete_Theatre()
