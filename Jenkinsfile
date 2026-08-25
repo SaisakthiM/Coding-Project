@@ -41,6 +41,7 @@ pipeline {
         }
 
         // ── 2. Detect Changes ─────────────────────────────────────
+        
         stage('Detect Changes') {
             steps {
                 script {
