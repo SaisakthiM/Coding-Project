@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $today = Get-Date -Format "yyyy-MM-dd"
 $commitMessage = "Changes made on Date : $today"
 
-Set-Location "C:\Coding Project"
+Set-Location "C:\Coding-Project"
 
 # Detect current branch
 $branch = git branch --show-current
