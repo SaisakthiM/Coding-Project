@@ -28,3 +28,4 @@ resource "null_resource" "gateway_kind_network" {
     command = "docker network disconnect kind gateway || true"
   }
 }
+
