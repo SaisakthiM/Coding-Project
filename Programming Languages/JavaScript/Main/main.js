@@ -13,7 +13,7 @@ const form = document.getElementById("string");
 form.addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent page reload
 
-    const form_data = new FormData(form);
+const form_data = new FormData(form);
     const first_name = form_data.get("first_name");
     const last_name = form_data.get("last_name");
 
