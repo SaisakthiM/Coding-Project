@@ -3,4 +3,4 @@
 	url = https://github.com/mainmatter/100-exercises-to-learn-rust
 [submodule "General Programming Skills/Git/opentelemetry-python"]
 	path = General Programming Skills/Git/opentelemetry-python
-	url = https://github.com/open-telemetry/opentelemetry-python.git
+	url = git@github.com:SaisakthiM/opentelemetry-python.git
