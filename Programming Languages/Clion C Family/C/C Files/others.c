@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdio.h>
-int main(int argc, char *argv[]) {
+aint main(int argc, char *argv[]) {
     int n, i;
     int d2, count;
     double d1;
@@ -22,3 +22,5 @@ int main(int argc, char *argv[]) {
         printf("%d is not prime\n", n);
     }
 }
+
+
