@@ -242,6 +242,8 @@ struct Teacher {
     double ppg;
 };
 
+
+
 int main(int argc, char *argv[]) {
     FILE *fpt;
     struct frog {
