@@ -14,7 +14,7 @@ Download high-confidence matches:
 Also download review/duplicate matches after verifying their APP NO values:
     python download_mark_statements.py --excel "UG CONSORTIUM.xlsx" --out "mark_statements" --download --headed --include-review
 
-The script ignores handwritten numbers and uses the Excel APP NO column.
+The script ignores handwritten numbers and uses the Excel APP NO column. It matches exact name tokens, ignoring word order and compact initial order; it does not use fuzzy matching.
 It regenerates matched_students.csv each run. --include-review allows rows below
 threshold and duplicate-APP-NO rows into the download queue; inspect the report first.
 """
@@ -30,22 +30,18 @@ from pathlib import Path
 from typing import Any
 
 from openpyxl import load_workbook
-from rapidfuzz import fuzz, process
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 URL = "http://209.38.124.171:3000/mark-statement-ug.html"
 
 # Names transcribed from the two provided photographs.
 LIST_NAMES = [
-    "C Saravana Kumar", "Sanjay C", "Sudharshan G T", "Sanjay V",
-    "P Prakash", "Rakesh M", "Sivabalaji G", "Saifudeen Z", "Tharunika S",
-    "Roopakt Raj", "Priyadharshini B S", "Ruthika R", "Swaminathan B",
-    "Sriram P", "Soumiya S", "Tamil Arasi R", "Srija B", "Reena C",
-    "Varshini N", "Sruthi S", "Shruthi J", "S Yershini", "Rekha N",
-    "Rethika J", "Steffi Grace G", "Thusanthini A", "Trinita Barbara M",
-    "Srischnya Angel V", "Sajana H", "Srinivasan M", "Saran K",
-    "T R Sanjay", "Sham Sundar V", "Rejinath B", "Sanjay Mukundhan S",
-    "Yashivanth K", "Sarvesh V", "Tharun Karthik I", "Tamil Arasan S",
+    "Ramya", "Reena", "Rethika", "Rithish", "Rohith Balaji",
+    "Roopak Raj", "Ruthika", "Saifudeen", "Sajana", "Sanjay TR",
+    "Saran", "Sarvesh", "Sham Sundar", "Shruthi J", "Siddhesh",
+    "Srija", "Srikam", "Angel", "Sudharshan G T", "Sujan",
+    "Surya", "Swaminathan", "Tamil Arasan", "Tamil Arasi",
+    "Thaniya", "Varun Aswath", "Yershini",
 ]
 
 
@@ -92,39 +88,50 @@ def read_consortium(path: Path) -> list[dict[str, str]]:
         wb.close()
 
 
-def match_names(names, records, threshold: int):
-    # Keep the first record for each normalized name, as in the original script.
-    choices = {r["excel_name"]: r for r in records}
-    choice_norms = {norm(n): n for n in choices}
-    norm_choices = list(choice_norms.keys())
-    result = []
+def exact_name_key(value: Any) -> tuple[str, ...]:
+    """Canonicalize a name by its words, ignoring word order and initial order.
 
-    for source_name in names:
-        key = norm(source_name)
-        if key in choice_norms:
-            matched, score = choice_norms[key], 100
+    Examples: "Sanjay T R", "T R Sanjay", and "Sanjay TR" share a key.
+    No fuzzy/approximate matches are made.
+    """
+    words = norm(value).split()
+    expanded = []
+    for word in words:
+        # Treat compact two-letter initials (TR, GT, BS, etc.) as two initials.
+        if len(word) == 2 and word.isalpha():
+            expanded.extend(word)
         else:
-            best = process.extractOne(key, norm_choices, scorer=fuzz.ratio)
-            if best:
-                candidate_norm, score, _ = best
-                matched = choice_norms[candidate_norm]
-            else:
-                matched, score = "", 0
+            expanded.append(word)
+    return tuple(sorted(expanded))
 
-        if matched and score >= threshold:
-            rec = choices[matched]
+
+def match_names(names, records, threshold: int = 100):
+    # Exact match only: all name tokens must match, but their order may differ.
+    index: dict[tuple[str, ...], list[dict[str, str]]] = {}
+    for record in records:
+        index.setdefault(exact_name_key(record["excel_name"]), []).append(record)
+
+    result = []
+    for source_name in names:
+        candidates = index.get(exact_name_key(source_name), [])
+        if len(candidates) == 1:
+            rec = candidates[0]
             result.append({
                 "list_name": source_name, "excel_name": rec["excel_name"],
-                "app_no": rec["app_no"], "score": score, "status": "MATCHED",
+                "app_no": rec["app_no"], "score": 100, "status": "MATCHED",
+            })
+        elif len(candidates) > 1:
+            result.append({
+                "list_name": source_name, "excel_name": " | ".join(r["excel_name"] for r in candidates),
+                "app_no": "", "score": 100, "status": "REVIEW / AMBIGUOUS EXACT MATCH",
             })
         else:
             result.append({
-                "list_name": source_name, "excel_name": matched,
-                "app_no": choices[matched]["app_no"] if matched else "",
-                "score": score, "status": "REVIEW / UNMATCHED",
+                "list_name": source_name, "excel_name": "",
+                "app_no": "", "score": 0, "status": "REVIEW / NO EXACT MATCH",
             })
 
-    # Flag repeated APP NO values rather than silently treating them as unique students.
+    # Flag duplicate APP NO values so they cannot silently pass as unique matches.
     seen = set()
     for row in result:
         if row["status"] == "MATCHED":
@@ -227,14 +234,14 @@ def main():
     parser.add_argument("--excel", type=Path, default=Path("UG CONSORTIUM.xlsx"))
     parser.add_argument("--out", type=Path, default=Path("mark_statements"))
     parser.add_argument("--url", default=URL)
-    parser.add_argument("--threshold", type=int, default=90, help="Fuzzy name match threshold (0-100); higher is safer")
+    parser.add_argument("--threshold", type=int, default=90, help="Deprecated; matching is exact apart from word order and initials")
     parser.add_argument("--headed", action="store_true", help="Show the browser window")
     parser.add_argument("--input-selector", help="CSS selector for the application-number field, if auto-detection fails")
     parser.add_argument("--submit-selector", help="CSS selector for the search/submit button, if auto-detection fails")
     parser.add_argument("--download", action="store_true", help="Actually download statements; without this flag only create the matching report")
     parser.add_argument(
         "--include-review", action="store_true",
-        help="Also download REVIEW / UNMATCHED and DUPLICATE APP NO - REVIEW rows (verify APP NOs first)",
+        help="Also download review and duplicate rows (verify APP NOs first)",
     )
     parser.add_argument("--pause", type=float, default=1.0, help="Seconds to wait between requests")
     args = parser.parse_args()
@@ -252,7 +259,7 @@ def main():
 
     eligible_statuses = {"MATCHED"}
     if args.include_review:
-        eligible_statuses.update({"REVIEW / UNMATCHED", "DUPLICATE APP NO - REVIEW"})
+        eligible_statuses.update({"REVIEW / UNMATCHED", "REVIEW / NO EXACT MATCH", "REVIEW / AMBIGUOUS EXACT MATCH", "DUPLICATE APP NO - REVIEW"})
     selected = [r for r in rows if r["status"] in eligible_statuses and r["app_no"]]
     not_selected = [r for r in rows if r not in selected]
 
